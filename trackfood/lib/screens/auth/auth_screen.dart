@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gotrue/gotrue.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../services/supabase_service.dart';
 
@@ -47,7 +46,9 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   Future<void> _handleGoogleSignIn() async {
-    setState(() { _isLoading = true; });
+    setState(() {
+      _isLoading = true;
+    });
     try {
       await Supabase.instance.client.auth.signInWithIdToken(
         provider: OAuthProvider.google,
@@ -57,7 +58,9 @@ class _AuthScreenState extends State<AuthScreen> {
     } catch (e) {
       _showSnackBar('Google Anmeldung fehlgeschlagen: $e', isError: true);
     } finally {
-      setState(() { _isLoading = false; });
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -89,14 +92,16 @@ class _AuthScreenState extends State<AuthScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.only(bottom: 24.0),
-                child: SizedBox(height: 100, child: Image.asset('assets/logo.png', fit: BoxFit.contain)),
+                child: SizedBox(
+                    height: 100,
+                    child: Image.asset('assets/logo.png', fit: BoxFit.contain)),
               ),
               Text(
                 _isLogin ? 'Willkommen zurück!' : 'Erstelle dein Konto',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).primaryColor,
-                ),
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).primaryColor,
+                    ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 30),
@@ -156,7 +161,9 @@ class _AuthScreenState extends State<AuthScreen> {
                   });
                 },
                 child: Text(
-                  _isLogin ? 'Noch kein Konto? Registrieren' : 'Bereits registriert? Login',
+                  _isLogin
+                      ? 'Noch kein Konto? Registrieren'
+                      : 'Bereits registriert? Login',
                   style: TextStyle(color: Theme.of(context).primaryColor),
                 ),
               ),
