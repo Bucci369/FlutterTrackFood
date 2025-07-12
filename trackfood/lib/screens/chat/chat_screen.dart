@@ -7,7 +7,7 @@ import '../../widgets/quick_actions.dart';
 import '../../widgets/typing_indicator.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({Key? key}) : super(key: key);
+  const ChatScreen({super.key});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -95,9 +95,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: ListView.builder(
                   controller: _scrollController,
                   padding: const EdgeInsets.symmetric(vertical: 8),
-                  itemCount: chatProvider.messages.length + 
-                            (chatProvider.isLoading ? 1 : 0) + 
-                            (_showQuickActions ? 1 : 0),
+                  itemCount: chatProvider.messages.length +
+                      (chatProvider.isLoading ? 1 : 0) +
+                      (_showQuickActions ? 1 : 0),
                   itemBuilder: (context, index) {
                     // Quick Actions (shown at the beginning)
                     if (_showQuickActions && index == 0) {
@@ -114,7 +114,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
                     // Adjust index for messages
                     final messageIndex = _showQuickActions ? index - 1 : index;
-                    
+
                     // Loading indicator
                     if (messageIndex >= chatProvider.messages.length) {
                       return const TypingIndicator();

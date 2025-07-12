@@ -10,16 +10,18 @@ class OnboardingNameScreen extends StatefulWidget {
 }
 
 class _OnboardingNameScreenState extends State<OnboardingNameScreen> {
-  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
   String? _error;
 
   void _handleNext() {
-    if (_nameController.text.isEmpty) {
-      setState(() => _error = 'Bitte gib deinen Namen ein.');
+    if (_firstNameController.text.isEmpty || _lastNameController.text.isEmpty) {
+      setState(() => _error = 'Bitte gib Vor- und Nachname ein.');
       return;
     }
-    Provider.of<ProfileProvider>(context, listen: false)
-        .updateField('name', _nameController.text);
+    final provider = Provider.of<ProfileProvider>(context, listen: false);
+    provider.updateField('firstName', _firstNameController.text.trim());
+    provider.updateField('lastName', _lastNameController.text.trim());
     Navigator.of(context).pushNamed('/onboarding/age');
   }
 
@@ -35,9 +37,17 @@ class _OnboardingNameScreenState extends State<OnboardingNameScreen> {
                 style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
             const SizedBox(height: 32),
             TextField(
-              controller: _nameController,
+              controller: _firstNameController,
               decoration: InputDecoration(
-                hintText: 'Name',
+                hintText: 'Vorname',
+                errorText: _error,
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _lastNameController,
+              decoration: InputDecoration(
+                hintText: 'Nachname',
                 errorText: _error,
               ),
             ),

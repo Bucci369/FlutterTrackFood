@@ -384,6 +384,24 @@ class Profile {
   final double heightCm;
   final double weightKg;
   final String activityLevel;
+  /// Ziel des Nutzers. Mögliche Werte laut Supabase (in der Datenbank ENGLISCH gespeichert):
+  /// - 'weight_loss' (Abnehmen)
+  /// - 'weight_gain' (Zunehmen)
+  /// - 'maintain_weight' (Gewicht halten)
+  /// - 'muscle_gain' (Muskelaufbau)
+  ///
+  /// Beispiel für die UI-Übersetzung:
+  ///
+  /// ```dart
+  /// const Map<String, String> goalLabels = {
+  ///   'weight_loss': 'Abnehmen',
+  ///   'weight_gain': 'Zunehmen',
+  ///   'maintain_weight': 'Gewicht halten',
+  ///   'muscle_gain': 'Muskelaufbau',
+  /// };
+  /// ```
+  ///
+  /// In der UI: goalLabels[profile.goal] anzeigen, in Supabase weiterhin englische Werte speichern.
   final String goal;
   // ...weitere Felder nach Bedarf
 

@@ -6,18 +6,19 @@ class ChatBubble extends StatelessWidget {
   final ChatMessage message;
 
   const ChatBubble({
-    Key? key,
+    super.key,
     required this.message,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     final isUser = message.isUser;
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
       child: Row(
-        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isUser) ...[
@@ -97,7 +98,8 @@ class ChatBubble extends StatelessWidget {
                           ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(left: 12, right: 12, bottom: 8),
+                    padding:
+                        const EdgeInsets.only(left: 12, right: 12, bottom: 8),
                     child: Text(
                       _formatTime(message.timestamp),
                       style: TextStyle(
@@ -134,7 +136,7 @@ class ChatBubble extends StatelessWidget {
   String _formatTime(DateTime timestamp) {
     final now = DateTime.now();
     final difference = now.difference(timestamp);
-    
+
     if (difference.inDays > 0) {
       return '${difference.inDays}d';
     } else if (difference.inHours > 0) {

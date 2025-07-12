@@ -20,9 +20,10 @@ class MealCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final totalCalories = entries.fold<double>(0, (sum, entry) => sum + entry.calories);
+    final totalCalories =
+        entries.fold<double>(0, (sum, entry) => sum + entry.calories);
     final progress = totalCalories / recommendedCalories;
-    
+
     return GlassmorphicContainer(
       width: double.infinity,
       height: entries.isEmpty ? 140 : 140 + (entries.length * 50.0),
@@ -116,9 +117,9 @@ class MealCard extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Progress bar
             LinearProgressIndicator(
               value: progress.clamp(0.0, 1.0),
@@ -129,15 +130,15 @@ class MealCard extends StatelessWidget {
               minHeight: 4,
               borderRadius: BorderRadius.circular(2),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Food entries
             if (entries.isEmpty)
               _buildEmptyState()
             else
-              ...entries.take(3).map((entry) => _buildFoodEntry(entry)).toList(),
-              
+              ...entries.take(3).map((entry) => _buildFoodEntry(entry)),
+
             // Show more indicator
             if (entries.length > 3)
               Padding(
@@ -158,7 +159,7 @@ class MealCard extends StatelessWidget {
   }
 
   Widget _buildEmptyState() {
-    return Container(
+    return SizedBox(
       height: 50,
       child: Center(
         child: Text(
@@ -223,22 +224,20 @@ class MealCard extends StatelessWidget {
           ),
         ],
       ),
-    )
-    .animate()
-    .fadeIn(duration: 300.ms)
-    .slideX(begin: 0.3, end: 0);
+    ).animate().fadeIn(duration: 300.ms).slideX(begin: 0.3, end: 0);
   }
 
   void _addFood(BuildContext context) {
     // TODO: Navigate to food selection screen
     // Navigator.of(context).pushNamed('/diary/add', arguments: mealType);
-    
+
     // For now, show a placeholder dialog
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('${mealType.displayName} hinzufügen'),
-        content: const Text('Food-Auswahl wird in der nächsten Version implementiert.'),
+        content: const Text(
+            'Food-Auswahl wird in der nächsten Version implementiert.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),

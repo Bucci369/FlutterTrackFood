@@ -4,6 +4,51 @@ import '../models/profile.dart';
 import '../services/profile_service.dart';
 
 class ProfileProvider extends ChangeNotifier {
+  // Ermöglicht das direkte Setzen einzelner Felder im Profil (für Onboarding)
+  void updateField(String key, dynamic value) {
+    if (_profile == null) {
+      // Falls noch kein Profil existiert, lege ein neues mit minimalen Feldern an
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) return;
+      _profile = Profile(id: user.id);
+    }
+    switch (key) {
+      case 'firstName':
+        _profile = _profile!.copyWith(firstName: value as String?);
+        break;
+      case 'lastName':
+        _profile = _profile!.copyWith(lastName: value as String?);
+        break;
+      case 'age':
+        _profile = _profile!.copyWith(age: value as int?);
+        break;
+      case 'gender':
+        _profile = _profile!.copyWith(gender: value as String?);
+        break;
+      case 'heightCm':
+        _profile = _profile!.copyWith(heightCm: value as double?);
+        break;
+      case 'weightKg':
+        _profile = _profile!.copyWith(weightKg: value as double?);
+        break;
+      case 'activityLevel':
+        _profile = _profile!.copyWith(activityLevel: value as String?);
+        break;
+      case 'goal':
+        _profile = _profile!.copyWith(goal: value as String?);
+        break;
+      case 'dietType':
+        _profile = _profile!.copyWith(dietType: value as String?);
+        break;
+      case 'isGlutenfree':
+        _profile = _profile!.copyWith(isGlutenfree: value as bool?);
+        break;
+      default:
+        break;
+    }
+    notifyListeners();
+  }
+
   final ProfileService _profileService = ProfileService();
   Profile? _profile;
   bool _isLoading = false;

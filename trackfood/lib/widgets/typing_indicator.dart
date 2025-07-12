@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class TypingIndicator extends StatefulWidget {
-  const TypingIndicator({Key? key}) : super(key: key);
+  const TypingIndicator({super.key});
 
   @override
   State<TypingIndicator> createState() => _TypingIndicatorState();
@@ -96,7 +96,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
     final delay = index * 0.2;
     final animationValue = (_animation.value - delay).clamp(0.0, 1.0);
     final opacity = (animationValue * 2).clamp(0.0, 1.0);
-    
+
     return Container(
       width: 8,
       height: 8,

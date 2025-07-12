@@ -5,7 +5,7 @@ import '../../models/profile.dart';
 import '../../widgets/custom_text_field.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -47,7 +47,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _loadProfileData() {
     final profileProvider = context.read<ProfileProvider>();
     final profile = profileProvider.profile;
-    
+
     if (profile != null) {
       _firstNameController.text = profile.firstName ?? '';
       _lastNameController.text = profile.lastName ?? '';
@@ -72,18 +72,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     try {
       final profileProvider = context.read<ProfileProvider>();
-      
+
       await profileProvider.updateBasicInfo(
-        firstName: _firstNameController.text.trim().isEmpty ? null : _firstNameController.text.trim(),
-        lastName: _lastNameController.text.trim().isEmpty ? null : _lastNameController.text.trim(),
-        age: _ageController.text.trim().isEmpty ? null : int.tryParse(_ageController.text),
+        firstName: _firstNameController.text.trim().isEmpty
+            ? null
+            : _firstNameController.text.trim(),
+        lastName: _lastNameController.text.trim().isEmpty
+            ? null
+            : _lastNameController.text.trim(),
+        age: _ageController.text.trim().isEmpty
+            ? null
+            : int.tryParse(_ageController.text),
         gender: _selectedGender,
       );
 
       await profileProvider.updatePhysicalStats(
-        heightCm: _heightController.text.trim().isEmpty ? null : double.tryParse(_heightController.text),
-        weightKg: _weightController.text.trim().isEmpty ? null : double.tryParse(_weightController.text),
-        targetWeightKg: _targetWeightController.text.trim().isEmpty ? null : double.tryParse(_targetWeightController.text),
+        heightCm: _heightController.text.trim().isEmpty
+            ? null
+            : double.tryParse(_heightController.text),
+        weightKg: _weightController.text.trim().isEmpty
+            ? null
+            : double.tryParse(_weightController.text),
+        targetWeightKg: _targetWeightController.text.trim().isEmpty
+            ? null
+            : double.tryParse(_targetWeightController.text),
       );
 
       await profileProvider.updateGoalsAndPreferences(
@@ -219,9 +231,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               labelText: 'Geschlecht',
                             ),
                             items: const [
-                              DropdownMenuItem(value: 'male', child: Text('Männlich')),
-                              DropdownMenuItem(value: 'female', child: Text('Weiblich')),
-                              DropdownMenuItem(value: 'other', child: Text('Divers')),
+                              DropdownMenuItem(
+                                  value: 'male', child: Text('Männlich')),
+                              DropdownMenuItem(
+                                  value: 'female', child: Text('Weiblich')),
+                              DropdownMenuItem(
+                                  value: 'other', child: Text('Divers')),
                             ],
                             onChanged: (value) {
                               setState(() {
@@ -234,9 +249,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 24),
-
                 _buildSection(
                   title: 'Körperliche Daten',
                   children: [
@@ -250,7 +263,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             validator: (value) {
                               if (value?.trim().isEmpty ?? true) return null;
                               final height = double.tryParse(value!);
-                              if (height == null || height < 100 || height > 250) {
+                              if (height == null ||
+                                  height < 100 ||
+                                  height > 250) {
                                 return 'Größe zwischen 100-250cm';
                               }
                               return null;
@@ -266,7 +281,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             validator: (value) {
                               if (value?.trim().isEmpty ?? true) return null;
                               final weight = double.tryParse(value!);
-                              if (weight == null || weight < 30 || weight > 300) {
+                              if (weight == null ||
+                                  weight < 30 ||
+                                  weight > 300) {
                                 return 'Gewicht zwischen 30-300kg';
                               }
                               return null;
@@ -291,9 +308,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 24),
-
                 _buildSection(
                   title: 'Ziele & Aktivität',
                   children: [
@@ -303,10 +318,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         labelText: 'Hauptziel',
                       ),
                       items: const [
-                        DropdownMenuItem(value: 'lose_weight', child: Text('Abnehmen')),
-                        DropdownMenuItem(value: 'maintain_weight', child: Text('Gewicht halten')),
-                        DropdownMenuItem(value: 'gain_weight', child: Text('Zunehmen')),
-                        DropdownMenuItem(value: 'build_muscle', child: Text('Muskeln aufbauen')),
+                        DropdownMenuItem(
+                            value: 'lose_weight', child: Text('Abnehmen')),
+                        DropdownMenuItem(
+                            value: 'maintain_weight',
+                            child: Text('Gewicht halten')),
+                        DropdownMenuItem(
+                            value: 'gain_weight', child: Text('Zunehmen')),
+                        DropdownMenuItem(
+                            value: 'build_muscle',
+                            child: Text('Muskeln aufbauen')),
                       ],
                       onChanged: (value) {
                         setState(() {
@@ -321,11 +342,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         labelText: 'Aktivitätslevel',
                       ),
                       items: const [
-                        DropdownMenuItem(value: 'sedentary', child: Text('Wenig aktiv')),
-                        DropdownMenuItem(value: 'light', child: Text('Leicht aktiv')),
-                        DropdownMenuItem(value: 'moderate', child: Text('Mäßig aktiv')),
-                        DropdownMenuItem(value: 'active', child: Text('Sehr aktiv')),
-                        DropdownMenuItem(value: 'very_active', child: Text('Extrem aktiv')),
+                        DropdownMenuItem(
+                            value: 'sedentary', child: Text('Wenig aktiv')),
+                        DropdownMenuItem(
+                            value: 'light', child: Text('Leicht aktiv')),
+                        DropdownMenuItem(
+                            value: 'moderate', child: Text('Mäßig aktiv')),
+                        DropdownMenuItem(
+                            value: 'active', child: Text('Sehr aktiv')),
+                        DropdownMenuItem(
+                            value: 'very_active', child: Text('Extrem aktiv')),
                       ],
                       onChanged: (value) {
                         setState(() {
@@ -335,9 +361,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 24),
-
                 _buildSection(
                   title: 'Ernährungspräferenzen',
                   children: [
@@ -347,12 +371,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         labelText: 'Ernährungsform',
                       ),
                       items: const [
-                        DropdownMenuItem(value: null, child: Text('Keine Einschränkungen')),
-                        DropdownMenuItem(value: 'vegetarian', child: Text('Vegetarisch')),
+                        DropdownMenuItem(
+                            value: null, child: Text('Keine Einschränkungen')),
+                        DropdownMenuItem(
+                            value: 'vegetarian', child: Text('Vegetarisch')),
                         DropdownMenuItem(value: 'vegan', child: Text('Vegan')),
                         DropdownMenuItem(value: 'keto', child: Text('Ketogen')),
                         DropdownMenuItem(value: 'paleo', child: Text('Paleo')),
-                        DropdownMenuItem(value: 'mediterranean', child: Text('Mediterran')),
+                        DropdownMenuItem(
+                            value: 'mediterranean', child: Text('Mediterran')),
                       ],
                       onChanged: (value) {
                         setState(() {
@@ -373,11 +400,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 24),
-
                 _buildHealthStatsCard(profileProvider.profile!),
-
                 const SizedBox(height: 32),
               ],
             ),
@@ -387,7 +411,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildSection({required String title, required List<Widget> children}) {
+  Widget _buildSection(
+      {required String title, required List<Widget> children}) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -470,7 +495,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Expanded(
                 child: _buildStatItem(
                   'Status',
-                  profile.isOnboardingComplete ? 'Vollständig' : 'Unvollständig',
+                  profile.isOnboardingComplete
+                      ? 'Vollständig'
+                      : 'Unvollständig',
                   '',
                 ),
               ),

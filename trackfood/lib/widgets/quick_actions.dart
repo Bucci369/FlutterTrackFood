@@ -5,10 +5,10 @@ class QuickActions extends StatelessWidget {
   final List<String> actions;
 
   const QuickActions({
-    Key? key,
+    super.key,
     required this.onActionTap,
     required this.actions,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +29,8 @@ class QuickActions extends StatelessWidget {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: actions.map((action) => _buildActionChip(action)).toList(),
+            children:
+                actions.map((action) => _buildActionChip(action)).toList(),
           ),
         ],
       ),

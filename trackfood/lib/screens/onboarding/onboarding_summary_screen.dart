@@ -24,7 +24,6 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
   late AnimationController _backgroundController;
   late AnimationController _chartController;
   bool _isLoading = false;
-  bool _animateChart = false;
 
   @override
   void initState() {
@@ -53,7 +52,6 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
     // Start chart animation after initial elements
     Future.delayed(const Duration(milliseconds: 800), () {
       if (mounted) {
-        setState(() => _animateChart = true);
         _chartController.forward();
       }
     });
@@ -69,22 +67,33 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
 
   String _mapGoalToDatabase(String flutterGoal) {
     switch (flutterGoal) {
-      case 'weight_loss': return 'lose_weight';
-      case 'weight_gain': return 'gain_weight';
-      case 'maintain_weight': return 'maintain_weight';
-      case 'muscle_gain': return 'build_muscle';
-      default: return 'maintain_weight';
+      case 'weight_loss':
+        return 'lose_weight';
+      case 'weight_gain':
+        return 'gain_weight';
+      case 'maintain_weight':
+        return 'maintain_weight';
+      case 'muscle_gain':
+        return 'build_muscle';
+      default:
+        return 'maintain_weight';
     }
   }
 
   String _mapActivityToDatabase(String flutterActivity) {
     switch (flutterActivity) {
-      case 'sedentary': return 'sedentary';
-      case 'lightly_active': return 'lightly_active';
-      case 'moderately_active': return 'moderately_active';
-      case 'very_active': return 'very_active';
-      case 'extremely_active': return 'extra_active';
-      default: return 'moderately_active';
+      case 'sedentary':
+        return 'sedentary';
+      case 'lightly_active':
+        return 'lightly_active';
+      case 'moderately_active':
+        return 'moderately_active';
+      case 'very_active':
+        return 'very_active';
+      case 'extremely_active':
+        return 'extra_active';
+      default:
+        return 'moderately_active';
     }
   }
 
@@ -93,17 +102,19 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
     try {
       final supabaseService = SupabaseService();
       final userId = supabaseService.currentUserId;
-      
+
       if (userId == null) {
         throw Exception('Benutzer nicht angemeldet');
       }
-      
+
       final client = supabaseService.client;
-      
+
       // Map Flutter values to database-compatible values
-      final databaseGoal = _mapGoalToDatabase(profile.goal);
-      final databaseActivity = _mapActivityToDatabase(profile.activityLevel);
-      
+      final databaseGoal =
+          _mapGoalToDatabase(profile.goal ?? 'maintain_weight');
+      final databaseActivity =
+          _mapActivityToDatabase(profile.activityLevel ?? 'moderately_active');
+
       await client.from('profiles').update({
         'onboarding_completed': true,
         'age': profile.age,
@@ -119,7 +130,7 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
             ? profile.name.split(' ').skip(1).join(' ')
             : '',
       }).eq('id', userId);
-      
+
       if (mounted) {
         // The AuthWrapper will automatically show the dashboard when onboarding is completed
         Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
@@ -145,18 +156,20 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
         body: Center(child: CircularProgressIndicator()),
       );
     }
-    final weight = profile.weightKg;
-    final height = profile.heightCm;
-    final targetWeight = profile.goal == 'weight_loss'
+    final weight = profile.weightKg ?? 0.0;
+    final height = profile.heightCm ?? 0.0;
+    final goal = profile.goal ?? 'maintain_weight';
+    final targetWeight = goal == 'weight_loss'
         ? (weight - 5)
-        : profile.goal == 'weight_gain'
+        : goal == 'weight_gain'
             ? (weight + 5)
             : weight;
-    final bmi = weight / ((height / 100) * (height / 100));
-    final progressPercentage = profile.goal == 'weight_loss'
-        ? ((weight - targetWeight) / weight * 100).round()
-        : profile.goal == 'weight_gain'
-            ? ((targetWeight - weight) / weight * 100).round()
+    final bmi = (height > 0) ? weight / ((height / 100) * (height / 100)) : 0.0;
+    final progressPercentage = goal == 'weight_loss'
+        ? ((weight - targetWeight) / (weight == 0 ? 1 : weight) * 100).round()
+        : goal == 'weight_gain'
+            ? ((targetWeight - weight) / (weight == 0 ? 1 : weight) * 100)
+                .round()
             : 0;
 
     return Scaffold(
@@ -264,7 +277,7 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
                       const SizedBox(height: 40),
 
                       // Progress Chart
-                      _buildProgressChart(weight, targetWeight, profile.goal)
+                      _buildProgressChart(weight, targetWeight, goal)
                           .animate()
                           .fadeIn(delay: 800.ms, duration: 800.ms)
                           .scale(
@@ -289,11 +302,11 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
                       const SizedBox(height: 16),
 
                       _buildSummaryCard(
-                        _getGoalTitle(profile.goal),
+                        _getGoalTitle(goal),
                         '$progressPercentage%',
-                        _getGoalDescription(profile.goal),
-                        _getGoalIcon(profile.goal),
-                        _getGoalColor(profile.goal),
+                        _getGoalDescription(goal),
+                        _getGoalIcon(goal),
+                        _getGoalColor(goal),
                       )
                           .animate()
                           .fadeIn(delay: 1100.ms, duration: 600.ms)
@@ -357,7 +370,7 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
                       const SizedBox(height: 40),
 
                       // Action Button
-                      Container(
+                      SizedBox(
                         width: double.infinity,
                         height: 56,
                         child: ElevatedButton(
@@ -563,8 +576,7 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
                                     radius: 6,
                                     color: Colors.white,
                                     strokeWidth: 3,
-                                    strokeColor:
-                                        Colors.white.withValues(alpha: 0.8),
+                                    strokeColor: Colors.white.withOpacity(0.8),
                                   );
                                 }
                                 return FlDotCirclePainter(

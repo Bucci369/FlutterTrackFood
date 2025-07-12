@@ -5,10 +5,10 @@ class MessageInput extends StatefulWidget {
   final bool isLoading;
 
   const MessageInput({
-    Key? key,
+    super.key,
     required this.onSendMessage,
     this.isLoading = false,
-  }) : super(key: key);
+  });
 
   @override
   State<MessageInput> createState() => _MessageInputState();
@@ -99,7 +99,8 @@ class _MessageInputState extends State<MessageInput> {
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
                             ),
                           )
                         : Icon(

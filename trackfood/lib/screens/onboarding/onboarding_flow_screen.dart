@@ -19,12 +19,13 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
     with TickerProviderStateMixin {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  
+
   late AnimationController _animationController;
   late AnimationController _backgroundController;
 
   // Form controllers
-  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
   final TextEditingController _weightController = TextEditingController();
@@ -37,9 +38,26 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
   bool _isGlutenfree = false;
 
   final List<String> _genders = ['male', 'female', 'other'];
-  final List<String> _goals = ['weight_loss', 'weight_gain', 'maintain_weight', 'muscle_gain'];
-  final List<String> _activityLevels = ['sedentary', 'lightly_active', 'moderately_active', 'very_active', 'extremely_active'];
-  final List<String> _dietTypes = ['standard', 'vegan', 'vegetarian', 'keto', 'other'];
+  final List<String> _goals = [
+    'weight_loss',
+    'weight_gain',
+    'maintain_weight',
+    'muscle_gain'
+  ];
+  final List<String> _activityLevels = [
+    'sedentary',
+    'lightly_active',
+    'moderately_active',
+    'very_active',
+    'extremely_active'
+  ];
+  final List<String> _dietTypes = [
+    'standard',
+    'vegan',
+    'vegetarian',
+    'keto',
+    'other'
+  ];
 
   @override
   void initState() {
@@ -52,7 +70,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
       duration: const Duration(seconds: 15),
       vsync: this,
     );
-    
+
     _animationController.forward();
     _backgroundController.repeat();
   }
@@ -62,7 +80,8 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
     _pageController.dispose();
     _animationController.dispose();
     _backgroundController.dispose();
-    _nameController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _ageController.dispose();
     _heightController.dispose();
     _weightController.dispose();
@@ -93,10 +112,11 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
 
   void _completeOnboarding() {
     final userId = SupabaseService().currentUserId ?? '';
-    
+
     final profile = Profile(
       id: userId,
-      name: _nameController.text,
+      firstName: _firstNameController.text.trim(),
+      lastName: _lastNameController.text.trim(),
       age: int.tryParse(_ageController.text) ?? 25,
       gender: _selectedGender ?? 'other',
       heightCm: double.tryParse(_heightController.text) ?? 170.0,
@@ -109,7 +129,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
     );
 
     Provider.of<ProfileProvider>(context, listen: false).setProfile(profile);
-    
+
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (context) => const OnboardingSummaryScreen()),
     );
@@ -117,20 +137,30 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
 
   bool _canProceed() {
     switch (_currentPage) {
-      case 0: return _nameController.text.isNotEmpty;
-      case 1: return _ageController.text.isNotEmpty && (int.tryParse(_ageController.text) ?? 0) > 0;
-      case 2: return _selectedGender != null;
-      case 3: return _heightController.text.isNotEmpty && (double.tryParse(_heightController.text) ?? 0) > 0;
-      case 4: return _weightController.text.isNotEmpty && (double.tryParse(_weightController.text) ?? 0) > 0;
-      case 5: return _selectedGoal != null && _selectedActivityLevel != null;
-      case 6: return _selectedDietType != null;
-      default: return false;
+      case 0:
+        return _firstNameController.text.isNotEmpty && _lastNameController.text.isNotEmpty;
+      case 1:
+        return _ageController.text.isNotEmpty &&
+            (int.tryParse(_ageController.text) ?? 0) > 0;
+      case 2:
+        return _selectedGender != null;
+      case 3:
+        return _heightController.text.isNotEmpty &&
+            (double.tryParse(_heightController.text) ?? 0) > 0;
+      case 4:
+        return _weightController.text.isNotEmpty &&
+            (double.tryParse(_weightController.text) ?? 0) > 0;
+      case 5:
+        return _selectedGoal != null && _selectedActivityLevel != null;
+      case 6:
+        return _selectedDietType != null;
+      default:
+        return false;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -160,13 +190,14 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                         Color(0xFF52B69A).withValues(alpha: 0.6),
                         Color(0xFF34A0A4).withValues(alpha: 0.7),
                       ],
-                      transform: GradientRotation(_backgroundController.value * 2 * 3.14159),
+                      transform: GradientRotation(
+                          _backgroundController.value * 2 * 3.14159),
                     ),
                   ),
                 );
               },
             ),
-            
+
             SafeArea(
               child: Column(
                 children: [
@@ -181,7 +212,8 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                             if (_currentPage > 0)
                               IconButton(
                                 onPressed: _previousPage,
-                                icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+                                icon: const Icon(Icons.arrow_back_ios,
+                                    color: Colors.white),
                               )
                             else
                               const SizedBox(width: 48),
@@ -195,7 +227,8 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                             ),
                             IconButton(
                               onPressed: () => Navigator.of(context).pop(),
-                              icon: const Icon(Icons.close, color: Colors.white),
+                              icon:
+                                  const Icon(Icons.close, color: Colors.white),
                             ),
                           ],
                         ),
@@ -203,13 +236,14 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                         LinearProgressIndicator(
                           value: (_currentPage + 1) / 7,
                           backgroundColor: Colors.white.withValues(alpha: 0.3),
-                          valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor:
+                              const AlwaysStoppedAnimation<Color>(Colors.white),
                           minHeight: 4,
                         ),
                       ],
                     ),
                   ),
-                  
+
                   // Page content
                   Expanded(
                     child: PageView(
@@ -230,11 +264,11 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                       ],
                     ),
                   ),
-                  
+
                   // Bottom button
                   Container(
                     padding: const EdgeInsets.all(24),
-                    child: Container(
+                    child: SizedBox(
                       width: double.infinity,
                       height: 56,
                       child: ElevatedButton(
@@ -242,9 +276,11 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: const Color(0xFF34A0A4),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16)),
                           elevation: 8,
-                          disabledBackgroundColor: Colors.white.withValues(alpha: 0.5),
+                          disabledBackgroundColor:
+                              Colors.white.withValues(alpha: 0.5),
                         ),
                         child: Text(
                           _currentPage == 6 ? 'Fertigstellen' : 'Weiter',
@@ -269,14 +305,21 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
   Widget _buildNamePage() {
     return _buildPageContent(
       title: 'Wie heißt du?',
-      subtitle: 'Lass uns dich kennenlernen',
+      subtitle: 'Bitte gib Vor- und Nachname ein',
       icon: Icons.person_outline,
       child: Column(
         children: [
           _buildTextField(
-            controller: _nameController,
-            label: 'Dein Name',
-            hint: 'z.B. Max Mustermann',
+            controller: _firstNameController,
+            label: 'Vorname',
+            hint: 'z.B. Max',
+            icon: Icons.person,
+          ),
+          const SizedBox(height: 16),
+          _buildTextField(
+            controller: _lastNameController,
+            label: 'Nachname',
+            hint: 'z.B. Mustermann',
             icon: Icons.person,
           ),
         ],
@@ -311,52 +354,52 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
       child: Column(
         children: [
           ..._genders.map((gender) => Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            child: GestureDetector(
-              onTap: () => setState(() => _selectedGender = gender),
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  color: _selectedGender == gender 
-                    ? Colors.white.withValues(alpha: 0.2)
-                    : Colors.white.withValues(alpha: 0.1),
-                  border: Border.all(
-                    color: _selectedGender == gender 
-                      ? Colors.white 
-                      : Colors.white.withValues(alpha: 0.3),
-                    width: _selectedGender == gender ? 2 : 1,
+                margin: const EdgeInsets.only(bottom: 16),
+                child: GestureDetector(
+                  onTap: () => setState(() => _selectedGender = gender),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      color: _selectedGender == gender
+                          ? Colors.white.withValues(alpha: 0.2)
+                          : Colors.white.withValues(alpha: 0.1),
+                      border: Border.all(
+                        color: _selectedGender == gender
+                            ? Colors.white
+                            : Colors.white.withValues(alpha: 0.3),
+                        width: _selectedGender == gender ? 2 : 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          _getGenderIcon(gender),
+                          color: Colors.white,
+                          size: 28,
+                        ),
+                        const SizedBox(width: 20),
+                        Expanded(
+                          child: Text(
+                            _getGenderDisplayName(gender),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        if (_selectedGender == gender)
+                          const Icon(
+                            Icons.check_circle,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                      ],
+                    ),
                   ),
                 ),
-                child: Row(
-                  children: [
-                    Icon(
-                      _getGenderIcon(gender),
-                      color: Colors.white,
-                      size: 28,
-                    ),
-                    const SizedBox(width: 20),
-                    Expanded(
-                      child: Text(
-                        _getGenderDisplayName(gender),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    if (_selectedGender == gender)
-                      const Icon(
-                        Icons.check_circle,
-                        color: Colors.white,
-                        size: 28,
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          )),
+              )),
         ],
       ),
     );
@@ -417,7 +460,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // Goals as compact grid
           GridView.builder(
             shrinkWrap: true,
@@ -432,19 +475,19 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
             itemBuilder: (context, index) {
               final goal = _goals[index];
               final isSelected = _selectedGoal == goal;
-              
+
               return GestureDetector(
                 onTap: () => setState(() => _selectedGoal = goal),
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
-                    color: isSelected 
-                      ? Colors.white.withValues(alpha: 0.3)
-                      : Colors.white.withValues(alpha: 0.1),
+                    color: isSelected
+                        ? Colors.white.withValues(alpha: 0.3)
+                        : Colors.white.withValues(alpha: 0.1),
                     border: Border.all(
-                      color: isSelected 
-                        ? Colors.white 
-                        : Colors.white.withValues(alpha: 0.3),
+                      color: isSelected
+                          ? Colors.white
+                          : Colors.white.withValues(alpha: 0.3),
                       width: isSelected ? 2 : 1,
                     ),
                   ),
@@ -482,9 +525,9 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
               );
             },
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           const Text(
             'Aktivitätslevel:',
             style: TextStyle(
@@ -494,18 +537,19 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // Activity levels as compact list
           ..._activityLevels.map((level) => Container(
-            margin: const EdgeInsets.only(bottom: 8),
-            child: _buildSelectionTile(
-              title: _getActivityDisplayName(level),
-              value: level,
-              groupValue: _selectedActivityLevel,
-              onChanged: (value) => setState(() => _selectedActivityLevel = value),
-              icon: _getActivityIcon(level),
-            ),
-          )),
+                margin: const EdgeInsets.only(bottom: 8),
+                child: _buildSelectionTile(
+                  title: _getActivityDisplayName(level),
+                  value: level,
+                  groupValue: _selectedActivityLevel,
+                  onChanged: (value) =>
+                      setState(() => _selectedActivityLevel = value),
+                  icon: _getActivityIcon(level),
+                ),
+              )),
         ],
       ),
     );
@@ -527,15 +571,13 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 16),
-          
           // Diet types grid - more compact
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,  // 3 columns instead of 2
-              childAspectRatio: 0.9,  // Slightly taller
+              crossAxisCount: 3, // 3 columns instead of 2
+              childAspectRatio: 0.9, // Slightly taller
               crossAxisSpacing: 8,
               mainAxisSpacing: 8,
             ),
@@ -543,19 +585,19 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
             itemBuilder: (context, index) {
               final dietType = _dietTypes[index];
               final isSelected = _selectedDietType == dietType;
-              
+
               return GestureDetector(
                 onTap: () => setState(() => _selectedDietType = dietType),
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    color: isSelected 
-                      ? Colors.white.withValues(alpha: 0.3)
-                      : Colors.white.withValues(alpha: 0.1),
+                    color: isSelected
+                        ? Colors.white.withValues(alpha: 0.3)
+                        : Colors.white.withValues(alpha: 0.1),
                     border: Border.all(
-                      color: isSelected 
-                        ? Colors.white 
-                        : Colors.white.withValues(alpha: 0.3),
+                      color: isSelected
+                          ? Colors.white
+                          : Colors.white.withValues(alpha: 0.3),
                       width: isSelected ? 2 : 1,
                     ),
                   ),
@@ -590,14 +632,14 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                   ),
                 ),
               )
-              .animate(delay: Duration(milliseconds: 100 * index))
-              .fadeIn(duration: 600.ms)
-              .scale(begin: const Offset(0.8, 0.8));
+                  .animate(delay: Duration(milliseconds: 100 * index))
+                  .fadeIn(duration: 600.ms)
+                  .scale(begin: const Offset(0.8, 0.8));
             },
           ),
-          
+
           const SizedBox(height: 20),
-          
+
           // Glutenfree checkbox - more compact
           GestureDetector(
             onTap: () => setState(() => _isGlutenfree = !_isGlutenfree),
@@ -605,13 +647,13 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                color: _isGlutenfree 
-                  ? Colors.white.withValues(alpha: 0.3)
-                  : Colors.white.withValues(alpha: 0.1),
+                color: _isGlutenfree
+                    ? Colors.white.withValues(alpha: 0.3)
+                    : Colors.white.withValues(alpha: 0.1),
                 border: Border.all(
-                  color: _isGlutenfree 
-                    ? Colors.white 
-                    : Colors.white.withValues(alpha: 0.3),
+                  color: _isGlutenfree
+                      ? Colors.white
+                      : Colors.white.withValues(alpha: 0.3),
                   width: _isGlutenfree ? 2 : 1,
                 ),
               ),
@@ -623,21 +665,19 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                     height: 20,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(4),
-                      color: _isGlutenfree 
-                        ? Colors.white 
-                        : Colors.transparent,
+                      color: _isGlutenfree ? Colors.white : Colors.transparent,
                       border: Border.all(
                         color: Colors.white,
                         width: 2,
                       ),
                     ),
                     child: _isGlutenfree
-                      ? const Icon(
-                          Icons.check,
-                          size: 14,
-                          color: Color(0xFF34A0A4),
-                        )
-                      : null,
+                        ? const Icon(
+                            Icons.check,
+                            size: 14,
+                            color: Color(0xFF34A0A4),
+                          )
+                        : null,
                   ),
                   const SizedBox(width: 12),
                   const Text(
@@ -689,12 +729,9 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                     size: 40,
                     color: Colors.white,
                   ),
-                )
-                .animate()
-                .scale(delay: 200.ms, duration: 600.ms, curve: Curves.elasticOut),
-                
+                ).animate().scale(
+                    delay: 200.ms, duration: 600.ms, curve: Curves.elasticOut),
                 const SizedBox(height: 24),
-                
                 Text(
                   title,
                   style: const TextStyle(
@@ -704,12 +741,10 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                   ),
                   textAlign: TextAlign.center,
                 )
-                .animate()
-                .fadeIn(delay: 400.ms, duration: 600.ms)
-                .slideY(begin: 0.3, end: 0),
-                
+                    .animate()
+                    .fadeIn(delay: 400.ms, duration: 600.ms)
+                    .slideY(begin: 0.3, end: 0),
                 const SizedBox(height: 8),
-                
                 Text(
                   subtitle,
                   style: TextStyle(
@@ -719,13 +754,13 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                   ),
                   textAlign: TextAlign.center,
                 )
-                .animate()
-                .fadeIn(delay: 600.ms, duration: 600.ms)
-                .slideY(begin: 0.2, end: 0),
+                    .animate()
+                    .fadeIn(delay: 600.ms, duration: 600.ms)
+                    .slideY(begin: 0.2, end: 0),
               ],
             ),
           ),
-          
+
           // Content
           Expanded(
             child: GlassmorphicContainer(
@@ -760,9 +795,9 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
               ),
             ),
           )
-          .animate()
-          .fadeIn(delay: 800.ms, duration: 800.ms)
-          .slideY(begin: 0.2, end: 0),
+              .animate()
+              .fadeIn(delay: 800.ms, duration: 800.ms)
+              .slideY(begin: 0.2, end: 0),
         ],
       ),
     );
@@ -813,20 +848,19 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
     required IconData icon,
   }) {
     final isSelected = value == groupValue;
-    
+
     return GestureDetector(
       onTap: () => onChanged(value),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          color: isSelected 
-            ? Colors.white.withValues(alpha: 0.2)
-            : Colors.white.withValues(alpha: 0.1),
+          color: isSelected
+              ? Colors.white.withValues(alpha: 0.2)
+              : Colors.white.withValues(alpha: 0.1),
           border: Border.all(
-            color: isSelected 
-              ? Colors.white 
-              : Colors.white.withValues(alpha: 0.3),
+            color:
+                isSelected ? Colors.white : Colors.white.withValues(alpha: 0.3),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -864,83 +898,125 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
 
   String _getGenderDisplayName(String gender) {
     switch (gender) {
-      case 'male': return 'Männlich';
-      case 'female': return 'Weiblich';
-      case 'other': return 'Divers';
-      default: return gender;
+      case 'male':
+        return 'Männlich';
+      case 'female':
+        return 'Weiblich';
+      case 'other':
+        return 'Divers';
+      default:
+        return gender;
     }
   }
 
   IconData _getGenderIcon(String gender) {
     switch (gender) {
-      case 'male': return Icons.male;
-      case 'female': return Icons.female;
-      case 'other': return Icons.transgender;
-      default: return Icons.person;
+      case 'male':
+        return Icons.male;
+      case 'female':
+        return Icons.female;
+      case 'other':
+        return Icons.transgender;
+      default:
+        return Icons.person;
     }
   }
 
   String _getGoalDisplayName(String goal) {
     switch (goal) {
-      case 'weight_loss': return 'Gewicht verlieren';
-      case 'weight_gain': return 'Gewicht zunehmen';
-      case 'maintain_weight': return 'Gewicht halten';
-      case 'muscle_gain': return 'Muskeln aufbauen';
-      default: return goal;
+      case 'weight_loss':
+        return 'Gewicht verlieren';
+      case 'weight_gain':
+        return 'Gewicht zunehmen';
+      case 'maintain_weight':
+        return 'Gewicht halten';
+      case 'muscle_gain':
+        return 'Muskeln aufbauen';
+      default:
+        return goal;
     }
   }
 
   IconData _getGoalIcon(String goal) {
     switch (goal) {
-      case 'weight_loss': return Icons.trending_down;
-      case 'weight_gain': return Icons.trending_up;
-      case 'maintain_weight': return Icons.trending_flat;
-      case 'muscle_gain': return Icons.fitness_center;
-      default: return Icons.flag;
+      case 'weight_loss':
+        return Icons.trending_down;
+      case 'weight_gain':
+        return Icons.trending_up;
+      case 'maintain_weight':
+        return Icons.trending_flat;
+      case 'muscle_gain':
+        return Icons.fitness_center;
+      default:
+        return Icons.flag;
     }
   }
 
   String _getActivityDisplayName(String level) {
     switch (level) {
-      case 'sedentary': return 'Wenig aktiv (Bürojob)';
-      case 'lightly_active': return 'Leicht aktiv (1-3x Sport/Woche)';
-      case 'moderately_active': return 'Mäßig aktiv (3-5x Sport/Woche)';
-      case 'very_active': return 'Sehr aktiv (6-7x Sport/Woche)';
-      case 'extremely_active': return 'Extrem aktiv (2x täglich)';
-      default: return level;
+      case 'sedentary':
+        return 'Wenig aktiv (Bürojob)';
+      case 'lightly_active':
+        return 'Leicht aktiv (1-3x Sport/Woche)';
+      case 'moderately_active':
+        return 'Mäßig aktiv (3-5x Sport/Woche)';
+      case 'very_active':
+        return 'Sehr aktiv (6-7x Sport/Woche)';
+      case 'extremely_active':
+        return 'Extrem aktiv (2x täglich)';
+      default:
+        return level;
     }
   }
 
   IconData _getActivityIcon(String level) {
     switch (level) {
-      case 'sedentary': return Icons.chair;
-      case 'lightly_active': return Icons.directions_walk;
-      case 'moderately_active': return Icons.directions_run;
-      case 'very_active': return Icons.fitness_center;
-      case 'extremely_active': return Icons.sports_gymnastics;
-      default: return Icons.directions_walk;
+      case 'sedentary':
+        return Icons.chair;
+      case 'lightly_active':
+        return Icons.directions_walk;
+      case 'moderately_active':
+        return Icons.directions_run;
+      case 'very_active':
+        return Icons.fitness_center;
+      case 'extremely_active':
+        return Icons.sports_gymnastics;
+      default:
+        return Icons.directions_walk;
     }
   }
 
   String _getDietDisplayName(String diet) {
     switch (diet) {
-      case 'standard': return 'Standard';
-      case 'vegan': return 'Vegan';
-      case 'vegetarian': return 'Vegetarisch';
-      case 'keto': return 'Keto';
-      case 'other': return 'Andere';
-      default: return diet;
+      case 'standard':
+        return 'Standard';
+      case 'vegan':
+        return 'Vegan';
+      case 'vegetarian':
+        return 'Vegetarisch';
+      case 'keto':
+        return 'Keto';
+      case 'other':
+        return 'Andere';
+      default:
+        return diet;
     }
   }
 
   String _getDietEmoji(String diet) {
     switch (diet) {
-      case 'standard': return '🥩';
-      case 'vegan': return '🥑';
-      case 'vegetarian': return '🥦';
-      case 'keto': return '🍣';
-      case 'other': return '🍽️';
-      default: return '🍽️';
+      case 'standard':
+        return '🥩';
+      case 'vegan':
+        return '🥑';
+      case 'vegetarian':
+        return '🥦';
+      case 'keto':
+        return '🍣';
+      case 'other':
+        return '🍽️';
+      default:
+        return '🍽️';
     }
   }
 }

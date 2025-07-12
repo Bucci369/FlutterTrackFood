@@ -17,11 +17,6 @@ class _CustomAnimatedLogoState extends State<CustomAnimatedLogo>
   }
 
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
@@ -92,7 +87,7 @@ class _CustomAnimatedLogoState extends State<CustomAnimatedLogo>
                 ),
               ),
               const SizedBox(height: 60),
-              Container(
+              SizedBox(
                 width: 50,
                 height: 50,
                 child: Stack(
@@ -108,7 +103,7 @@ class _CustomAnimatedLogoState extends State<CustomAnimatedLogo>
                         ),
                       ),
                     ),
-                    Container(
+                    SizedBox(
                       width: 50,
                       height: 50,
                       child: CircularProgressIndicator(

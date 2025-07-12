@@ -49,40 +49,35 @@ class _WaterTrackerCardState extends State<WaterTrackerCard>
 
   Future<void> _addWater(int amountMl) async {
     if (_isAdding) return;
-    
+
     setState(() => _isAdding = true);
     HapticFeedback.lightImpact();
-    
+
     try {
       final supabaseService = SupabaseService();
       final userId = supabaseService.currentUserId;
-      
+
       if (userId == null) return;
-      
+
       final dateString = widget.selectedDate.toIso8601String().split('T')[0];
       final newAmount = _currentAmount + amountMl;
-      
+
       if (widget.waterIntake != null) {
         // Update existing record
-        await supabaseService.client
-            .from('water_intake')
-            .update({
-              'amount_ml': newAmount,
-              'updated_at': DateTime.now().toIso8601String(),
-            })
-            .eq('id', widget.waterIntake!.id);
+        await supabaseService.client.from('water_intake').update({
+          'amount_ml': newAmount,
+          'updated_at': DateTime.now().toIso8601String(),
+        }).eq('id', widget.waterIntake!.id);
       } else {
         // Create new record
-        await supabaseService.client
-            .from('water_intake')
-            .insert({
-              'user_id': userId,
-              'date': dateString,
-              'amount_ml': newAmount,
-              'daily_goal_ml': _dailyGoal,
-            });
+        await supabaseService.client.from('water_intake').insert({
+          'user_id': userId,
+          'date': dateString,
+          'amount_ml': newAmount,
+          'daily_goal_ml': _dailyGoal,
+        });
       }
-      
+
       widget.onWaterAdded();
     } catch (e) {
       print('Error adding water: $e');
@@ -156,9 +151,9 @@ class _WaterTrackerCardState extends State<WaterTrackerCard>
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Progress visualization with wave effect
             Expanded(
               child: Row(
@@ -184,13 +179,14 @@ class _WaterTrackerCardState extends State<WaterTrackerCard>
                           animation: _waveController,
                           builder: (context, child) {
                             return ClipOval(
-                              child: Container(
+                              child: SizedBox(
                                 width: 100,
                                 height: 100,
                                 child: CustomPaint(
                                   painter: WavePainter(
                                     progress: _progress,
-                                    wavePhase: _waveController.value * 2 * 3.14159,
+                                    wavePhase:
+                                        _waveController.value * 2 * 3.14159,
                                   ),
                                 ),
                               ),
@@ -209,9 +205,9 @@ class _WaterTrackerCardState extends State<WaterTrackerCard>
                       ],
                     ),
                   ),
-                  
+
                   const SizedBox(width: 20),
-                  
+
                   // Quick add buttons
                   Expanded(
                     child: Column(
@@ -285,9 +281,9 @@ class _WaterTrackerCardState extends State<WaterTrackerCard>
         ),
       ),
     )
-    .animate(delay: Duration(milliseconds: 100 * (amountMl ~/ 250)))
-    .scale(begin: const Offset(0.8, 0.8))
-    .fadeIn(duration: 300.ms);
+        .animate(delay: Duration(milliseconds: 100 * (amountMl ~/ 250)))
+        .scale(begin: const Offset(0.8, 0.8))
+        .fadeIn(duration: 300.ms);
   }
 }
 
@@ -313,36 +309,38 @@ class WavePainter extends CustomPainter {
     final waveLength = size.width / 2;
 
     final path = Path();
-    
+
     // Start from bottom left
     path.moveTo(0, size.height);
-    
+
     // Draw bottom and sides
     path.lineTo(0, size.height - fillHeight + waveHeight);
-    
+
     // Draw wave at water surface
     for (double x = 0; x <= size.width; x += 1) {
-      final waveY = size.height - fillHeight + 
-          (waveHeight * (1 + progress * 0.5) * 
-           (sin((x / waveLength * 2 * 3.14159) + wavePhase) * 0.5 + 0.5));
-      
+      final waveY = size.height -
+          fillHeight +
+          (waveHeight *
+              (1 + progress * 0.5) *
+              (sin((x / waveLength * 2 * 3.14159) + wavePhase) * 0.5 + 0.5));
+
       if (x == 0) {
         path.lineTo(x, waveY);
       } else {
         path.lineTo(x, waveY);
       }
     }
-    
+
     // Complete the path
     path.lineTo(size.width, size.height);
     path.close();
-    
+
     canvas.drawPath(path, paint);
   }
 
   @override
   bool shouldRepaint(WavePainter oldDelegate) {
-    return oldDelegate.progress != progress || oldDelegate.wavePhase != wavePhase;
+    return oldDelegate.progress != progress ||
+        oldDelegate.wavePhase != wavePhase;
   }
 }
-

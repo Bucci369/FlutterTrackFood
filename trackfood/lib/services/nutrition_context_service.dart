@@ -16,25 +16,21 @@ class NutritionContextService {
       final diaryEntries = await _fetchDiaryEntries(userId, startDate, endDate);
       final activities = await _fetchUserActivities(userId, startDate, endDate);
       final waterIntakes = await _fetchWaterIntakes(userId, startDate, endDate);
-      final fastingSessions = await _fetchFastingSessions(userId, startDate, endDate);
-      final weightHistory = await _fetchWeightHistory(userId, startDate, endDate);
+      final fastingSessions =
+          await _fetchFastingSessions(userId, startDate, endDate);
+      final weightHistory =
+          await _fetchWeightHistory(userId, startDate, endDate);
 
       // Generate comprehensive context string
-      return _buildAdvancedNutritionContext(
-        profile, 
-        diaryEntries, 
-        activities, 
-        waterIntakes, 
-        fastingSessions,
-        weightHistory,
-        days
-      );
+      return _buildAdvancedNutritionContext(profile, diaryEntries, activities,
+          waterIntakes, fastingSessions, weightHistory, days);
     } catch (e) {
       return 'Ernährungsdaten konnten nicht geladen werden: $e';
     }
   }
 
-  Future<List<DiaryEntry>> _fetchDiaryEntries(String userId, DateTime start, DateTime end) async {
+  Future<List<DiaryEntry>> _fetchDiaryEntries(
+      String userId, DateTime start, DateTime end) async {
     try {
       final response = await _supabaseService.client
           .from('diary_entries')
@@ -52,7 +48,8 @@ class NutritionContextService {
     }
   }
 
-  Future<List<UserActivity>> _fetchUserActivities(String userId, DateTime start, DateTime end) async {
+  Future<List<UserActivity>> _fetchUserActivities(
+      String userId, DateTime start, DateTime end) async {
     try {
       final response = await _supabaseService.client
           .from('user_activities')
@@ -70,7 +67,8 @@ class NutritionContextService {
     }
   }
 
-  Future<List<WaterIntake>> _fetchWaterIntakes(String userId, DateTime start, DateTime end) async {
+  Future<List<WaterIntake>> _fetchWaterIntakes(
+      String userId, DateTime start, DateTime end) async {
     try {
       final response = await _supabaseService.client
           .from('water_intake')
@@ -101,7 +99,8 @@ class NutritionContextService {
     }
   }
 
-  Future<List<Map<String, dynamic>>> _fetchFastingSessions(String userId, DateTime start, DateTime end) async {
+  Future<List<Map<String, dynamic>>> _fetchFastingSessions(
+      String userId, DateTime start, DateTime end) async {
     try {
       final response = await _supabaseService.client
           .from('fasting_sessions')
@@ -117,7 +116,8 @@ class NutritionContextService {
     }
   }
 
-  Future<List<Map<String, dynamic>>> _fetchWeightHistory(String userId, DateTime start, DateTime end) async {
+  Future<List<Map<String, dynamic>>> _fetchWeightHistory(
+      String userId, DateTime start, DateTime end) async {
     try {
       final response = await _supabaseService.client
           .from('weight_history')
@@ -143,36 +143,44 @@ class NutritionContextService {
     int days,
   ) {
     final buffer = StringBuffer();
-    
+
     buffer.writeln('🧑‍⚕️ VOLLSTÄNDIGE NUTZERDATEN-ANALYSE ($days Tage):');
     buffer.writeln('=' * 50);
-    
+
     // User Profile Analysis
     if (profile != null) {
       buffer.writeln('👤 BENUTZERPROFIL:');
       buffer.writeln('- Alter: ${profile['age'] ?? 'nicht angegeben'} Jahre');
       buffer.writeln('- Geschlecht: ${profile['gender'] ?? 'nicht angegeben'}');
-      buffer.writeln('- Größe: ${profile['height_cm'] ?? 'nicht angegeben'} cm');
-      buffer.writeln('- Aktuelles Gewicht: ${profile['weight_kg'] ?? 'nicht angegeben'} kg');
-      buffer.writeln('- Zielgewicht: ${profile['target_weight_kg'] ?? 'nicht angegeben'} kg');
-      buffer.writeln('- Aktivitätslevel: ${profile['activity_level'] ?? 'nicht angegeben'}');
+      buffer
+          .writeln('- Größe: ${profile['height_cm'] ?? 'nicht angegeben'} cm');
+      buffer.writeln(
+          '- Aktuelles Gewicht: ${profile['weight_kg'] ?? 'nicht angegeben'} kg');
+      buffer.writeln(
+          '- Zielgewicht: ${profile['target_weight_kg'] ?? 'nicht angegeben'} kg');
+      buffer.writeln(
+          '- Aktivitätslevel: ${profile['activity_level'] ?? 'nicht angegeben'}');
       buffer.writeln('- Hauptziel: ${profile['goal'] ?? 'nicht angegeben'}');
-      
+
       final goals = profile['goals'] as List<dynamic>?;
       if (goals != null && goals.isNotEmpty) {
         buffer.writeln('- Spezifische Ziele: ${goals.join(', ')}');
       }
-      
-      buffer.writeln('- Diät-Typ: ${profile['diet_type'] ?? 'keine Einschränkungen'}');
-      buffer.writeln('- Unverträglichkeiten: ${profile['intolerances'] ?? 'keine bekannten'}');
-      buffer.writeln('- Glutenfrei: ${profile['is_glutenfree'] == true ? 'Ja' : 'Nein'}');
-      
+
+      buffer.writeln(
+          '- Diät-Typ: ${profile['diet_type'] ?? 'keine Einschränkungen'}');
+      buffer.writeln(
+          '- Unverträglichkeiten: ${profile['intolerances'] ?? 'keine bekannten'}');
+      buffer.writeln(
+          '- Glutenfrei: ${profile['is_glutenfree'] == true ? 'Ja' : 'Nein'}');
+
       // Calculate BMI if possible
       if (profile['height_cm'] != null && profile['weight_kg'] != null) {
         final height = profile['height_cm'] / 100.0;
         final weight = profile['weight_kg'];
         final bmi = weight / (height * height);
-        buffer.writeln('- BMI: ${bmi.toStringAsFixed(1)} (${_getBMICategory(bmi)})');
+        buffer.writeln(
+            '- BMI: ${bmi.toStringAsFixed(1)} (${_getBMICategory(bmi)})');
       }
       buffer.writeln();
     }
@@ -190,21 +198,29 @@ class NutritionContextService {
     // Advanced Nutrition Analysis
     final nutritionSummary = _calculateNutritionSummary(diaryEntries, days);
     buffer.writeln('🍽️ ERWEITERTE MAKRONÄHRSTOFF-ANALYSE:');
-    buffer.writeln('- Gesamtkalorien: ${nutritionSummary['totalCalories']?.toInt() ?? 0} kcal (⌀ ${nutritionSummary['avgCaloriesPerDay']?.toInt() ?? 0} kcal/Tag)');
-    
+    buffer.writeln(
+        '- Gesamtkalorien: ${nutritionSummary['totalCalories']?.toInt() ?? 0} kcal (⌀ ${nutritionSummary['avgCaloriesPerDay']?.toInt() ?? 0} kcal/Tag)');
+
     // Calculate daily calorie needs
     if (profile != null) {
       final dailyNeeds = _calculateDailyCalorieNeeds(profile);
-      final calorieBalance = (nutritionSummary['avgCaloriesPerDay'] ?? 0) - dailyNeeds;
+      final calorieBalance =
+          (nutritionSummary['avgCaloriesPerDay'] ?? 0) - dailyNeeds;
       buffer.writeln('- Geschätzter Bedarf: ${dailyNeeds.toInt()} kcal/Tag');
-      buffer.writeln('- Kalorien-Bilanz: ${calorieBalance > 0 ? '+' : ''}${calorieBalance.toInt()} kcal/Tag (${calorieBalance > 0 ? 'Überschuss' : 'Defizit'})');
+      buffer.writeln(
+          '- Kalorien-Bilanz: ${calorieBalance > 0 ? '+' : ''}${calorieBalance.toInt()} kcal/Tag (${calorieBalance > 0 ? 'Überschuss' : 'Defizit'})');
     }
-    
-    buffer.writeln('- Protein: ${nutritionSummary['totalProtein']?.toStringAsFixed(1) ?? '0.0'}g (${nutritionSummary['proteinPercent']?.toStringAsFixed(1) ?? '0.0'}% der Kalorien)');
-    buffer.writeln('- Kohlenhydrate: ${nutritionSummary['totalCarbs']?.toStringAsFixed(1) ?? '0.0'}g (${nutritionSummary['carbPercent']?.toStringAsFixed(1) ?? '0.0'}% der Kalorien)');
-    buffer.writeln('- Fett: ${nutritionSummary['totalFat']?.toStringAsFixed(1) ?? '0.0'}g (${nutritionSummary['fatPercent']?.toStringAsFixed(1) ?? '0.0'}% der Kalorien)');
-    buffer.writeln('- Ballaststoffe: ${nutritionSummary['totalFiber']?.toStringAsFixed(1) ?? '0.0'}g (⌀ ${nutritionSummary['avgFiberPerDay']?.toStringAsFixed(1) ?? '0.0'}g/Tag)');
-    buffer.writeln('- Zucker: ${nutritionSummary['totalSugar']?.toStringAsFixed(1) ?? '0.0'}g (⌀ ${nutritionSummary['avgSugarPerDay']?.toStringAsFixed(1) ?? '0.0'}g/Tag)');
+
+    buffer.writeln(
+        '- Protein: ${nutritionSummary['totalProtein']?.toStringAsFixed(1) ?? '0.0'}g (${nutritionSummary['proteinPercent']?.toStringAsFixed(1) ?? '0.0'}% der Kalorien)');
+    buffer.writeln(
+        '- Kohlenhydrate: ${nutritionSummary['totalCarbs']?.toStringAsFixed(1) ?? '0.0'}g (${nutritionSummary['carbPercent']?.toStringAsFixed(1) ?? '0.0'}% der Kalorien)');
+    buffer.writeln(
+        '- Fett: ${nutritionSummary['totalFat']?.toStringAsFixed(1) ?? '0.0'}g (${nutritionSummary['fatPercent']?.toStringAsFixed(1) ?? '0.0'}% der Kalorien)');
+    buffer.writeln(
+        '- Ballaststoffe: ${nutritionSummary['totalFiber']?.toStringAsFixed(1) ?? '0.0'}g (⌀ ${nutritionSummary['avgFiberPerDay']?.toStringAsFixed(1) ?? '0.0'}g/Tag)');
+    buffer.writeln(
+        '- Zucker: ${nutritionSummary['totalSugar']?.toStringAsFixed(1) ?? '0.0'}g (⌀ ${nutritionSummary['avgSugarPerDay']?.toStringAsFixed(1) ?? '0.0'}g/Tag)');
     buffer.writeln();
 
     // Meal Timing and Patterns
@@ -212,11 +228,13 @@ class NutritionContextService {
     final mealPatterns = _analyzeMealPatterns(diaryEntries);
     buffer.writeln('🕐 MAHLZEITEN-TIMING & MUSTER:');
     mealPatterns.forEach((mealType, data) {
-      buffer.writeln('- $mealType: ${data['count']} Einträge, ⌀ ${data['avgCalories']?.toInt() ?? 0} kcal');
+      buffer.writeln(
+          '- $mealType: ${data['count']} Einträge, ⌀ ${data['avgCalories']?.toInt() ?? 0} kcal');
     });
-    
+
     if (mealTimings.isNotEmpty) {
-      buffer.writeln('- Essens-Zeitfenster: ${mealTimings['firstMeal']} bis ${mealTimings['lastMeal']}');
+      buffer.writeln(
+          '- Essens-Zeitfenster: ${mealTimings['firstMeal']} bis ${mealTimings['lastMeal']}');
       buffer.writeln('- Eating Window: ${mealTimings['eatingWindow']} Stunden');
     }
     buffer.writeln();
@@ -224,9 +242,9 @@ class NutritionContextService {
     // Behavioral Patterns
     final behaviorPatterns = _analyzeBehaviorPatterns(diaryEntries, activities);
     buffer.writeln('🧠 VERHALTENS-MUSTER:');
-    behaviorPatterns.forEach((pattern) {
+    for (var pattern in behaviorPatterns) {
       buffer.writeln('- $pattern');
-    });
+    }
     buffer.writeln();
 
     // Fasting Analysis
@@ -234,7 +252,8 @@ class NutritionContextService {
       final fastingAnalysis = _analyzeFastingSessions(fastingSessions);
       buffer.writeln('⏰ FASTEN-ANALYSE:');
       buffer.writeln('- Fasten-Sessions: ${fastingSessions.length}');
-      buffer.writeln('- Durchschnittliche Dauer: ${fastingAnalysis['avgDuration']} Stunden');
+      buffer.writeln(
+          '- Durchschnittliche Dauer: ${fastingAnalysis['avgDuration']} Stunden');
       buffer.writeln('- Häufigster Typ: ${fastingAnalysis['mostCommonType']}');
       buffer.writeln('- Erfolgsrate: ${fastingAnalysis['successRate']}%');
       buffer.writeln();
@@ -242,11 +261,14 @@ class NutritionContextService {
 
     // Activity Integration
     if (activities.isNotEmpty) {
-      final activityAnalysis = _calculateAdvancedActivitySummary(activities, nutritionSummary);
+      final activityAnalysis =
+          _calculateAdvancedActivitySummary(activities, nutritionSummary);
       buffer.writeln('💪 FITNESS & TRAININGS-INTEGRATION:');
       buffer.writeln('- Trainings-Sessions: ${activities.length}');
-      buffer.writeln('- Verbrannte Kalorien: ${activityAnalysis['totalCaloriesBurned']?.toInt() ?? 0} kcal');
-      buffer.writeln('- Training-Nutrition Ratio: ${activityAnalysis['trainingNutritionRatio']}');
+      buffer.writeln(
+          '- Verbrannte Kalorien: ${activityAnalysis['totalCaloriesBurned']?.toInt() ?? 0} kcal');
+      buffer.writeln(
+          '- Training-Nutrition Ratio: ${activityAnalysis['trainingNutritionRatio']}');
       buffer.writeln('- Aktivste Zeiten: ${activityAnalysis['peakTimes']}');
       buffer.writeln('- Recovery-Bedarf: ${activityAnalysis['recoveryNeeds']}');
       buffer.writeln();
@@ -256,8 +278,10 @@ class NutritionContextService {
     if (waterIntakes.isNotEmpty) {
       final hydrationAnalysis = _analyzeHydrationPatterns(waterIntakes);
       buffer.writeln('💧 HYDRATION-ANALYSE:');
-      buffer.writeln('- Durchschnittliche Aufnahme: ${hydrationAnalysis['avgDaily']}ml/Tag');
-      buffer.writeln('- Zielerfüllung: ${hydrationAnalysis['goalAchievement']}%');
+      buffer.writeln(
+          '- Durchschnittliche Aufnahme: ${hydrationAnalysis['avgDaily']}ml/Tag');
+      buffer
+          .writeln('- Zielerfüllung: ${hydrationAnalysis['goalAchievement']}%');
       buffer.writeln('- Hydration-Timing: ${hydrationAnalysis['timing']}');
       buffer.writeln();
     }
@@ -272,30 +296,28 @@ class NutritionContextService {
 
     // Advanced Health Insights
     final advancedInsights = _generateAdvancedHealthInsights(
-      profile, nutritionSummary, mealPatterns, behaviorPatterns, days
-    );
+        profile, nutritionSummary, mealPatterns, behaviorPatterns, days);
     if (advancedInsights.isNotEmpty) {
       buffer.writeln('🔬 ERWEITERTE GESUNDHEITS-INSIGHTS:');
-      advancedInsights.forEach((insight) {
+      for (var insight in advancedInsights) {
         buffer.writeln('- $insight');
-      });
+      }
       buffer.writeln();
     }
 
     // Optimization Opportunities
     final optimizations = _identifyOptimizationOpportunities(
-      profile, nutritionSummary, mealPatterns, activities
-    );
+        profile, nutritionSummary, mealPatterns, activities);
     buffer.writeln('🎯 OPTIMIERUNGS-MÖGLICHKEITEN:');
-    optimizations.forEach((optimization) {
+    for (var optimization in optimizations) {
       buffer.writeln('- $optimization');
-    });
+    }
 
     return buffer.toString();
   }
 
-
-  Map<String, double> _calculateNutritionSummary(List<DiaryEntry> entries, int days) {
+  Map<String, double> _calculateNutritionSummary(
+      List<DiaryEntry> entries, int days) {
     double totalCalories = 0;
     double totalProtein = 0;
     double totalCarbs = 0;
@@ -326,13 +348,16 @@ class NutritionContextService {
       'totalSugar': totalSugar,
       'avgFiberPerDay': totalFiber / days,
       'avgSugarPerDay': totalSugar / days,
-      'proteinPercent': totalCalories > 0 ? (proteinCalories / totalCalories) * 100 : 0,
-      'carbPercent': totalCalories > 0 ? (carbCalories / totalCalories) * 100 : 0,
+      'proteinPercent':
+          totalCalories > 0 ? (proteinCalories / totalCalories) * 100 : 0,
+      'carbPercent':
+          totalCalories > 0 ? (carbCalories / totalCalories) * 100 : 0,
       'fatPercent': totalCalories > 0 ? (fatCalories / totalCalories) * 100 : 0,
     };
   }
 
-  Map<String, Map<String, dynamic>> _analyzeMealPatterns(List<DiaryEntry> entries) {
+  Map<String, Map<String, dynamic>> _analyzeMealPatterns(
+      List<DiaryEntry> entries) {
     final patterns = <String, Map<String, dynamic>>{};
 
     for (final entry in entries) {
@@ -375,7 +400,8 @@ class NutritionContextService {
 
     return {
       'totalCaloriesBurned': totalCaloriesBurned,
-      'avgDuration': activities.isNotEmpty ? totalDuration / activities.length : 0,
+      'avgDuration':
+          activities.isNotEmpty ? totalDuration / activities.length : 0,
     };
   }
 
@@ -390,45 +416,54 @@ class NutritionContextService {
 
     return {
       'totalWater': totalWater,
-      'avgWaterPerDay': uniqueDays.isNotEmpty ? (totalWater / uniqueDays.length).round() : 0,
+      'avgWaterPerDay':
+          uniqueDays.isNotEmpty ? (totalWater / uniqueDays.length).round() : 0,
     };
   }
 
-  List<String> _generateHealthInsights(Map<String, double> nutritionSummary, int days) {
+  List<String> _generateHealthInsights(
+      Map<String, double> nutritionSummary, int days) {
     final insights = <String>[];
 
     // Protein analysis
     final proteinPercent = nutritionSummary['proteinPercent']!;
     if (proteinPercent < 15) {
-      insights.add('Proteinanteil ist niedrig (${proteinPercent.toStringAsFixed(1)}%). Empfohlen: 15-25%');
+      insights.add(
+          'Proteinanteil ist niedrig (${proteinPercent.toStringAsFixed(1)}%). Empfohlen: 15-25%');
     } else if (proteinPercent > 30) {
-      insights.add('Sehr hoher Proteinanteil (${proteinPercent.toStringAsFixed(1)}%)');
+      insights.add(
+          'Sehr hoher Proteinanteil (${proteinPercent.toStringAsFixed(1)}%)');
     }
 
     // Carb analysis
     final carbPercent = nutritionSummary['carbPercent']!;
     if (carbPercent > 60) {
-      insights.add('Hoher Kohlenhydratanteil (${carbPercent.toStringAsFixed(1)}%). Mehr Protein und gesunde Fette?');
+      insights.add(
+          'Hoher Kohlenhydratanteil (${carbPercent.toStringAsFixed(1)}%). Mehr Protein und gesunde Fette?');
     }
 
     // Fiber analysis
     final avgFiber = nutritionSummary['avgFiberPerDay']!;
     if (avgFiber < 25) {
-      insights.add('Ballaststoffaufnahme niedrig (${avgFiber.toStringAsFixed(1)}g/Tag). Ziel: 25-35g');
+      insights.add(
+          'Ballaststoffaufnahme niedrig (${avgFiber.toStringAsFixed(1)}g/Tag). Ziel: 25-35g');
     }
 
     // Sugar analysis
     final avgSugar = nutritionSummary['avgSugarPerDay']!;
     if (avgSugar > 50) {
-      insights.add('Hohe Zuckeraufnahme (${avgSugar.toStringAsFixed(1)}g/Tag). Weniger Süßes?');
+      insights.add(
+          'Hohe Zuckeraufnahme (${avgSugar.toStringAsFixed(1)}g/Tag). Weniger Süßes?');
     }
 
     // Calorie consistency
     final avgCalories = nutritionSummary['avgCaloriesPerDay']!;
     if (avgCalories < 1200) {
-      insights.add('Sehr niedrige Kalorienaufnahme (${avgCalories.toInt()} kcal/Tag). Ausreichend essen!');
+      insights.add(
+          'Sehr niedrige Kalorienaufnahme (${avgCalories.toInt()} kcal/Tag). Ausreichend essen!');
     } else if (avgCalories > 3000) {
-      insights.add('Hohe Kalorienaufnahme (${avgCalories.toInt()} kcal/Tag). Aktivitätslevel berücksichtigen');
+      insights.add(
+          'Hohe Kalorienaufnahme (${avgCalories.toInt()} kcal/Tag). Aktivitätslevel berücksichtigen');
     }
 
     return insights;
@@ -469,14 +504,16 @@ class NutritionContextService {
     return bmr * (activityMultipliers[activityLevel] ?? 1.55);
   }
 
-  Map<String, dynamic> _analyzeWeightTrend(List<Map<String, dynamic>> weightHistory) {
+  Map<String, dynamic> _analyzeWeightTrend(
+      List<Map<String, dynamic>> weightHistory) {
     if (weightHistory.length < 2) {
       return {'trend': 'Unzureichende Daten', 'change': 'N/A'};
     }
 
-    final sorted = weightHistory..sort((a, b) => 
-        DateTime.parse(a['recorded_date']).compareTo(DateTime.parse(b['recorded_date'])));
-    
+    final sorted = weightHistory
+      ..sort((a, b) => DateTime.parse(a['recorded_date'])
+          .compareTo(DateTime.parse(b['recorded_date'])));
+
     final firstWeight = sorted.first['weight_kg'];
     final lastWeight = sorted.last['weight_kg'];
     final change = lastWeight - firstWeight;
@@ -499,67 +536,91 @@ class NutritionContextService {
   Map<String, dynamic> _analyzeMealTimings(List<DiaryEntry> entries) {
     if (entries.isEmpty) return {};
 
-    final times = entries.map((e) => e.createdAt.hour + e.createdAt.minute / 60.0).toList();
+    final times = entries
+        .map((e) => e.createdAt.hour + e.createdAt.minute / 60.0)
+        .toList();
     times.sort();
 
     return {
-      'firstMeal': '${times.first.toInt()}:${((times.first % 1) * 60).toInt().toString().padLeft(2, '0')}',
-      'lastMeal': '${times.last.toInt()}:${((times.last % 1) * 60).toInt().toString().padLeft(2, '0')}',
+      'firstMeal':
+          '${times.first.toInt()}:${((times.first % 1) * 60).toInt().toString().padLeft(2, '0')}',
+      'lastMeal':
+          '${times.last.toInt()}:${((times.last % 1) * 60).toInt().toString().padLeft(2, '0')}',
       'eatingWindow': (times.last - times.first).toStringAsFixed(1),
     };
   }
 
-  List<String> _analyzeBehaviorPatterns(List<DiaryEntry> entries, List<UserActivity> activities) {
+  List<String> _analyzeBehaviorPatterns(
+      List<DiaryEntry> entries, List<UserActivity> activities) {
     final patterns = <String>[];
 
     // Weekend vs Weekday patterns
-    final weekendEntries = entries.where((e) => e.entryDate.weekday >= 6).length;
+    final weekendEntries =
+        entries.where((e) => e.entryDate.weekday >= 6).length;
     final weekdayEntries = entries.where((e) => e.entryDate.weekday < 6).length;
-    
+
     if (weekendEntries > 0 && weekdayEntries > 0) {
-      final weekendAvgCalories = entries.where((e) => e.entryDate.weekday >= 6)
-          .map((e) => e.calories).reduce((a, b) => a + b) / weekendEntries;
-      final weekdayAvgCalories = entries.where((e) => e.entryDate.weekday < 6)
-          .map((e) => e.calories).reduce((a, b) => a + b) / weekdayEntries;
-      
+      final weekendAvgCalories = entries
+              .where((e) => e.entryDate.weekday >= 6)
+              .map((e) => e.calories)
+              .reduce((a, b) => a + b) /
+          weekendEntries;
+      final weekdayAvgCalories = entries
+              .where((e) => e.entryDate.weekday < 6)
+              .map((e) => e.calories)
+              .reduce((a, b) => a + b) /
+          weekdayEntries;
+
       if ((weekendAvgCalories - weekdayAvgCalories).abs() > 200) {
-        patterns.add('Unterschiedliche Essgewohnheiten: Wochenende vs. Wochentage');
+        patterns
+            .add('Unterschiedliche Essgewohnheiten: Wochenende vs. Wochentage');
       }
     }
 
     // Activity correlation
     if (activities.isNotEmpty) {
-      patterns.add('Trainingstage: ${activities.length} von ${entries.map((e) => e.entryDate).toSet().length} Tagen');
+      patterns.add(
+          'Trainingstage: ${activities.length} von ${entries.map((e) => e.entryDate).toSet().length} Tagen');
     }
 
     // Meal frequency
-    final daysWithData = entries.map((e) => e.entryDate.toIso8601String().split('T')[0]).toSet().length;
+    final daysWithData = entries
+        .map((e) => e.entryDate.toIso8601String().split('T')[0])
+        .toSet()
+        .length;
     if (daysWithData > 0) {
       final avgMealsPerDay = entries.length / daysWithData;
       if (avgMealsPerDay < 3) {
-        patterns.add('Wenige Mahlzeiten pro Tag (⌀ ${avgMealsPerDay.toStringAsFixed(1)})');
+        patterns.add(
+            'Wenige Mahlzeiten pro Tag (⌀ ${avgMealsPerDay.toStringAsFixed(1)})');
       } else if (avgMealsPerDay > 5) {
-        patterns.add('Häufige kleine Mahlzeiten (⌀ ${avgMealsPerDay.toStringAsFixed(1)})');
+        patterns.add(
+            'Häufige kleine Mahlzeiten (⌀ ${avgMealsPerDay.toStringAsFixed(1)})');
       }
     }
 
     return patterns;
   }
 
-  Map<String, dynamic> _analyzeFastingSessions(List<Map<String, dynamic>> sessions) {
+  Map<String, dynamic> _analyzeFastingSessions(
+      List<Map<String, dynamic>> sessions) {
     if (sessions.isEmpty) return {};
 
     final durations = sessions.map((s) {
       final start = DateTime.parse(s['start_time']);
-      final end = s['end_time'] != null ? DateTime.parse(s['end_time']) : DateTime.now();
+      final end = s['end_time'] != null
+          ? DateTime.parse(s['end_time'])
+          : DateTime.now();
       return end.difference(start).inHours;
     }).toList();
 
     final avgDuration = durations.reduce((a, b) => a + b) / durations.length;
-    final successfulSessions = sessions.where((s) => s['status'] == 'completed').length;
+    final successfulSessions =
+        sessions.where((s) => s['status'] == 'completed').length;
     final successRate = (successfulSessions / sessions.length * 100).round();
 
-    final types = sessions.map((s) => s['fasting_type'] ?? 'intermittent').toList();
+    final types =
+        sessions.map((s) => s['fasting_type'] ?? 'intermittent').toList();
     final mostCommonType = types.isNotEmpty ? types.first : 'intermittent';
 
     return {
@@ -580,32 +641,45 @@ class NutritionContextService {
     }
 
     final avgCaloriesConsumed = nutritionSummary['avgCaloriesPerDay'] ?? 0;
-    final trainingNutritionRatio = totalCaloriesBurned > 0 
-        ? (avgCaloriesConsumed / (totalCaloriesBurned / activities.length)).toStringAsFixed(1)
+    final trainingNutritionRatio = totalCaloriesBurned > 0
+        ? (avgCaloriesConsumed / (totalCaloriesBurned / activities.length))
+            .toStringAsFixed(1)
         : 'N/A';
 
-    final peakHour = times.isNotEmpty 
-        ? times.fold<Map<int, int>>({}, (map, hour) {
-            map[hour] = (map[hour] ?? 0) + 1;
-            return map;
-          }).entries.reduce((a, b) => a.value > b.value ? a : b).key
+    final peakHour = times.isNotEmpty
+        ? times
+            .fold<Map<int, int>>({}, (map, hour) {
+              map[hour] = (map[hour] ?? 0) + 1;
+              return map;
+            })
+            .entries
+            .reduce((a, b) => a.value > b.value ? a : b)
+            .key
         : 0;
 
     return {
       'totalCaloriesBurned': totalCaloriesBurned,
       'trainingNutritionRatio': trainingNutritionRatio,
-      'peakTimes': '${peakHour}:00 Uhr',
+      'peakTimes': '$peakHour:00 Uhr',
       'recoveryNeeds': totalCaloriesBurned > 500 ? 'Hoch' : 'Moderat',
     };
   }
 
-  Map<String, dynamic> _analyzeHydrationPatterns(List<WaterIntake> waterIntakes) {
-    final totalWater = waterIntakes.fold<int>(0, (sum, intake) => sum + intake.amountMl);
-    final uniqueDays = waterIntakes.map((w) => w.date.toIso8601String().split('T')[0]).toSet().length;
+  Map<String, dynamic> _analyzeHydrationPatterns(
+      List<WaterIntake> waterIntakes) {
+    final totalWater =
+        waterIntakes.fold<int>(0, (sum, intake) => sum + intake.amountMl);
+    final uniqueDays = waterIntakes
+        .map((w) => w.date.toIso8601String().split('T')[0])
+        .toSet()
+        .length;
     final avgDaily = uniqueDays > 0 ? (totalWater / uniqueDays).round() : 0;
 
-    final goalAchievement = waterIntakes.isNotEmpty 
-        ? ((waterIntakes.where((w) => w.amountMl >= w.dailyGoalMl).length / waterIntakes.length) * 100).round()
+    final goalAchievement = waterIntakes.isNotEmpty
+        ? ((waterIntakes.where((w) => w.amountMl >= w.dailyGoalMl).length /
+                    waterIntakes.length) *
+                100)
+            .round()
         : 0;
 
     return {
@@ -617,15 +691,19 @@ class NutritionContextService {
 
   Map<String, dynamic> _assessFoodQuality(List<DiaryEntry> entries) {
     // Simplified food quality assessment
-    final processedFoods = entries.where((e) => 
-        e.foodName.toLowerCase().contains('fertig') ||
-        e.foodName.toLowerCase().contains('instant') ||
-        e.foodName.toLowerCase().contains('dose')).length;
-    
-    final processingLevel = processedFoods / entries.length > 0.3 ? 'Hoch' : 'Niedrig';
-    
+    final processedFoods = entries
+        .where((e) =>
+            e.foodName.toLowerCase().contains('fertig') ||
+            e.foodName.toLowerCase().contains('instant') ||
+            e.foodName.toLowerCase().contains('dose'))
+        .length;
+
+    final processingLevel =
+        processedFoods / entries.length > 0.3 ? 'Hoch' : 'Niedrig';
+
     final uniqueFoods = entries.map((e) => e.foodName).toSet().length;
-    final varietyScore = (uniqueFoods / entries.length * 10).clamp(0, 10).round();
+    final varietyScore =
+        (uniqueFoods / entries.length * 10).clamp(0, 10).round();
 
     return {
       'processingLevel': processingLevel,
@@ -645,17 +723,20 @@ class NutritionContextService {
     // Metabolic insights
     final proteinPercent = nutritionSummary['proteinPercent'] ?? 0;
     if (proteinPercent < 15) {
-      insights.add('Niedriger Proteinanteil kann Muskelerhaltung und Sättigung beeinträchtigen');
+      insights.add(
+          'Niedriger Proteinanteil kann Muskelerhaltung und Sättigung beeinträchtigen');
     }
 
     // Meal timing insights
-    if (mealPatterns.containsKey('snack') && mealPatterns['snack']!['count'] > days * 2) {
+    if (mealPatterns.containsKey('snack') &&
+        mealPatterns['snack']!['count'] > days * 2) {
       insights.add('Häufiges Snacken könnte Insulinresistenz fördern');
     }
 
     // Behavior-based insights
     if (behaviorPatterns.any((p) => p.contains('Wochenende'))) {
-      insights.add('Inkonsistente Wochenend-Ernährung kann Fortschritt verlangsamen');
+      insights.add(
+          'Inkonsistente Wochenend-Ernährung kann Fortschritt verlangsamen');
     }
 
     return insights;
@@ -671,17 +752,21 @@ class NutritionContextService {
     // Macro optimization
     final proteinPercent = nutritionSummary['proteinPercent'] ?? 0;
     if (proteinPercent < 20 && activities.isNotEmpty) {
-      optimizations.add('Protein erhöhen für bessere Regeneration nach dem Training');
+      optimizations
+          .add('Protein erhöhen für bessere Regeneration nach dem Training');
     }
 
     // Meal timing optimization
     if (activities.isNotEmpty && !mealPatterns.containsKey('post_workout')) {
-      optimizations.add('Post-Workout Nutrition implementieren für optimale Recovery');
+      optimizations
+          .add('Post-Workout Nutrition implementieren für optimale Recovery');
     }
 
     // Hydration optimization
-    if (nutritionSummary['avgCaloriesPerDay'] != null && nutritionSummary['avgCaloriesPerDay']! > 2000) {
-      optimizations.add('Wasseraufnahme überprüfen - könnte bei höherer Kalorienzufuhr unzureichend sein');
+    if (nutritionSummary['avgCaloriesPerDay'] != null &&
+        nutritionSummary['avgCaloriesPerDay']! > 2000) {
+      optimizations.add(
+          'Wasseraufnahme überprüfen - könnte bei höherer Kalorienzufuhr unzureichend sein');
     }
 
     return optimizations;
