@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'auth_screen.dart';
+import '../onboarding/onboarding_flow_screen.dart';
 import '../../widgets/animated_logo.dart';
 import '../../services/supabase_service.dart';
 
@@ -31,12 +32,17 @@ class _AuthWrapperState extends State<AuthWrapper> {
     Supabase.instance.client.auth.onAuthStateChange.listen((data) async {
       final AuthChangeEvent event = data.event;
       if (mounted) {
-        if (event == AuthChangeEvent.signedIn || event == AuthChangeEvent.initialSession) {
+        if (event == AuthChangeEvent.signedIn ||
+            event == AuthChangeEvent.initialSession) {
           final userId = _supabaseService.currentUserId;
           if (userId != null) {
             final profile = await _supabaseService.getProfile(userId);
             setState(() {
               _isOnboardingCompleted = profile?.onboardingCompleted ?? false;
+            });
+          } else {
+            setState(() {
+              _isOnboardingCompleted = false;
             });
           }
         } else if (event == AuthChangeEvent.signedOut) {
@@ -51,24 +57,20 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
   @override
   Widget build(BuildContext context) {
+    print('User: ${_supabaseService.currentUser}');
+    print('OnboardingCompleted: $_isOnboardingCompleted');
     if (_showSplash) {
       return const Scaffold(
         body: CustomAnimatedLogo(),
       );
     }
-    if (_supabaseService.currentUser == null && !(Supabase.instance.client.auth.currentSession?.isExpired == false)) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
     if (_supabaseService.currentUser == null) {
       return const AuthScreen();
+    } else if (!_isOnboardingCompleted) {
+      return const OnboardingFlowScreen();
     } else {
-      // TODO: Onboarding und HomeScreen einbinden
       return const Scaffold(
-        body: Center(child: Text('Onboarding/HomeScreen kommt hier hin!')),
+        body: Center(child: Text('Dashboard kommt hier hin!')),
       );
     }
   }

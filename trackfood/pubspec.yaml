@@ -12,7 +12,8 @@ dependencies:
   uuid: ^4.4.0
   http: ^1.2.1
   flutter_dotenv: ^5.1.0
-  fl_chart: ^0.68.0
+  flutter_svg: ^2.0.7
+  fl_chart: ^1.0.0
   image_picker: ^1.1.0
   barcode_scan2: ^4.5.1
   google_maps_flutter: ^2.6.0
@@ -26,6 +27,15 @@ dependencies:
   url_launcher: ^6.2.5
   permission_handler: ^11.3.1
   flutter_animate: ^4.5.0
+  confetti: ^0.7.0
+  lottie: ^3.1.2
+  animated_text_kit: ^4.2.2
+  glassmorphism: ^3.0.0
+  flutter_staggered_animations: ^1.1.1
+  rive: ^0.13.1
+  card_swiper: ^3.0.1
+  smooth_page_indicator: ^1.1.0
+  flutter_local_notifications: ^17.2.1+2
   # riverpod: ^2.5.1
   # flutter_bloc: ^8.1.5
   # flutter_quill: ^9.0.0
@@ -36,4 +46,4 @@ flutter:
   uses-material-design: true
   assets:
     - .env
-    - assets/image/logo1.webp
+    - assets/image/
