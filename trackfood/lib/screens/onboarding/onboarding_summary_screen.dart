@@ -5,6 +5,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'package:provider/provider.dart';
+import 'dart:math' as math;
 import '../../models/profile.dart';
 import '../../providers/profile_provider.dart';
 import '../../services/supabase_service.dart';
@@ -399,7 +400,8 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
     final weightDifference = (currentWeight - targetWeight).abs();
     final calorieDeficitPerDay =
         (weightDifference * 7700) / (6 * 30); // 7700 kcal per kg, over 6 months
-    final maxCalorieDeficit = calorieDeficitPerDay * 1.5; // For chart scaling
+    // Für die goldene Linie: Werte als Prozent des maximalen Defizits anzeigen
+    final maxCalorieDeficit = calorieDeficitPerDay; // Chart zeigt 0-100%
 
     return GlassmorphicContainer(
       width: double.infinity,
@@ -476,24 +478,30 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
                 builder: (context, child) {
                   final animationProgress = _chartController.value;
 
-                  // Create animated spots for weight line
+                  // Gewichtskurve: nur zwischen Start- und Zielgewicht
                   List<FlSpot> weightSpots = [];
                   List<FlSpot> calorieSpots = [];
+                  final startWeight = currentWeight;
+                  final endWeight = targetWeight;
 
                   if (animationProgress > 0) {
-                    final progressPoints =
-                        (animationProgress * 20).round(); // 20 points total
-                    for (int i = 0; i <= progressPoints && i <= 20; i++) {
-                      final x = (i / 20) * 6; // 0 to 6
-                      final weightY = currentWeight +
-                          (targetWeight - currentWeight) * (i / 20);
-                      final calorieY = calorieDeficitPerDay *
-                          (1 - (i / 20)); // Decreasing over time
-
-                      if (x <= 6) {
-                        weightSpots.add(FlSpot(x, weightY));
-                        calorieSpots.add(FlSpot(x, calorieY));
-                      }
+                    final progressPoints = (animationProgress * 40).round();
+                    for (int i = 0; i <= progressPoints && i <= 40; i++) {
+                      final t = i / 40;
+                      final x = t * 6;
+                      // Gewicht: S-Kurve
+                      final weightY = startWeight +
+                          (endWeight - startWeight) *
+                              (0.5 - 0.5 * math.cos(math.pi * t));
+                      // Goldene Linie: S-Kurve, aber immer knapp unterhalb der Gewichtskurve
+                      final calorieY = weightY -
+                          1.2 +
+                          0.5 *
+                              math.sin(math.pi * t -
+                                  math.pi /
+                                      2); // optisch ansprechend, immer sichtbar
+                      calorieSpots.add(FlSpot(x, calorieY));
+                      weightSpots.add(FlSpot(x, weightY));
                     }
                   }
 
@@ -501,13 +509,10 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
                     LineChartData(
                       minX: 0,
                       maxX: 6,
-                      minY: 0,
-                      maxY: (currentWeight > targetWeight
-                              ? currentWeight
-                              : targetWeight) +
-                          2,
+                      minY: endWeight - 2,
+                      maxY: startWeight + 2,
                       lineBarsData: [
-                        // Weight line
+                        // Gewichtslinie (S-Kurve)
                         if (weightSpots.isNotEmpty)
                           LineChartBarData(
                             spots: weightSpots,
@@ -543,8 +548,8 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
                               ),
                             ),
                           ),
-                        // Calorie deficit line
-                        if (calorieSpots.isNotEmpty && goal == 'weight_loss')
+                        // Goldene Linie: optisch animiert
+                        if (calorieSpots.isNotEmpty)
                           LineChartBarData(
                             spots: calorieSpots,
                             isCurved: true,
@@ -571,72 +576,10 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
                           ),
                       ],
                       titlesData: FlTitlesData(
-                        show: true,
-                        leftTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            getTitlesWidget: (value, meta) {
-                              if (value <= 0) return const Text('');
-                              if (value < maxCalorieDeficit) {
-                                return Text(
-                                  '${value.toInt()}',
-                                  style: TextStyle(
-                                    color: const Color(0xFFFFD700)
-                                        .withValues(alpha: 0.8),
-                                    fontSize: 10,
-                                  ),
-                                );
-                              }
-                              return Text(
-                                '${value.toInt()}kg',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                ),
-                              );
-                            },
-                            reservedSize: 35,
-                            interval: goal == 'weight_loss' ? 200 : 5,
-                          ),
-                        ),
-                        rightTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: goal == 'weight_loss',
-                            getTitlesWidget: (value, meta) {
-                              if (value > 0 &&
-                                  value < maxCalorieDeficit &&
-                                  value % 200 == 0) {
-                                return Text(
-                                  '${value.toInt()}\\nkcal',
-                                  style: TextStyle(
-                                    color: const Color(0xFFFFD700)
-                                        .withValues(alpha: 0.8),
-                                    fontSize: 9,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                );
-                              }
-                              return const Text('');
-                            },
-                            reservedSize: 40,
-                            interval: 200,
-                          ),
-                        ),
-                        bottomTitles: const AxisTitles(
-                            sideTitles: SideTitles(showTitles: false)),
-                        topTitles: const AxisTitles(
-                            sideTitles: SideTitles(showTitles: false)),
+                        show: false,
                       ),
                       gridData: FlGridData(
-                        show: true,
-                        drawVerticalLine: false,
-                        horizontalInterval: goal == 'weight_loss' ? 200 : 5,
-                        getDrawingHorizontalLine: (value) {
-                          return FlLine(
-                            color: Colors.white.withValues(alpha: 0.15),
-                            strokeWidth: 1,
-                          );
-                        },
+                        show: false,
                       ),
                       borderData: FlBorderData(show: false),
                     ),
