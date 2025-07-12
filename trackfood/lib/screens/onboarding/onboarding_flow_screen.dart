@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import '../../providers/profile_provider.dart';
 import '../../models/profile.dart';
+import '../../services/supabase_service.dart';
 import 'onboarding_summary_screen.dart';
 
 class OnboardingFlowScreen extends StatefulWidget {
@@ -91,8 +92,10 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
   }
 
   void _completeOnboarding() {
+    final userId = SupabaseService().currentUserId ?? '';
+    
     final profile = Profile(
-      id: '', // Will be set by provider
+      id: userId,
       name: _nameController.text,
       age: int.tryParse(_ageController.text) ?? 25,
       gender: _selectedGender ?? 'other',

@@ -67,34 +67,73 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
     super.dispose();
   }
 
+  String _mapGoalToDatabase(String flutterGoal) {
+    switch (flutterGoal) {
+      case 'weight_loss': return 'lose_weight';
+      case 'weight_gain': return 'gain_weight';
+      case 'maintain_weight': return 'maintain_weight';
+      case 'muscle_gain': return 'build_muscle';
+      default: return 'maintain_weight';
+    }
+  }
+
+  String _mapActivityToDatabase(String flutterActivity) {
+    switch (flutterActivity) {
+      case 'sedentary': return 'sedentary';
+      case 'lightly_active': return 'lightly_active';
+      case 'moderately_active': return 'moderately_active';
+      case 'very_active': return 'very_active';
+      case 'extremely_active': return 'extra_active';
+      default: return 'moderately_active';
+    }
+  }
+
   Future<void> _handleComplete(Profile profile) async {
     setState(() => _isLoading = true);
     try {
-      final client = SupabaseService().client;
+      final supabaseService = SupabaseService();
+      final userId = supabaseService.currentUserId;
+      
+      if (userId == null) {
+        throw Exception('Benutzer nicht angemeldet');
+      }
+      
+      final client = supabaseService.client;
+      
+      // Map Flutter values to database-compatible values
+      final databaseGoal = _mapGoalToDatabase(profile.goal);
+      final databaseActivity = _mapActivityToDatabase(profile.activityLevel);
+      
       await client.from('profiles').update({
         'onboarding_completed': true,
         'age': profile.age,
         'gender': profile.gender,
         'height_cm': profile.heightCm,
         'weight_kg': profile.weightKg,
-        'activity_level': profile.activityLevel,
-        'goal': profile.goal,
+        'activity_level': databaseActivity,
+        'goal': databaseGoal,
         'diet_type': profile.dietType,
         'is_glutenfree': profile.isGlutenfree ?? false,
         'first_name': profile.name.split(' ').first,
         'last_name': profile.name.split(' ').length > 1
             ? profile.name.split(' ').skip(1).join(' ')
             : '',
-      }).eq('id', profile.id);
+      }).eq('id', userId);
+      
       if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/dashboard');
+        // The AuthWrapper will automatically show the dashboard when onboarding is completed
+        Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Fehler beim Speichern: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Fehler beim Speichern: $e')),
+        );
+      }
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -396,12 +435,8 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
 
   Widget _buildProgressChart(
       double currentWeight, double targetWeight, String goal) {
-    // Calculate calorie deficit needed (rough estimation)
-    final weightDifference = (currentWeight - targetWeight).abs();
-    final calorieDeficitPerDay =
-        (weightDifference * 7700) / (6 * 30); // 7700 kcal per kg, over 6 months
-    // Für die goldene Linie: Werte als Prozent des maximalen Defizits anzeigen
-    final maxCalorieDeficit = calorieDeficitPerDay; // Chart zeigt 0-100%
+    // Chart visualization (simplified for now)
+    // Future: Add calorie deficit calculations
 
     return GlassmorphicContainer(
       width: double.infinity,

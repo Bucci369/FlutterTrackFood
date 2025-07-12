@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/profile_provider.dart';
+import 'providers/chat_provider.dart';
 
 class AppProviders extends StatelessWidget {
   final Widget child;
@@ -8,8 +9,15 @@ class AppProviders extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<ProfileProvider>(
-      create: (_) => ProfileProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<ProfileProvider>(
+          create: (_) => ProfileProvider(),
+        ),
+        ChangeNotifierProvider<ChatProvider>(
+          create: (_) => ChatProvider(),
+        ),
+      ],
       child: child,
     );
   }

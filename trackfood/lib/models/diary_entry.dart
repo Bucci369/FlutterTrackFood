@@ -1,10 +1,12 @@
+import 'meal_type.dart';
+
 class DiaryEntry {
   final String id;
   final String userId;
   final String foodName;
   final double quantity;
   final String unit;
-  final String mealType;
+  final MealType mealType;
   final double calories;
   final double proteinG;
   final double carbG;
@@ -41,7 +43,7 @@ class DiaryEntry {
     foodName: json['food_name'],
     quantity: (json['quantity'] as num).toDouble(),
     unit: json['unit'],
-    mealType: json['meal_type'],
+    mealType: MealType.fromString(json['meal_type']),
     calories: (json['calories'] as num).toDouble(),
     proteinG: (json['protein_g'] as num).toDouble(),
     carbG: (json['carb_g'] as num).toDouble(),
@@ -53,4 +55,28 @@ class DiaryEntry {
     createdAt: DateTime.parse(json['created_at']),
     productCode: json['product_code'],
   );
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'user_id': userId,
+    'food_name': foodName,
+    'quantity': quantity,
+    'unit': unit,
+    'meal_type': mealType.databaseValue,
+    'calories': calories,
+    'protein_g': proteinG,
+    'carb_g': carbG,
+    'fat_g': fatG,
+    'fiber_g': fiberG,
+    'sugar_g': sugarG,
+    'sodium_mg': sodiumMg,
+    'entry_date': entryDate.toIso8601String().split('T')[0],
+    'created_at': createdAt.toIso8601String(),
+    'product_code': productCode,
+  };
+
+  // Helper method for nutrition calculations
+  static double calculateNutrientPortion(double per100g, double quantity) {
+    return (per100g * quantity) / 100;
+  }
 }

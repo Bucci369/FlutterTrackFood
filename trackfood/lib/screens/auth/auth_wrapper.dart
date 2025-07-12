@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'auth_screen.dart';
 import '../onboarding/onboarding_flow_screen.dart';
+import '../dashboard/dashboard_screen.dart';
 import '../../widgets/animated_logo.dart';
 import '../../services/supabase_service.dart';
 
@@ -69,9 +70,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
     } else if (!_isOnboardingCompleted) {
       return const OnboardingFlowScreen();
     } else {
-      return const Scaffold(
-        body: Center(child: Text('Dashboard kommt hier hin!')),
-      );
+      return const DashboardScreen();
     }
   }
 }

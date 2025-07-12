@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'screens/auth/auth_wrapper.dart';
+import 'screens/dashboard/dashboard_screen.dart';
+import 'screens/diary/diary_screen.dart';
+import 'screens/onboarding/onboarding_flow_screen.dart';
+import 'screens/chat/chat_screen.dart';
+import 'screens/profile/profile_screen.dart';
 import 'app_providers.dart';
 
 Future<void> main() async {
@@ -53,7 +58,15 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const AuthWrapper(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const AuthWrapper(),
+        '/dashboard': (context) => const DashboardScreen(),
+        '/diary': (context) => const DiaryScreen(),
+        '/onboarding': (context) => const OnboardingFlowScreen(),
+        '/chat': (context) => const ChatScreen(),
+        '/profile': (context) => const ProfileScreen(),
+      },
     );
   }
 }
