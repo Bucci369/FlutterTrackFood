@@ -7,6 +7,61 @@
 
 This repository containing links of all the example apps demonstrating features/functionality/integrations in [Flutter](https://flutter.io/) application development.
 
+## 🚀 Getting Started
+
+### Prerequisites
+
+Before you can run these Flutter examples, you need to have Flutter installed on your system.
+
+#### Install Flutter on macOS
+
+1. **Download Flutter SDK**:
+   ```bash
+   # Download Flutter using Git
+   git clone https://github.com/flutter/flutter.git -b stable
+   ```
+
+2. **Add Flutter to your PATH**:
+   ```bash
+   # Add to your shell profile (.zshrc, .bash_profile, etc.)
+   export PATH="$PATH:`pwd`/flutter/bin"
+   ```
+
+3. **Verify Installation**:
+   ```bash
+   flutter doctor
+   ```
+
+4. **Install Xcode** (for iOS development):
+   - Download from Mac App Store
+   - Run `sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer`
+
+5. **Accept iOS licenses**:
+   ```bash
+   sudo xcodebuild -runFirstLaunch
+   ```
+
+### VS Code Setup
+
+The following extensions are recommended and should be automatically installed:
+- Flutter (Dart-Code.flutter)
+- Dart (Dart-Code.dart-code)
+
+### Running the Examples
+
+1. **Simple Dart Example**:
+   ```bash
+   dart main.dart
+   ```
+
+2. **For individual Flutter apps**:
+   - Navigate to any specific app directory
+   - Run `flutter pub get` to install dependencies
+   - Run `flutter run` to start the app
+
+3. **Using VS Code Tasks**:
+   - Use `Cmd+Shift+P` → "Tasks: Run Task" → "Flutter: Run Example Apps"
+
 ## YouTube Channel
 
 [MTechViral](https://www.youtube.com/c/MTechViral)
