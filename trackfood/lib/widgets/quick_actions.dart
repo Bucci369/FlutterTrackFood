@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_typography.dart';
 
 class QuickActions extends StatelessWidget {
   final Function(String) onActionTap;
@@ -20,11 +21,9 @@ class QuickActions extends StatelessWidget {
         children: [
           Text(
             'Schnellaktionen:',
-            style: TextStyle(
+            style: AppTypography.headline.copyWith(
+              color: AppColors.label,
               fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey.shade700,
-              letterSpacing: -0.41,
             ),
           ),
           const SizedBox(height: 12),
@@ -47,17 +46,16 @@ class QuickActions extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.green.shade50,
+          color: AppColors.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.green.shade200),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
         ),
         child: Text(
           action,
-          style: TextStyle(
-            color: Colors.green.shade700,
+          style: AppTypography.body.copyWith(
+            color: AppColors.primary,
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            letterSpacing: -0.41,
           ),
         ),
       ),

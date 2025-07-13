@@ -4,28 +4,27 @@ import 'package:flutter/services.dart';
 import 'package:confetti/confetti.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math' as math;
 import '../../models/profile.dart';
 import '../../providers/profile_provider.dart';
-import '../../services/supabase_service.dart';
 import '../../theme/app_colors.dart';
-import '../../theme/app_theme.dart';
 import '../../theme/app_typography.dart';
 import '../dashboard/dashboard_screen.dart';
 
 // Apple White color
 const Color appleWhite = Color(0xFFF6F1E7);
 
-class OnboardingSummaryScreen extends StatefulWidget {
+class OnboardingSummaryScreen extends ConsumerStatefulWidget {
   const OnboardingSummaryScreen({super.key});
 
   @override
-  State<OnboardingSummaryScreen> createState() =>
+  ConsumerState<OnboardingSummaryScreen> createState() =>
       _OnboardingSummaryScreenState();
 }
 
-class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
+class _OnboardingSummaryScreenState
+    extends ConsumerState<OnboardingSummaryScreen>
     with TickerProviderStateMixin {
   late ConfettiController _confettiController;
   late AnimationController _backgroundController;
@@ -80,82 +79,17 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
     super.dispose();
   }
 
-  String _mapGoalToDatabase(String flutterGoal) {
-    switch (flutterGoal) {
-      case 'weight_loss':
-        return 'lose_weight';
-      case 'weight_gain':
-        return 'gain_weight';
-      case 'maintain_weight':
-        return 'maintain_weight';
-      case 'muscle_gain':
-        return 'build_muscle';
-      default:
-        return 'maintain_weight';
-    }
-  }
-
-  String _mapActivityToDatabase(String flutterActivity) {
-    switch (flutterActivity) {
-      case 'sedentary':
-        return 'sedentary';
-      case 'lightly_active':
-        return 'lightly_active';
-      case 'moderately_active':
-        return 'moderately_active';
-      case 'very_active':
-        return 'very_active';
-      case 'extremely_active':
-        return 'extra_active';
-      default:
-        return 'moderately_active';
-    }
-  }
-
   Future<void> _handleComplete(Profile profile) async {
     setState(() => _isLoading = true);
-
-    // Play celebration confetti again on completion
     _confettiController.play();
     HapticFeedback.mediumImpact();
 
     try {
-      final supabaseService = SupabaseService();
-      final userId = supabaseService.currentUserId;
+      // Use the notifier to update the profile
+      final profileNotifier = ref.read(profileProvider.notifier);
+      final updatedProfile = profile.copyWith(onboardingCompleted: true);
 
-      if (userId == null) {
-        throw Exception('Benutzer nicht angemeldet');
-      }
-
-      final client = supabaseService.client;
-
-      // Map Flutter values to database-compatible values
-      final databaseGoal = _mapGoalToDatabase(
-        profile.goal ?? 'maintain_weight',
-      );
-      final databaseActivity = _mapActivityToDatabase(
-        profile.activityLevel ?? 'moderately_active',
-      );
-
-      await client
-          .from('profiles')
-          .update({
-            'onboarding_completed': true,
-            'age': profile.age,
-            'gender': profile.gender,
-            'height_cm': profile.heightCm,
-            'weight_kg': profile.weightKg,
-            'activity_level': databaseActivity,
-            'goal': databaseGoal,
-            'target_weight_kg': profile.targetWeightKg,
-            'diet_type': profile.dietType,
-            'is_glutenfree': profile.isGlutenfree ?? false,
-            'first_name': profile.name.split(' ').first,
-            'last_name': profile.name.split(' ').length > 1
-                ? profile.name.split(' ').skip(1).join(' ')
-                : '',
-          })
-          .eq('id', userId);
+      await profileNotifier.updateProfile(updatedProfile);
 
       if (mounted) {
         Navigator.of(context).pushAndRemoveUntil(
@@ -188,10 +122,19 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
 
   @override
   Widget build(BuildContext context) {
-    final profile = Provider.of<ProfileProvider>(context).profile;
-    if (profile == null) {
+    final profileState = ref.watch(profileProvider);
+    final profile = profileState.profile;
+
+    // Corrected loading check
+    if (profileState.isLoading && profile == null) {
       return const CupertinoPageScaffold(
         child: Center(child: CupertinoActivityIndicator()),
+      );
+    }
+
+    if (profile == null) {
+      return const CupertinoPageScaffold(
+        child: Center(child: Text('Profil konnte nicht geladen werden.')),
       );
     }
 

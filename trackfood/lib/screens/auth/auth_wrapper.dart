@@ -5,7 +5,7 @@ import 'auth_screen.dart';
 import '../onboarding/onboardingFlowScreen.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../../services/supabase_service.dart';
-import '../../app_providers.dart';
+import '../../providers/profile_provider.dart';
 
 class AuthWrapper extends ConsumerStatefulWidget {
   const AuthWrapper({super.key});
@@ -44,9 +44,9 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
               });
               // ProfileProvider mit dem Profil synchronisieren
               if (profile != null) {
-                ref.read(profileProvider).setProfile(profile);
+                ref.read(profileProvider.notifier).setOnboardingProfile(profile);
               } else {
-                await ref.read(profileProvider).loadProfile();
+                await ref.read(profileProvider.notifier).loadProfile();
               }
             }
           } else {
@@ -61,8 +61,9 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
             setState(() {
               _isOnboardingCompleted = false;
             });
-            // ProfileProvider bei Logout leeren
-            ref.read(profileProvider).clearProfile();
+            // ProfileProvider bei Logout leeren - reset to initial state
+            // Note: StateNotifier doesn't have clearProfile, but loadProfile will reset
+            ref.read(profileProvider.notifier).loadProfile();
           }
         }
         if (mounted) {
@@ -74,8 +75,11 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
 
   @override
   Widget build(BuildContext context) {
+    final profileState = ref.watch(profileProvider);
+    
     print('User: ${_supabaseService.currentUser}');
     print('OnboardingCompleted: $_isOnboardingCompleted');
+    
     if (_supabaseService.currentUser == null) {
       return const AuthScreen();
     } else if (!_isOnboardingCompleted) {

@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import '../models/chat_message.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_typography.dart';
 
 class ChatBubble extends StatelessWidget {
   final ChatMessage message;
@@ -28,13 +29,13 @@ class ChatBubble extends StatelessWidget {
               height: 32,
               margin: const EdgeInsets.only(right: 8, top: 4),
               decoration: BoxDecoration(
-                color: Colors.green.shade100,
+                color: AppColors.primary.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Icon(
                 CupertinoIcons.sparkles,
                 size: 20,
-                color: Colors.green.shade700,
+                color: AppColors.primary,
               ),
             ),
           ],
@@ -46,18 +47,19 @@ class ChatBubble extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: isUser
                     ? LinearGradient(
-                        colors: [Colors.green.shade600, Colors.green.shade500],
+                        colors: [AppColors.primary, AppColors.primary.withValues(alpha: 0.8)],
                       )
                     : null,
-                color: isUser ? null : Colors.grey.shade100,
+                color: isUser ? null : AppColors.background,
                 borderRadius: BorderRadius.circular(16).copyWith(
                   bottomRight: isUser ? const Radius.circular(4) : null,
                   bottomLeft: !isUser ? const Radius.circular(4) : null,
                 ),
+                border: !isUser ? Border.all(color: AppColors.separator, width: 1) : null,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 4,
+                    color: CupertinoColors.systemGrey.withValues(alpha: 0.1),
+                    blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
                 ],
@@ -70,32 +72,30 @@ class ChatBubble extends StatelessWidget {
                     child: isUser
                         ? Text(
                             message.content,
-                            style: TextStyle(
-                              color: Colors.white,
+                            style: AppTypography.body.copyWith(
+                              color: CupertinoColors.white,
                               fontSize: 16,
                               height: 1.4,
-                              letterSpacing: -0.41,
                             ),
                           )
                         : MarkdownBody(
                             data: message.content,
                             styleSheet: MarkdownStyleSheet(
-                              p: TextStyle(
-                                color: Colors.grey.shade800,
+                              p: AppTypography.body.copyWith(
+                                color: AppColors.label,
                                 fontSize: 16,
                                 height: 1.4,
-                                letterSpacing: -0.41,
                               ),
-                              strong: TextStyle(
-                                color: Colors.grey.shade900,
+                              strong: AppTypography.body.copyWith(
+                                color: AppColors.label,
                                 fontWeight: FontWeight.bold,
                               ),
-                              em: TextStyle(
-                                color: Colors.grey.shade700,
+                              em: AppTypography.body.copyWith(
+                                color: AppColors.secondaryLabel,
                                 fontStyle: FontStyle.italic,
                               ),
-                              listBullet: TextStyle(
-                                color: Colors.green.shade600,
+                              listBullet: AppTypography.body.copyWith(
+                                color: AppColors.primary,
                               ),
                             ),
                           ),
@@ -105,10 +105,9 @@ class ChatBubble extends StatelessWidget {
                         const EdgeInsets.only(left: 12, right: 12, bottom: 8),
                     child: Text(
                       _formatTime(message.timestamp),
-                      style: TextStyle(
-                        color: isUser ? Colors.white70 : Colors.grey.shade500,
+                      style: AppTypography.caption1.copyWith(
+                        color: isUser ? CupertinoColors.white.withValues(alpha: 0.7) : AppColors.secondaryLabel,
                         fontSize: 12,
-                        letterSpacing: -0.41,
                       ),
                     ),
                   ),
@@ -122,13 +121,13 @@ class ChatBubble extends StatelessWidget {
               height: 32,
               margin: const EdgeInsets.only(left: 8, top: 4),
               decoration: BoxDecoration(
-                color: Colors.green.shade600,
+                color: AppColors.primary,
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: Icon(
+              child: const Icon(
                 CupertinoIcons.person_fill,
                 size: 20,
-                color: Colors.white,
+                color: CupertinoColors.white,
               ),
             ),
           ],

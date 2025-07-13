@@ -1,9 +1,33 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart'; // Import Material
 import 'app_colors.dart';
 import 'app_typography.dart';
 
 /// Zentrales App-Theme, das ein modernes und natives iOS-Design umsetzt.
 class AppTheme {
+  AppTheme._();
+
+  // === MATERIAL THEME ===
+  /// Helles Material-Theme, das die Cupertino-Ästhetik widerspiegelt.
+  static ThemeData get materialLightTheme => ThemeData(
+    brightness: Brightness.light,
+    primaryColor: AppColors.primary,
+    scaffoldBackgroundColor: AppColors.background,
+    colorScheme: const ColorScheme.light(
+      primary: AppColors.primary,
+      secondary: AppColors.secondary,
+      surface: AppColors.secondaryBackground,
+      error: AppColors.systemRed,
+    ),
+    appBarTheme: const AppBarTheme(
+      backgroundColor: AppColors.secondaryBackground,
+      elevation: 0,
+      iconTheme: IconThemeData(color: AppColors.primary),
+    ),
+    cupertinoOverrideTheme:
+        lightTheme, // Use Cupertino theme for Cupertino widgets
+  );
+
   /// Dunkles Theme für die App
   static CupertinoThemeData get darkTheme => CupertinoThemeData(
     brightness: Brightness.dark,
@@ -20,7 +44,6 @@ class AppTheme {
       dateTimePickerTextStyle: AppTypography.body,
     ),
   );
-  AppTheme._();
 
   /// Helles Theme für die App
   static CupertinoThemeData get lightTheme => CupertinoThemeData(

@@ -1,36 +1,44 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 
 enum MealType {
-  breakfast,
-  lunch,
-  dinner,
-  snack;
+  breakfast(
+    displayName: 'Frühstück',
+    icon: CupertinoIcons.sunrise_fill,
+    gradientColors: [Color(0xFFFFAA7A), Color(0xFFFFD480)],
+    imagePath: 'assets/image/Fruestuck.webp',
+  ),
+  lunch(
+    displayName: 'Mittagessen',
+    icon: CupertinoIcons.sun_max_fill,
+    gradientColors: [Color(0xFF7AD7F0), Color(0xFF8FE388)],
+    imagePath: 'assets/image/Mittagessen.webp',
+  ),
+  dinner(
+    displayName: 'Abendessen',
+    icon: CupertinoIcons.moon_stars_fill,
+    gradientColors: [Color(0xFF6B7AFF), Color(0xFF8F7AFF)],
+    imagePath: 'assets/image/Abendessen.webp',
+  ),
+  snack(
+    displayName: 'Snacks',
+    icon: CupertinoIcons.flame_fill,
+    gradientColors: [Color(0xFFFF7A7A), Color(0xFFFFB27A)],
+    imagePath: 'assets/image/Snacks.webp',
+  );
 
-  String get displayName {
-    switch (this) {
-      case MealType.breakfast:
-        return 'Frühstück';
-      case MealType.lunch:
-        return 'Mittagessen';
-      case MealType.dinner:
-        return 'Abendessen';
-      case MealType.snack:
-        return 'Snacks';
-    }
-  }
+  const MealType({
+    required this.displayName,
+    required this.icon,
+    required this.gradientColors,
+    required this.imagePath,
+  });
 
-  String get databaseValue {
-    switch (this) {
-      case MealType.breakfast:
-        return 'breakfast';
-      case MealType.lunch:
-        return 'lunch';
-      case MealType.dinner:
-        return 'dinner';
-      case MealType.snack:
-        return 'snack';
-    }
-  }
+  final String displayName;
+  final IconData icon;
+  final List<Color> gradientColors;
+  final String imagePath;
+
+  String get databaseValue => name;
 
   double get calorieDistribution {
     switch (this) {
@@ -42,32 +50,6 @@ enum MealType {
         return 0.30; // 30%
       case MealType.snack:
         return 0.10; // 10%
-    }
-  }
-
-  List<Color> get gradientColors {
-    switch (this) {
-      case MealType.breakfast:
-        return [const Color(0xFF43CEA2), const Color(0xFF185A9D)];
-      case MealType.lunch:
-        return [const Color(0xFFFFAF7B), const Color(0xFFD76D77)];
-      case MealType.dinner:
-        return [const Color(0xFFF7971E), const Color(0xFFFFD200)];
-      case MealType.snack:
-        return [const Color(0xFF76C893), const Color(0xFF34A0A4)];
-    }
-  }
-
-  IconData get icon {
-    switch (this) {
-      case MealType.breakfast:
-        return Icons.breakfast_dining;
-      case MealType.lunch:
-        return Icons.lunch_dining;
-      case MealType.dinner:
-        return Icons.dinner_dining;
-      case MealType.snack:
-        return Icons.cake;
     }
   }
 

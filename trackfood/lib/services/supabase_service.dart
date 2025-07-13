@@ -1,7 +1,10 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:trackfood/models/diary_entry.dart';
 import 'package:trackfood/models/fasting_session.dart';
+import 'package:trackfood/models/food_item.dart'; // Import FoodItem model
 import 'package:trackfood/models/profile.dart';
+import 'package:trackfood/models/water_intake.dart';
 
 class SupabaseService {
   final SupabaseClient client = Supabase.instance.client;
@@ -129,27 +132,14 @@ class SupabaseService {
   Future<List<DiaryEntry>> getEntriesForDate(DateTime date) async {
     if (currentUserId == null) return [];
     try {
-      final startOfDay = DateTime(
-        date.year,
-        date.month,
-        date.day,
-      ).toIso8601String();
-      final endOfDay = DateTime(
-        date.year,
-        date.month,
-        date.day,
-        23,
-        59,
-        59,
-      ).toIso8601String();
-
+      final dateStr = date.toIso8601String().split('T')[0];
       final response = await client
           .from('diary_entries')
           .select()
           .eq('user_id', currentUserId!)
-          .gte('entry_date', startOfDay)
-          .lte('entry_date', endOfDay)
-          .order('created_at', ascending: true);
+          .gte('created_at', '${dateStr}T00:00:00Z')
+          .lt('created_at', '${dateStr}T23:59:59Z')
+          .order('created_at', ascending: false);
 
       return (response as List)
           .map((json) => DiaryEntry.fromJson(json))
@@ -159,4 +149,152 @@ class SupabaseService {
       return [];
     }
   }
+
+  // Add a new diary entry
+  Future<void> addDiaryEntry({
+    required String userId,
+    required String mealType,
+    required String foodName,
+    required double calories,
+    required double protein,
+    required double carbs,
+    required double fat,
+    required double quantity,
+    String? productCode,
+  }) async {
+    final newEntry = {
+      'user_id': userId,
+      'meal_type': mealType,
+      'food_name': foodName,
+      'calories': calories,
+      'protein_g': protein,
+      'carb_g': carbs,
+      'fat_g': fat,
+      'quantity': quantity,
+      'unit': 'g', // Assuming grams for now
+      'entry_date': DateTime.now().toIso8601String(),
+      'product_code': productCode,
+    };
+
+    final response = await client.from('diary_entries').insert(newEntry);
+
+    if (response.error != null) {
+      throw Exception(response.error!.message);
+    }
+  }
+
+  // Delete a diary entry
+  Future<void> deleteDiaryEntry(String entryId) async {
+    final response = await client
+        .from('diary_entries')
+        .delete()
+        .eq('id', entryId);
+
+    if (response.error != null) {
+      throw Exception(response.error!.message);
+    }
+  }
+
+  // === Water Intake ===
+
+  /// Fetches or creates water intake for a specific date.
+  Future<WaterIntake> getWaterIntakeForDate(
+    String userId,
+    DateTime date,
+  ) async {
+    final dateStr = date.toIso8601String().split('T')[0];
+
+    try {
+      final data = await client
+          .from('water_intake') // Corrected table name
+          .select()
+          .eq('user_id', userId)
+          .eq('date', dateStr)
+          .maybeSingle();
+
+      if (data != null) {
+        return WaterIntake.fromJson(data);
+      } else {
+        // No entry for today, create one
+        final newIntake = {
+          'user_id': userId,
+          'date': dateStr,
+          'amount_ml': 0,
+          'daily_goal_ml': 3000, // Default goal
+        };
+        final createResponse = await client
+            .from('water_intake') // Corrected table name
+            .insert(newIntake)
+            .select()
+            .single();
+
+        return WaterIntake.fromJson(createResponse);
+      }
+    } on PostgrestException catch (e) {
+      // Handle specific Postgrest errors if needed
+      print('Supabase error in getWaterIntakeForDate: ${e.message}');
+      throw Exception('Failed to get or create water intake: ${e.message}');
+    } catch (e) {
+      // Handle other generic errors
+      print('Generic error in getWaterIntakeForDate: $e');
+      throw Exception('An unexpected error occurred.');
+    }
+  }
+
+  /// Adds a specific amount of water to the intake for a given ID.
+  Future<WaterIntake> addWater(String intakeId, int amountToAdd) async {
+    try {
+      // 1. Fetch the current amount of water
+      final currentIntakeData = await client
+          .from('water_intake')
+          .select('amount_ml')
+          .eq('id', intakeId)
+          .single();
+
+      final currentAmount = currentIntakeData['amount_ml'] as int;
+      final newAmount = currentAmount + amountToAdd;
+
+      // 2. Update the record with the new amount
+      final updatedData = await client
+          .from('water_intake')
+          .update({'amount_ml': newAmount})
+          .eq('id', intakeId)
+          .select()
+          .single();
+
+      // 3. Return the updated water intake object
+      return WaterIntake.fromJson(updatedData);
+    } on PostgrestException catch (e) {
+      print('Supabase error in addWater: ${e.message}');
+      throw Exception('Failed to add water: ${e.message}');
+    } catch (e) {
+      print('Generic error in addWater: $e');
+      throw Exception('An unexpected error occurred while adding water.');
+    }
+  }
+
+  // === Product Search ===
+
+  /// Searches for products in the local Supabase DB.
+  Future<List<FoodItem>> searchProducts(String query) async {
+    if (query.isEmpty) return [];
+    try {
+      final response = await client
+          .from('products')
+          .select()
+          .textSearch(
+            'name',
+            query,
+            config: 'german',
+          ); // Use text search for better results
+
+      return (response as List).map((json) => FoodItem.fromJson(json)).toList();
+    } catch (e) {
+      print('Error searching products in Supabase: $e');
+      return [];
+    }
+  }
 }
+
+/// Provider to make the SupabaseService instance available to the rest of the app.
+final supabaseServiceProvider = Provider((ref) => SupabaseService());

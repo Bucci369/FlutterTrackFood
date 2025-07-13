@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_typography.dart';
 
 class MessageInput extends StatefulWidget {
   final Function(String) onSendMessage;
@@ -39,11 +40,11 @@ class _MessageInputState extends State<MessageInput> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: CupertinoColors.systemBackground,
+        color: const Color(0xFFF6F1E7), // Apple White
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 4,
+            color: CupertinoColors.systemGrey.withValues(alpha: 0.1),
+            blurRadius: 6,
             offset: const Offset(0, -2),
           ),
         ],
@@ -54,9 +55,9 @@ class _MessageInputState extends State<MessageInput> {
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: CupertinoColors.systemGrey6,
+                  color: AppColors.background,
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: CupertinoColors.systemGrey4),
+                  border: Border.all(color: AppColors.separator),
                 ),
                 child: CupertinoTextField(
                   controller: _controller,
@@ -66,12 +67,11 @@ class _MessageInputState extends State<MessageInput> {
                   onSubmitted: (_) => _sendMessage(),
                   enabled: !widget.isLoading,
                   placeholder: 'Frage mich etwas über deine Ernährung...',
-                  placeholderStyle: TextStyle(
-                    color: CupertinoColors.placeholderText,
-                    letterSpacing: -0.41,
+                  placeholderStyle: AppTypography.body.copyWith(
+                    color: AppColors.placeholder,
                   ),
-                  style: const TextStyle(
-                    letterSpacing: -0.41,
+                  style: AppTypography.body.copyWith(
+                    color: AppColors.label,
                   ),
                   decoration: const BoxDecoration(),
                   padding: const EdgeInsets.symmetric(
@@ -85,7 +85,7 @@ class _MessageInputState extends State<MessageInput> {
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.green.shade600, Colors.green.shade500],
+                  colors: [AppColors.primary, AppColors.primary.withValues(alpha: 0.8)],
                 ),
                 borderRadius: BorderRadius.circular(24),
               ),
@@ -107,7 +107,7 @@ class _MessageInputState extends State<MessageInput> {
                         )
                       : const Icon(
                           CupertinoIcons.paperplane_fill,
-                          color: Colors.white,
+                          color: CupertinoColors.white,
                           size: 20,
                         ),
                 ),

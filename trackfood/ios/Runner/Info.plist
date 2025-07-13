@@ -45,5 +45,7 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Diese App benötigt Zugriff auf die Kamera, um Barcodes zu scannen.</string>
 </dict>
 </plist>

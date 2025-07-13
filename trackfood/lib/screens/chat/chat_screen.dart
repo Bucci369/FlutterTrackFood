@@ -1,20 +1,22 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../providers/chat_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../app_providers.dart';
+import '../../providers/chat_provider.dart'; // Import the file
 import '../../widgets/chat_bubble.dart';
 import '../../widgets/message_input.dart';
 import '../../widgets/quick_actions.dart';
 import '../../widgets/typing_indicator.dart';
+import '../../theme/app_colors.dart';
+import '../../theme/app_typography.dart';
 
-class ChatScreen extends StatefulWidget {
+class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key});
 
   @override
-  State<ChatScreen> createState() => _ChatScreenState();
+  ConsumerState<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends ConsumerState<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   bool _showQuickActions = true;
 
@@ -39,7 +41,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      backgroundColor: CupertinoColors.systemBackground,
+      backgroundColor: const Color(0xFFF6F1E7), // Apple White
       navigationBar: CupertinoNavigationBar(
         middle: Row(
           mainAxisSize: MainAxisSize.min,
@@ -49,47 +51,44 @@ class _ChatScreenState extends State<ChatScreen> {
               height: 32,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.green.shade600, Colors.green.shade400],
+                  colors: [
+                    AppColors.primary,
+                    AppColors.primary.withValues(alpha: 0.8),
+                  ],
                 ),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: const Icon(
                 CupertinoIcons.sparkles,
                 size: 18,
-                color: Colors.white,
+                color: CupertinoColors.white,
               ),
             ),
             const SizedBox(width: 12),
-            const Text(
+            Text(
               'KI Ernährungsberater',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                letterSpacing: -0.41,
-              ),
+              style: AppTypography.headline.copyWith(color: AppColors.label),
             ),
           ],
         ),
-        backgroundColor: CupertinoColors.systemBackground,
+        backgroundColor: const Color(0xFFF6F1E7), // Apple White
         border: null,
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: () {
-            context.read<ChatProvider>().clearChat();
+            ref.read(chatProvider).clearChat();
             setState(() {
               _showQuickActions = true;
             });
           },
-          child: const Icon(
-            CupertinoIcons.refresh,
-            color: Color(0xFF34A0A4),
-          ),
+          child: Icon(CupertinoIcons.refresh, color: AppColors.primary),
         ),
       ),
-      child: Consumer<ChatProvider>(
-        builder: (context, chatProvider, child) {
+      child: Consumer(
+        builder: (context, ref, child) {
+          final chat = ref.watch(chatProvider);
           // Auto-scroll when new messages arrive
-          if (chatProvider.messages.isNotEmpty) {
+          if (chat.messages.isNotEmpty) {
             _scrollToBottom();
           }
 
@@ -100,19 +99,21 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: ListView.builder(
                   controller: _scrollController,
                   padding: const EdgeInsets.symmetric(vertical: 8),
-                  itemCount: chatProvider.messages.length +
-                      (chatProvider.isLoading ? 1 : 0) +
+                  itemCount:
+                      chat.messages.length +
+                      (chat.isLoading ? 1 : 0) +
                       (_showQuickActions ? 1 : 0),
                   itemBuilder: (context, index) {
                     // Quick Actions (shown at the beginning)
                     if (_showQuickActions && index == 0) {
                       return QuickActions(
-                        actions: ChatProvider.quickActions,
+                        actions:
+                            kQuickActions, // Use the new top-level constant
                         onActionTap: (action) {
                           setState(() {
                             _showQuickActions = false;
                           });
-                          chatProvider.sendQuickAction(action);
+                          chat.sendQuickAction(action);
                         },
                       );
                     }
@@ -121,46 +122,52 @@ class _ChatScreenState extends State<ChatScreen> {
                     final messageIndex = _showQuickActions ? index - 1 : index;
 
                     // Loading indicator
-                    if (messageIndex >= chatProvider.messages.length) {
+                    if (messageIndex >= chat.messages.length) {
                       return const TypingIndicator();
                     }
 
                     // Regular message
-                    final message = chatProvider.messages[messageIndex];
+                    final message = chat.messages[messageIndex];
                     return ChatBubble(message: message);
                   },
                 ),
               ),
 
               // Error Display
-              if (chatProvider.error != null)
+              if (chat.error != null)
                 Container(
                   width: double.infinity,
                   margin: const EdgeInsets.all(16),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.red.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.red.shade200),
+                    color: AppColors.systemRed.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.systemRed.withValues(alpha: 0.3),
+                    ),
                   ),
                   child: Row(
                     children: [
-                      Icon(CupertinoIcons.exclamationmark_circle, color: Colors.red.shade600),
+                      Icon(
+                        CupertinoIcons.exclamationmark_circle,
+                        color: AppColors.systemRed,
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Fehler: ${chatProvider.error}',
-                          style: TextStyle(color: Colors.red.shade700),
+                          'Fehler: ${chat.error}',
+                          style: AppTypography.body.copyWith(
+                            color: AppColors.systemRed,
+                          ),
                         ),
                       ),
                       CupertinoButton(
                         padding: EdgeInsets.zero,
-                        onPressed: chatProvider.clearError,
+                        onPressed: chat.clearError,
                         child: Text(
                           'Schließen',
-                          style: TextStyle(
-                            color: Colors.red.shade600,
-                            letterSpacing: -0.41,
+                          style: AppTypography.body.copyWith(
+                            color: AppColors.systemRed,
                           ),
                         ),
                       ),
@@ -174,9 +181,9 @@ class _ChatScreenState extends State<ChatScreen> {
                   setState(() {
                     _showQuickActions = false;
                   });
-                  chatProvider.sendMessage(message);
+                  chat.sendMessage(message);
                 },
-                isLoading: chatProvider.isLoading,
+                isLoading: chat.isLoading,
               ),
             ],
           );

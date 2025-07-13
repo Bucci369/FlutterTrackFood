@@ -1,63 +1,143 @@
 import 'package:flutter/cupertino.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/profile_provider.dart';
 import '../../services/supabase_service.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_typography.dart';
 
-class ActivitiesScreen extends StatefulWidget {
+class ActivitiesScreen extends ConsumerStatefulWidget {
   const ActivitiesScreen({super.key});
 
   @override
-  State<ActivitiesScreen> createState() => _ActivitiesScreenState();
+  ConsumerState<ActivitiesScreen> createState() => _ActivitiesScreenState();
 }
 
-class _ActivitiesScreenState extends State<ActivitiesScreen> {
+class _ActivitiesScreenState extends ConsumerState<ActivitiesScreen> {
   // Exakt die gleichen Aktivitäten wie in der WebApp (activities-list.ts)
   static const List<Map<String, dynamic>> _webAppActivities = [
     {'id': 'aerobic', 'name': 'Aerobic Dancing', 'emoji': '💃', 'met': 7.0},
     {'id': 'aikido', 'name': 'Aikido', 'emoji': '🥋', 'met': 5.0},
     {'id': 'angeln', 'name': 'Angeln', 'emoji': '🎣', 'met': 2.5},
     {'id': 'aquajogging', 'name': 'Aquajogging', 'emoji': '🏊‍♂️', 'met': 7.0},
-    {'id': 'ausfallschritte', 'name': 'Ausfallschritte', 'emoji': '💪', 'met': 5.0},
+    {
+      'id': 'ausfallschritte',
+      'name': 'Ausfallschritte',
+      'emoji': '💪',
+      'met': 5.0,
+    },
     {'id': 'badminton', 'name': 'Badminton', 'emoji': '🏸', 'met': 4.5},
     {'id': 'basketball', 'name': 'Basketball', 'emoji': '🏀', 'met': 6.5},
-    {'id': 'basketball_wettkampf', 'name': 'Basketball, wettkampfmäßig', 'emoji': '🏀', 'met': 8.3},
+    {
+      'id': 'basketball_wettkampf',
+      'name': 'Basketball, wettkampfmäßig',
+      'emoji': '🏀',
+      'met': 8.3,
+    },
     {'id': 'beinpresse', 'name': 'Beinpresse', 'emoji': '💪', 'met': 5.0},
     {'id': 'bergsteigen', 'name': 'Bergsteigen', 'emoji': '🧗‍♂️', 'met': 8.0},
     {'id': 'boxen', 'name': 'Boxen', 'emoji': '🥊', 'met': 7.8},
-    {'id': 'boxen_wettkampf', 'name': 'Boxen, wettkampfmäßig', 'emoji': '🥊', 'met': 12.0},
-    {'id': 'crosstrainer', 'name': 'Crosstrainer', 'emoji': '🏋️‍♂️', 'met': 5.0},
-    {'id': 'fahrrad', 'name': 'Fahrradfahren, generell', 'emoji': '🚴‍♂️', 'met': 6.0},
+    {
+      'id': 'boxen_wettkampf',
+      'name': 'Boxen, wettkampfmäßig',
+      'emoji': '🥊',
+      'met': 12.0,
+    },
+    {
+      'id': 'crosstrainer',
+      'name': 'Crosstrainer',
+      'emoji': '🏋️‍♂️',
+      'met': 5.0,
+    },
+    {
+      'id': 'fahrrad',
+      'name': 'Fahrradfahren, generell',
+      'emoji': '🚴‍♂️',
+      'met': 6.0,
+    },
     {'id': 'fussball', 'name': 'Fußball', 'emoji': '⚽', 'met': 7.0},
-    {'id': 'fussball_wettkampf', 'name': 'Fußball, wettkampfmäßig', 'emoji': '⚽', 'met': 10.0},
+    {
+      'id': 'fussball_wettkampf',
+      'name': 'Fußball, wettkampfmäßig',
+      'emoji': '⚽',
+      'met': 10.0,
+    },
     {'id': 'handball', 'name': 'Handball', 'emoji': '🤾‍♂️', 'met': 8.0},
-    {'id': 'handball_wettkampf', 'name': 'Handball, wettkampfmäßig', 'emoji': '🤾‍♂️', 'met': 12.0},
+    {
+      'id': 'handball_wettkampf',
+      'name': 'Handball, wettkampfmäßig',
+      'emoji': '🤾‍♂️',
+      'met': 12.0,
+    },
     {'id': 'hiit', 'name': 'HIIT', 'emoji': '🔥', 'met': 8.0},
     {'id': 'joggen', 'name': 'Joggen, Laufen', 'emoji': '🏃‍♂️', 'met': 8.0},
     {'id': 'klettern', 'name': 'Klettern', 'emoji': '🧗‍♂️', 'met': 8.0},
-    {'id': 'krafttraining', 'name': 'Krafttraining, Fitnessstudio', 'emoji': '💪', 'met': 6.0},
+    {
+      'id': 'krafttraining',
+      'name': 'Krafttraining, Fitnessstudio',
+      'emoji': '💪',
+      'met': 6.0,
+    },
     {'id': 'laufen', 'name': 'Laufen (schnell)', 'emoji': '🏃‍♂️', 'met': 10.0},
-    {'id': 'mountainbike', 'name': 'Mountainbiken', 'emoji': '🚵‍♂️', 'met': 8.5},
-    {'id': 'nordicwalking', 'name': 'Nordic Walking', 'emoji': '🚶‍♀️', 'met': 4.5},
+    {
+      'id': 'mountainbike',
+      'name': 'Mountainbiken',
+      'emoji': '🚵‍♂️',
+      'met': 8.5,
+    },
+    {
+      'id': 'nordicwalking',
+      'name': 'Nordic Walking',
+      'emoji': '🚶‍♀️',
+      'met': 4.5,
+    },
     {'id': 'pilates', 'name': 'Pilates', 'emoji': '🧘‍♀️', 'met': 3.0},
     {'id': 'reiten', 'name': 'Reiten', 'emoji': '🏇', 'met': 5.5},
     {'id': 'rudern', 'name': 'Rudern', 'emoji': '🚣‍♂️', 'met': 7.0},
-    {'id': 'rudern_wettkampf', 'name': 'Rudern, wettkampfmäßig', 'emoji': '🚣‍♂️', 'met': 12.0},
+    {
+      'id': 'rudern_wettkampf',
+      'name': 'Rudern, wettkampfmäßig',
+      'emoji': '🚣‍♂️',
+      'met': 12.0,
+    },
     {'id': 'schwimmen', 'name': 'Schwimmen', 'emoji': '🏊‍♂️', 'met': 6.0},
-    {'id': 'schwimmen_kraulen', 'name': 'Schwimmen, Kraulen', 'emoji': '🏊‍♂️', 'met': 9.8},
+    {
+      'id': 'schwimmen_kraulen',
+      'name': 'Schwimmen, Kraulen',
+      'emoji': '🏊‍♂️',
+      'met': 9.8,
+    },
     {'id': 'skifahren', 'name': 'Ski fahren', 'emoji': '⛷️', 'met': 7.0},
-    {'id': 'skifahren_wettkampf', 'name': 'Ski fahren, wettkampfmäßig', 'emoji': '⛷️', 'met': 10.0},
+    {
+      'id': 'skifahren_wettkampf',
+      'name': 'Ski fahren, wettkampfmäßig',
+      'emoji': '⛷️',
+      'met': 10.0,
+    },
     {'id': 'skilanglauf', 'name': 'Ski Langlauf', 'emoji': '🎿', 'met': 7.5},
-    {'id': 'spazieren', 'name': 'Spazieren gehen', 'emoji': '🚶‍♂️', 'met': 3.0},
+    {
+      'id': 'spazieren',
+      'name': 'Spazieren gehen',
+      'emoji': '🚶‍♂️',
+      'met': 3.0,
+    },
     {'id': 'springen', 'name': 'Seilspringen', 'emoji': '🤾‍♂️', 'met': 12.0},
     {'id': 'tanzen', 'name': 'Tanzen', 'emoji': '💃', 'met': 5.5},
     {'id': 'tanzen_salsa', 'name': 'Tanzen: Salsa', 'emoji': '💃', 'met': 7.0},
     {'id': 'tennis', 'name': 'Tennis', 'emoji': '🎾', 'met': 7.3},
     {'id': 'tischtennis', 'name': 'Tischtennis', 'emoji': '🏓', 'met': 4.0},
-    {'id': 'trampolin', 'name': 'Trampolin springen', 'emoji': '🤸‍♂️', 'met': 3.5},
+    {
+      'id': 'trampolin',
+      'name': 'Trampolin springen',
+      'emoji': '🤸‍♂️',
+      'met': 3.5,
+    },
     {'id': 'volleyball', 'name': 'Volleyball', 'emoji': '🏐', 'met': 3.5},
-    {'id': 'volleyball_wettkampf', 'name': 'Volleyball, wettkampfmäßig', 'emoji': '🏐', 'met': 8.0},
+    {
+      'id': 'volleyball_wettkampf',
+      'name': 'Volleyball, wettkampfmäßig',
+      'emoji': '🏐',
+      'met': 8.0,
+    },
     {'id': 'wandern', 'name': 'Wandern', 'emoji': '🥾', 'met': 6.0},
     {'id': 'yoga', 'name': 'Yoga', 'emoji': '🧘‍♂️', 'met': 3.0},
     {'id': 'zufussgehen', 'name': 'Zufußgehen', 'emoji': '🚶‍♂️', 'met': 3.5},
@@ -85,12 +165,16 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
 
       if (response.isNotEmpty) {
         setState(() {
-          _activities = response.map<Map<String, dynamic>>((activity) => {
-            'id': activity['id'],
-            'name': activity['activity_name'] ?? 'Unbekannte Aktivität',
-            'emoji': activity['emoji'] ?? '🏃‍♂️',
-            'met': (activity['met'] as num?)?.toDouble() ?? 5.0,
-          }).toList();
+          _activities = response
+              .map<Map<String, dynamic>>(
+                (activity) => {
+                  'id': activity['id'],
+                  'name': activity['activity_name'] ?? 'Unbekannte Aktivität',
+                  'emoji': activity['emoji'] ?? '🏃‍♂️',
+                  'met': (activity['met'] as num?)?.toDouble() ?? 5.0,
+                },
+              )
+              .toList();
           _filteredActivities = _activities;
           _isLoading = false;
         });
@@ -112,15 +196,19 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
   Future<void> _ensureActivitiesInSupabase() async {
     try {
       // Importiere WebApp-Aktivitäten in Supabase
-      final insertData = _webAppActivities.map((activity) => {
-        'id': activity['id'],
-        'activity_name': activity['name'],
-        'emoji': activity['emoji'],
-        'met': activity['met'],
-      }).toList();
+      final insertData = _webAppActivities
+          .map(
+            (activity) => {
+              'id': activity['id'],
+              'activity_name': activity['name'],
+              'emoji': activity['emoji'],
+              'met': activity['met'],
+            },
+          )
+          .toList();
 
       await SupabaseService().client.from('activities').upsert(insertData);
-      
+
       setState(() {
         _activities = _webAppActivities;
         _filteredActivities = _activities;
@@ -143,8 +231,10 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
         _filteredActivities = _activities;
       } else {
         _filteredActivities = _activities
-            .where((activity) => 
-                activity['name'].toLowerCase().contains(query.toLowerCase()))
+            .where(
+              (activity) =>
+                  activity['name'].toLowerCase().contains(query.toLowerCase()),
+            )
             .toList();
       }
     });
@@ -158,17 +248,12 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
         backgroundColor: const Color(0xFFF6F1E7),
         middle: Text(
           'Aktivität hinzufügen',
-          style: AppTypography.headline.copyWith(
-            color: AppColors.label,
-          ),
+          style: AppTypography.headline.copyWith(color: AppColors.label),
         ),
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: () => Navigator.of(context).pop(),
-          child: Icon(
-            CupertinoIcons.back,
-            color: AppColors.primary,
-          ),
+          child: Icon(CupertinoIcons.back, color: AppColors.primary),
         ),
       ),
       child: SafeArea(
@@ -195,30 +280,29 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
               CupertinoSearchTextField(
                 placeholder: 'Aktivität suchen...',
                 onChanged: _filterActivities,
-                style: AppTypography.body.copyWith(
-                  color: AppColors.label,
-                ),
+                style: AppTypography.body.copyWith(color: AppColors.label),
               ),
               const SizedBox(height: 16),
               Expanded(
                 child: _isLoading
                     ? _buildLoadingState()
                     : _filteredActivities.isEmpty
-                        ? _buildEmptyState()
-                        : GridView.builder(
-                            physics: const BouncingScrollPhysics(),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    ? _buildEmptyState()
+                    : GridView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
                               crossAxisSpacing: 12,
                               mainAxisSpacing: 12,
                               childAspectRatio: 1.1,
                             ),
-                            itemCount: _filteredActivities.length,
-                            itemBuilder: (context, index) {
-                              final activity = _filteredActivities[index];
-                              return _buildActivityCard(activity);
-                            },
-                          ),
+                        itemCount: _filteredActivities.length,
+                        itemBuilder: (context, index) {
+                          final activity = _filteredActivities[index];
+                          return _buildActivityCard(activity);
+                        },
+                      ),
               ),
             ],
           ),
@@ -235,10 +319,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           color: AppColors.background,
-          border: Border.all(
-            color: AppColors.separator,
-            width: 1,
-          ),
+          border: Border.all(color: AppColors.separator, width: 1),
           boxShadow: [
             BoxShadow(
               color: CupertinoColors.systemGrey.withValues(alpha: 0.1),
@@ -296,7 +377,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
 
   void _showActivityDetailsDialog(Map<String, dynamic> activity) {
     int duration = 30; // Default duration in minutes
-    
+
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
@@ -319,12 +400,10 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
             const SizedBox(height: 16),
             Text(
               'Wie lange warst du aktiv?',
-              style: AppTypography.body.copyWith(
-                color: AppColors.label,
-              ),
+              style: AppTypography.body.copyWith(color: AppColors.label),
             ),
             const SizedBox(height: 16),
-            Container(
+            SizedBox(
               height: 120,
               child: CupertinoPicker(
                 itemExtent: 32,
@@ -369,9 +448,14 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
     );
   }
 
-  Future<void> _saveActivity(Map<String, dynamic> activity, int duration) async {
+  Future<void> _saveActivity(
+    Map<String, dynamic> activity,
+    int duration,
+  ) async {
     try {
-      final profile = Provider.of<ProfileProvider>(context, listen: false).profile;
+      // Use ref.read to get the profile from the Riverpod provider
+      final profileState = ref.read(profileProvider);
+      final profile = profileState.profile;
       if (profile?.id == null) return;
 
       // Calculate calories burned (gleiche Formel wie WebApp)
@@ -380,7 +464,8 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
       final calories = ((met * weightKg * duration) / 60).round();
 
       final today = DateTime.now();
-      final dateString = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+      final dateString =
+          '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
 
       // Genau die gleichen Felder wie in der WebApp
       await SupabaseService().client.from('user_activities').insert({
@@ -411,10 +496,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
                   Navigator.of(context).pop(); // Close dialog
                   Navigator.of(context).pop(); // Go back to dashboard
                 },
-                child: Text(
-                  'OK',
-                  style: TextStyle(color: AppColors.primary),
-                ),
+                child: Text('OK', style: TextStyle(color: AppColors.primary)),
               ),
             ],
           ),
@@ -445,15 +527,11 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CupertinoActivityIndicator(
-            color: AppColors.primary,
-          ),
+          CupertinoActivityIndicator(color: AppColors.primary),
           const SizedBox(height: 16),
           Text(
             'Lade Aktivitäten...',
-            style: AppTypography.body.copyWith(
-              color: AppColors.secondaryLabel,
-            ),
+            style: AppTypography.body.copyWith(color: AppColors.secondaryLabel),
           ),
         ],
       ),

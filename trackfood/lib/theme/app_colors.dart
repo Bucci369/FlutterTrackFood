@@ -37,6 +37,31 @@ class AppColors {
   static const Color separator = CupertinoColors.separator;
   static const Color fill = CupertinoColors.systemGrey5;
 
+  // === iOS System Colors for native feel ===
+  static const Color systemRed = CupertinoColors.systemRed;
+  static const Color systemGreen = CupertinoColors.systemGreen;
+  static const Color systemBlue = CupertinoColors.systemBlue;
+  static const Color systemOrange = CupertinoColors.systemOrange;
+  static const Color systemYellow = CupertinoColors.systemYellow;
+  static const Color systemPink = CupertinoColors.systemPink;
+  static const Color systemPurple = CupertinoColors.systemPurple;
+  static const Color systemTeal = CupertinoColors.systemTeal;
+  static const Color systemIndigo = CupertinoColors.systemIndigo;
+
+  static const Color systemBackground = CupertinoColors.systemBackground;
+  static const Color secondarySystemBackground = CupertinoColors.secondarySystemBackground;
+  static const Color tertiarySystemBackground = CupertinoColors.tertiarySystemBackground;
+  
+  static const Color systemGroupedBackground = CupertinoColors.systemGroupedBackground;
+  static const Color secondarySystemGroupedBackground = CupertinoColors.secondarySystemGroupedBackground;
+  static const Color tertiarySystemGroupedBackground = CupertinoColors.tertiarySystemGroupedBackground;
+
+  static const Color systemFill = CupertinoColors.systemFill;
+  static const Color secondarySystemFill = CupertinoColors.secondarySystemFill;
+  static const Color tertiarySystemFill = CupertinoColors.tertiarySystemFill;
+  static const Color quaternarySystemFill = CupertinoColors.quaternarySystemFill;
+
+
   // === FUNCTIONAL COLORS (EXISTING) ===
   static const Color success = CupertinoColors.systemGreen;
   static const Color warning = CupertinoColors.systemOrange;

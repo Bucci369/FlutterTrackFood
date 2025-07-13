@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:glassmorphism/glassmorphism.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:trackfood/theme/app_colors.dart';
+import 'package:trackfood/theme/app_typography.dart';
 import '../../../models/diary_entry.dart';
 import '../../../models/meal_type.dart';
 
@@ -8,47 +9,44 @@ class MealCard extends StatelessWidget {
   final MealType mealType;
   final List<DiaryEntry> entries;
   final int recommendedCalories;
-  final VoidCallback onEntryAdded;
+  final VoidCallback onAdd;
+  final Function(String) onDelete;
 
   const MealCard({
     super.key,
     required this.mealType,
     required this.entries,
     required this.recommendedCalories,
-    required this.onEntryAdded,
+    required this.onAdd,
+    required this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
-    final totalCalories =
-        entries.fold<double>(0, (sum, entry) => sum + entry.calories);
-    final progress = totalCalories / recommendedCalories;
+    final totalCalories = entries.fold<double>(
+      0,
+      (sum, entry) => sum + entry.calories,
+    );
+    final progress = recommendedCalories > 0
+        ? totalCalories / recommendedCalories
+        : 0.0;
 
-    return GlassmorphicContainer(
-      width: double.infinity,
-      height: entries.isEmpty ? 140 : 140 + (entries.length * 50.0),
-      borderRadius: 20,
-      blur: 20,
-      alignment: Alignment.center,
-      border: 2,
-      linearGradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          mealType.gradientColors[0].withValues(alpha: 0.3),
-          mealType.gradientColors[1].withValues(alpha: 0.1),
-        ],
-      ),
-      borderGradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          mealType.gradientColors[0].withValues(alpha: 0.4),
-          mealType.gradientColors[1].withValues(alpha: 0.2),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.separator, width: 1),
+        color: const Color(0xFFF6F1E7), // Apple White
+        boxShadow: [
+          BoxShadow(
+            color: CupertinoColors.systemGrey.withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -56,61 +54,54 @@ class MealCard extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  width: 50,
-                  height: 50,
+                  width: 44,
+                  height: 44,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: mealType.gradientColors,
+                    image: DecorationImage(
+                      image: AssetImage(mealType.imagePath),
+                      fit: BoxFit.cover,
                     ),
                   ),
-                  child: Icon(
-                    mealType.icon,
-                    color: Colors.white,
-                    size: 24,
-                  ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         mealType.displayName,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
+                        style: AppTypography.title3.copyWith(
+                          color: AppColors.label,
                           fontWeight: FontWeight.w600,
+                          inherit: true,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       Text(
                         '${totalCalories.toInt()} / $recommendedCalories kcal',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.8),
-                          fontSize: 14,
+                        style: AppTypography.subhead.copyWith(
+                          color: AppColors.secondaryLabel,
+                          inherit: true,
                         ),
                       ),
                     ],
                   ),
                 ),
                 // Add button
-                GestureDetector(
-                  onTap: () => _addFood(context),
+                CupertinoButton(
+                  onPressed: onAdd,
+                  padding: EdgeInsets.zero,
                   child: Container(
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white.withValues(alpha: 0.2),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.3),
-                        width: 1,
-                      ),
+                      color: AppColors.fill,
                     ),
-                    child: const Icon(
-                      Icons.add,
-                      color: Colors.white,
+                    child: Icon(
+                      CupertinoIcons.add,
+                      color: AppColors.label,
                       size: 20,
                     ),
                   ),
@@ -118,74 +109,68 @@ class MealCard extends StatelessWidget {
               ],
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
 
             // Progress bar
-            LinearProgressIndicator(
-              value: progress.clamp(0.0, 1.0),
-              backgroundColor: Colors.white.withValues(alpha: 0.3),
-              valueColor: AlwaysStoppedAnimation<Color>(
-                progress > 1.0 ? Colors.orange : Colors.white,
+            Container(
+              height: 6,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(3),
+                color: AppColors.fill,
               ),
-              minHeight: 4,
-              borderRadius: BorderRadius.circular(2),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Food entries
-            if (entries.isEmpty)
-              _buildEmptyState()
-            else
-              ...entries.take(3).map((entry) => _buildFoodEntry(entry)),
-
-            // Show more indicator
-            if (entries.length > 3)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text(
-                  '+${entries.length - 3} weitere Einträge',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.7),
-                    fontSize: 12,
-                    fontStyle: FontStyle.italic,
+              child: FractionallySizedBox(
+                alignment: Alignment.centerLeft,
+                widthFactor: progress.clamp(0.0, 1.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    color: progress > 1.0
+                        ? AppColors.systemOrange
+                        : AppColors.primary,
                   ),
                 ),
               ),
+            ),
+
+            if (entries.isNotEmpty) const SizedBox(height: 16),
+
+            // Food entries
+            ...entries.map(
+              (entry) => Dismissible(
+                key: Key(entry.id),
+                direction: DismissDirection.endToStart,
+                onDismissed: (direction) {
+                  onDelete(entry.id);
+                },
+                background: Container(
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.only(right: 20.0),
+                  decoration: BoxDecoration(
+                    color: AppColors.systemRed,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(CupertinoIcons.delete, color: CupertinoColors.white),
+                ),
+                child: _buildFoodEntry(entry),
+              ),
+            ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return SizedBox(
-      height: 50,
-      child: Center(
-        child: Text(
-          'Noch keine Einträge für ${mealType.displayName.toLowerCase()}',
-          style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.7),
-            fontSize: 14,
-            fontStyle: FontStyle.italic,
-          ),
-        ),
-      ),
-    );
+    ).animate().fadeIn(duration: 300.ms);
   }
 
   Widget _buildFoodEntry(DiaryEntry entry) {
     return Container(
-      height: 50,
+      height: 72, // Increased height to fit more info
       margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 8,
+      ), // Added vertical padding
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: Colors.white.withValues(alpha: 0.1),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.2),
-          width: 1,
-        ),
+        color: AppColors.background,
       ),
       child: Row(
         children: [
@@ -196,52 +181,49 @@ class MealCard extends StatelessWidget {
               children: [
                 Text(
                   entry.foodName,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                  style: AppTypography.body.copyWith(
+                    color: AppColors.label,
+                    fontWeight: FontWeight.w600,
+                    inherit: true,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
+                const SizedBox(height: 4), // Add some space
                 Text(
-                  '${entry.quantity.toInt()}${entry.unit}',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.7),
-                    fontSize: 12,
+                  // Show macros
+                  'P: ${entry.proteinG.toStringAsFixed(1)}g  •  C: ${entry.carbG.toStringAsFixed(1)}g  •  F: ${entry.fatG.toStringAsFixed(1)}g',
+                  style: AppTypography.footnote.copyWith(
+                    color: AppColors.secondaryLabel,
+                    inherit: true,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
-          Text(
-            '${entry.calories.toInt()} kcal',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    ).animate().fadeIn(duration: 300.ms).slideX(begin: 0.3, end: 0);
-  }
-
-  void _addFood(BuildContext context) {
-    // TODO: Navigate to food selection screen
-    // Navigator.of(context).pushNamed('/diary/add', arguments: mealType);
-
-    // For now, show a placeholder dialog
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('${mealType.displayName} hinzufügen'),
-        content: const Text(
-            'Food-Auswahl wird in der nächsten Version implementiert.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
+          const SizedBox(width: 8), // Add space before calories
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '${entry.calories.toInt()}',
+                style: AppTypography.title3.copyWith(
+                  color: AppColors.label,
+                  fontWeight: FontWeight.w600,
+                  inherit: true,
+                ),
+              ),
+              Text(
+                'kcal',
+                style: AppTypography.footnote.copyWith(
+                  color: AppColors.secondaryLabel,
+                  inherit: true,
+                ),
+              ),
+            ],
           ),
         ],
       ),

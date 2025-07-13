@@ -6,23 +6,37 @@ import 'package:trackfood/screens/diary/diary_screen.dart';
 import 'package:trackfood/screens/profile/profile_screen.dart';
 import 'dashboard_content.dart';
 
-class DashboardScreen extends ConsumerWidget {
-  const DashboardScreen({Key? key}) : super(key: key);
+class DashboardScreen extends ConsumerStatefulWidget {
+  const DashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final tabIndex = ref.watch(tabControllerProvider);
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+}
 
-    final List<Widget> _tabs = [
-      DashboardContent(), // Index 0
-      DiaryScreen(), // Index 1
-      ChatScreen(), // Index 2
-      ProfileScreen(), // Index 3
-    ];
+class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+  late CupertinoTabController _tabController;
 
+  @override
+  void initState() {
+    super.initState();
+    final initialIndex = ref.read(tabControllerProvider);
+    _tabController = CupertinoTabController(initialIndex: initialIndex);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return CupertinoTabScaffold(
-      controller: CupertinoTabController(initialIndex: tabIndex),
+      controller: _tabController,
       tabBar: CupertinoTabBar(
+        activeColor: const Color.fromARGB(255, 46, 71, 196),
+        inactiveColor: CupertinoColors.systemGrey,
+        backgroundColor: const Color(0xFFF6F1E7), // Apple White
         onTap: (index) {
           ref.read(tabControllerProvider.notifier).state = index;
         },
@@ -48,7 +62,18 @@ class DashboardScreen extends ConsumerWidget {
       tabBuilder: (BuildContext context, int index) {
         return CupertinoTabView(
           builder: (BuildContext context) {
-            return _tabs[index];
+            switch (index) {
+              case 0:
+                return const DashboardContent();
+              case 1:
+                return const DiaryScreen();
+              case 2:
+                return const ChatScreen();
+              case 3:
+                return const ProfileScreen();
+              default:
+                return const DashboardContent();
+            }
           },
         );
       },

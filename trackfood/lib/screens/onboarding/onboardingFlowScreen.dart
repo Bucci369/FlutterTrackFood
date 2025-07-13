@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/profile.dart';
 import '../../providers/profile_provider.dart';
 import 'onboarding_summary_screen.dart';
@@ -7,14 +7,15 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/app_typography.dart';
 
-class OnboardingFlowScreen extends StatefulWidget {
+class OnboardingFlowScreen extends ConsumerStatefulWidget {
   const OnboardingFlowScreen({super.key});
 
   @override
-  State<OnboardingFlowScreen> createState() => _OnboardingFlowScreenState();
+  ConsumerState<OnboardingFlowScreen> createState() =>
+      _OnboardingFlowScreenState();
 }
 
-class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
+class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
   final _pageController = PageController();
   int _currentStep = 0;
 
@@ -85,12 +86,11 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
   }
 
   void _completeOnboarding() {
-    final profileProvider = Provider.of<ProfileProvider>(
-      context,
-      listen: false,
-    );
+    final profileNotifier = ref.read(profileProvider.notifier);
+    final currentProfile = ref.read(profileProvider).profile;
+
     final finalProfile = Profile(
-      id: profileProvider.profile?.id ?? '',
+      id: currentProfile?.id ?? '', // Use existing ID if available
       firstName: _firstNameController.text.trim(),
       lastName: _lastNameController.text.trim(),
       age: int.tryParse(_ageController.text),
@@ -102,9 +102,12 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
       activityLevel: _selectedActivityLevel,
       dietType: _selectedDietType,
       isGlutenfree: _isGlutenfree,
-      onboardingCompleted: false,
+      onboardingCompleted: false, // Will be set to true on the summary screen
     );
-    profileProvider.setProfile(finalProfile);
+
+    // Use the new method to update the state without saving to DB
+    profileNotifier.setOnboardingProfile(finalProfile);
+
     Navigator.of(context).pushReplacement(
       CupertinoPageRoute(builder: (context) => const OnboardingSummaryScreen()),
     );
@@ -197,9 +200,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
         children: [
           Text(
             'Wie dürfen wir dich nennen?',
-            style: AppTypography.largeTitle.copyWith(
-              color: AppColors.label,
-            ),
+            style: AppTypography.largeTitle.copyWith(color: AppColors.label),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 40),
@@ -233,9 +234,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
         children: [
           Text(
             'Wie alt bist du?',
-            style: AppTypography.largeTitle.copyWith(
-              color: AppColors.label,
-            ),
+            style: AppTypography.largeTitle.copyWith(color: AppColors.label),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 40),
@@ -264,9 +263,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
         children: [
           Text(
             'Dein Geschlecht',
-            style: AppTypography.largeTitle.copyWith(
-              color: AppColors.label,
-            ),
+            style: AppTypography.largeTitle.copyWith(color: AppColors.label),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 40),
@@ -279,7 +276,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
                 onTap: () => setState(() => _selectedGender = gender['key']),
               ),
             ),
-          ).toList(),
+          ),
         ],
       ),
     );
@@ -293,9 +290,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
         children: [
           Text(
             'Deine Körpergröße',
-            style: AppTypography.largeTitle.copyWith(
-              color: AppColors.label,
-            ),
+            style: AppTypography.largeTitle.copyWith(color: AppColors.label),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 40),
@@ -325,9 +320,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
         children: [
           Text(
             'Dein aktuelles Gewicht',
-            style: AppTypography.largeTitle.copyWith(
-              color: AppColors.label,
-            ),
+            style: AppTypography.largeTitle.copyWith(color: AppColors.label),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 40),
@@ -357,9 +350,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
         children: [
           Text(
             'Dein Zielgewicht',
-            style: AppTypography.largeTitle.copyWith(
-              color: AppColors.label,
-            ),
+            style: AppTypography.largeTitle.copyWith(color: AppColors.label),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 40),
@@ -388,9 +379,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
         children: [
           Text(
             'Ziele & Aktivität',
-            style: AppTypography.largeTitle.copyWith(
-              color: AppColors.label,
-            ),
+            style: AppTypography.largeTitle.copyWith(color: AppColors.label),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),
@@ -399,9 +388,12 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Mein Hauptziel', style: AppTypography.headline.copyWith(
-                    color: AppColors.label,
-                  )),
+                  Text(
+                    'Mein Hauptziel',
+                    style: AppTypography.headline.copyWith(
+                      color: AppColors.label,
+                    ),
+                  ),
                   const SizedBox(height: 12),
                   ..._goals.map(
                     (goal) => Padding(
@@ -409,14 +401,18 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
                       child: _buildSelectionCard(
                         text: goal['title']!,
                         isSelected: _selectedGoal == goal['key'],
-                        onTap: () => setState(() => _selectedGoal = goal['key']),
+                        onTap: () =>
+                            setState(() => _selectedGoal = goal['key']),
                       ),
                     ),
                   ),
                   const SizedBox(height: 24),
-                  Text('Mein Aktivitätslevel', style: AppTypography.headline.copyWith(
-                    color: AppColors.label,
-                  )),
+                  Text(
+                    'Mein Aktivitätslevel',
+                    style: AppTypography.headline.copyWith(
+                      color: AppColors.label,
+                    ),
+                  ),
                   const SizedBox(height: 12),
                   ..._activityLevels.map(
                     (level) => Padding(
@@ -424,8 +420,9 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
                       child: _buildSelectionCard(
                         text: level['title']!,
                         isSelected: _selectedActivityLevel == level['key'],
-                        onTap: () =>
-                            setState(() => _selectedActivityLevel = level['key']),
+                        onTap: () => setState(
+                          () => _selectedActivityLevel = level['key'],
+                        ),
                       ),
                     ),
                   ),
@@ -445,9 +442,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
         children: [
           Text(
             'Deine Ernährung',
-            style: AppTypography.largeTitle.copyWith(
-              color: AppColors.label,
-            ),
+            style: AppTypography.largeTitle.copyWith(color: AppColors.label),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),
@@ -462,7 +457,8 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
                       child: _buildSelectionCard(
                         text: diet['title']!,
                         isSelected: _selectedDietType == diet['key'],
-                        onTap: () => setState(() => _selectedDietType = diet['key']),
+                        onTap: () =>
+                            setState(() => _selectedDietType = diet['key']),
                       ),
                     ),
                   ),
@@ -533,7 +529,9 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
-          color: isOn ? AppColors.primary.withOpacity(0.1) : const Color(0xFFF6F1E7), // Apple White
+          color: isOn
+              ? AppColors.primary.withOpacity(0.1)
+              : const Color(0xFFF6F1E7), // Apple White
           borderRadius: AppTheme.borderRadiusM,
           border: Border.all(
             color: isOn ? AppColors.primary : AppColors.separator,
@@ -543,13 +541,14 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(text, style: AppTypography.body.copyWith(
-              color: AppColors.label,
-            )),
+            Text(
+              text,
+              style: AppTypography.body.copyWith(color: AppColors.label),
+            ),
             CupertinoSwitch(
               value: isOn,
               onChanged: onChanged,
-              activeColor: AppColors.primary,
+              activeTrackColor: AppColors.primary,
             ),
           ],
         ),

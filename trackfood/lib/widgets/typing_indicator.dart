@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 
 class TypingIndicator extends StatefulWidget {
   const TypingIndicator({super.key});
@@ -45,13 +45,13 @@ class _TypingIndicatorState extends State<TypingIndicator>
             height: 32,
             margin: const EdgeInsets.only(right: 8, top: 4),
             decoration: BoxDecoration(
-              color: Colors.green.shade100,
+              color: AppColors.primary.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(
               CupertinoIcons.sparkles,
               size: 20,
-              color: Colors.green.shade700,
+              color: AppColors.primary,
             ),
           ),
           Container(
@@ -59,14 +59,15 @@ class _TypingIndicatorState extends State<TypingIndicator>
               maxWidth: MediaQuery.of(context).size.width * 0.75,
             ),
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: AppColors.background,
               borderRadius: BorderRadius.circular(16).copyWith(
                 bottomLeft: const Radius.circular(4),
               ),
+              border: Border.all(color: AppColors.separator, width: 1),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 4,
+                  color: CupertinoColors.systemGrey.withValues(alpha: 0.1),
+                  blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
               ],
@@ -102,7 +103,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
       width: 8,
       height: 8,
       decoration: BoxDecoration(
-        color: Colors.green.shade400.withValues(alpha: opacity),
+        color: AppColors.primary.withValues(alpha: opacity),
         borderRadius: BorderRadius.circular(4),
       ),
     );
