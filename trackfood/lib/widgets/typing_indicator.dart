@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class TypingIndicator extends StatefulWidget {
@@ -48,7 +49,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(
-              Icons.auto_awesome,
+              CupertinoIcons.sparkles,
               size: 20,
               color: Colors.green.shade700,
             ),

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class QuickActions extends StatelessWidget {
@@ -23,6 +24,7 @@ class QuickActions extends StatelessWidget {
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: Colors.grey.shade700,
+              letterSpacing: -0.41,
             ),
           ),
           const SizedBox(height: 12),
@@ -38,25 +40,24 @@ class QuickActions extends StatelessWidget {
   }
 
   Widget _buildActionChip(String action) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: () => onActionTap(action),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            color: Colors.green.shade50,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.green.shade200),
-          ),
-          child: Text(
-            action,
-            style: TextStyle(
-              color: Colors.green.shade700,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
+    return CupertinoButton(
+      padding: EdgeInsets.zero,
+      borderRadius: BorderRadius.circular(20),
+      onPressed: () => onActionTap(action),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.green.shade50,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.green.shade200),
+        ),
+        child: Text(
+          action,
+          style: TextStyle(
+            color: Colors.green.shade700,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            letterSpacing: -0.41,
           ),
         ),
       ),

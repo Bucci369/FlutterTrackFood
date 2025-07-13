@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import '../models/chat_message.dart';
@@ -31,7 +32,7 @@ class ChatBubble extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Icon(
-                Icons.auto_awesome,
+                CupertinoIcons.sparkles,
                 size: 20,
                 color: Colors.green.shade700,
               ),
@@ -73,6 +74,7 @@ class ChatBubble extends StatelessWidget {
                               color: Colors.white,
                               fontSize: 16,
                               height: 1.4,
+                              letterSpacing: -0.41,
                             ),
                           )
                         : MarkdownBody(
@@ -82,6 +84,7 @@ class ChatBubble extends StatelessWidget {
                                 color: Colors.grey.shade800,
                                 fontSize: 16,
                                 height: 1.4,
+                                letterSpacing: -0.41,
                               ),
                               strong: TextStyle(
                                 color: Colors.grey.shade900,
@@ -105,6 +108,7 @@ class ChatBubble extends StatelessWidget {
                       style: TextStyle(
                         color: isUser ? Colors.white70 : Colors.grey.shade500,
                         fontSize: 12,
+                        letterSpacing: -0.41,
                       ),
                     ),
                   ),
@@ -122,7 +126,7 @@ class ChatBubble extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Icon(
-                Icons.person,
+                CupertinoIcons.person_fill,
                 size: 20,
                 color: Colors.white,
               ),

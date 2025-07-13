@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class MessageInput extends StatefulWidget {
@@ -38,7 +39,7 @@ class _MessageInputState extends State<MessageInput> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: CupertinoColors.systemBackground,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
@@ -53,25 +54,29 @@ class _MessageInputState extends State<MessageInput> {
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
+                  color: CupertinoColors.systemGrey6,
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.grey.shade300),
+                  border: Border.all(color: CupertinoColors.systemGrey4),
                 ),
-                child: TextField(
+                child: CupertinoTextField(
                   controller: _controller,
                   focusNode: _focusNode,
                   maxLines: null,
                   textInputAction: TextInputAction.send,
                   onSubmitted: (_) => _sendMessage(),
                   enabled: !widget.isLoading,
-                  decoration: InputDecoration(
-                    hintText: 'Frage mich etwas über deine Ernährung...',
-                    hintStyle: TextStyle(color: Colors.grey.shade500),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
+                  placeholder: 'Frage mich etwas über deine Ernährung...',
+                  placeholderStyle: TextStyle(
+                    color: CupertinoColors.placeholderText,
+                    letterSpacing: -0.41,
+                  ),
+                  style: const TextStyle(
+                    letterSpacing: -0.41,
+                  ),
+                  decoration: const BoxDecoration(),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
                   ),
                 ),
               ),
@@ -84,31 +89,27 @@ class _MessageInputState extends State<MessageInput> {
                 ),
                 borderRadius: BorderRadius.circular(24),
               ),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(24),
-                  onTap: widget.isLoading ? null : _sendMessage,
-                  child: Container(
-                    width: 48,
-                    height: 48,
-                    alignment: Alignment.center,
-                    child: widget.isLoading
-                        ? SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          )
-                        : Icon(
-                            Icons.send,
-                            color: Colors.white,
-                            size: 20,
+              child: CupertinoButton(
+                padding: EdgeInsets.zero,
+                borderRadius: BorderRadius.circular(24),
+                onPressed: widget.isLoading ? null : _sendMessage,
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  alignment: Alignment.center,
+                  child: widget.isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CupertinoActivityIndicator(
+                            color: CupertinoColors.white,
                           ),
-                  ),
+                        )
+                      : const Icon(
+                          CupertinoIcons.paperplane_fill,
+                          color: Colors.white,
+                          size: 20,
+                        ),
                 ),
               ),
             ),

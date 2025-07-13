@@ -505,113 +505,189 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
   }
 
   Widget _buildGoalsPage() {
-    return _buildPageContent(
-      title: 'Deine Ziele',
-      subtitle: 'Was möchtest du erreichen?',
-      icon: CupertinoIcons.flag,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            'Hauptziel:',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Goals as compact grid
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 1.1,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-            ),
-            itemCount: _goals.length,
-            itemBuilder: (context, index) {
-              final goal = _goals[index];
-              final isSelected = _selectedGoal == goal;
-
-              return GestureDetector(
-                onTap: () => setState(() => _selectedGoal = goal),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    color: isSelected
-                        ? Colors.white.withValues(alpha: 0.3)
-                        : Colors.white.withValues(alpha: 0.1),
-                    border: Border.all(
-                      color: isSelected
-                          ? Colors.white
-                          : Colors.white.withValues(alpha: 0.3),
-                      width: isSelected ? 2 : 1,
+    return Container(
+      color: CupertinoColors.systemBackground,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header with back button
+              Row(
+                children: [
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: _previousPage,
+                    child: const Icon(
+                      CupertinoIcons.back,
+                      color: CupertinoColors.label,
+                      size: 28,
                     ),
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        _getGoalIcon(goal),
-                        color: Colors.white,
-                        size: 28,
+                  const Expanded(
+                    child: Text(
+                      'Was sind deine Ziele?',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: CupertinoColors.label,
+                        letterSpacing: -0.41,
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _getGoalDisplayName(goal),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      if (isSelected) ...[
-                        const SizedBox(height: 4),
-                        Icon(
-                          CupertinoIcons.check_mark_circled_solid,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                      ],
-                    ],
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(width: 48),
+                ],
+              ),
+              
+              const SizedBox(height: 48),
+              
+              // Goals cards
+              Expanded(
+                child: ListView(
+                  children: [
+                    _buildGoalCard(
+                      'weight_loss',
+                      'Gewichtsverlust',
+                      '🏃‍♂️',
+                      Colors.blue,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildGoalCard(
+                      'maintain_weight',
+                      'Verbesserte\nGesundheit',
+                      '❤️',
+                      Colors.red,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildGoalCard(
+                      'weight_gain',
+                      'Mehr Energie',
+                      '⚡',
+                      Colors.blue,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildGoalCard(
+                      'muscle_gain',
+                      'Mentales Wohlbefinden',
+                      '🧘‍♀️',
+                      Colors.pink,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildGoalCard(
+                      'maintain_weight',
+                      'Bessere Verdauung',
+                      '🍎',
+                      Colors.purple,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildGoalCard(
+                      'weight_loss',
+                      'Immunsystem stärken',
+                      '🛡️',
+                      Colors.cyan,
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Continue button
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: CupertinoButton(
+                  color: const Color(0xFF00C853),
+                  borderRadius: BorderRadius.circular(16),
+                  onPressed: _canProceed() ? _nextPage : null,
+                  child: const Text(
+                    'Weiter',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: -0.41,
+                      color: CupertinoColors.white,
+                    ),
                   ),
                 ),
-              );
-            },
+              ),
+            ],
           ),
+        ),
+      ),
+    );
+  }
 
-          const SizedBox(height: 24),
-
-          const Text(
-            'Aktivitätslevel:',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Activity levels as compact list
-          ..._activityLevels.map((level) => Container(
-                margin: const EdgeInsets.only(bottom: 8),
-                child: _buildSelectionTile(
-                  title: _getActivityDisplayName(level),
-                  value: level,
-                  groupValue: _selectedActivityLevel,
-                  onChanged: (value) =>
-                      setState(() => _selectedActivityLevel = value),
-                  icon: _getActivityIcon(level),
+  Widget _buildGoalCard(String goal, String title, String emoji, Color color) {
+    final isSelected = _selectedGoal == goal;
+    
+    return GestureDetector(
+      onTap: () => setState(() => _selectedGoal = goal),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: CupertinoColors.systemGrey6,
+          borderRadius: BorderRadius.circular(24),
+          border: isSelected 
+            ? Border.all(color: const Color(0xFF00C853), width: 2)
+            : null,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Center(
+                child: Text(
+                  emoji,
+                  style: const TextStyle(fontSize: 28),
                 ),
-              )),
-        ],
+              ),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: CupertinoColors.label,
+                  letterSpacing: -0.41,
+                ),
+              ),
+            ),
+            if (isSelected)
+              Container(
+                width: 28,
+                height: 28,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF00C853),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  CupertinoIcons.checkmark,
+                  color: CupertinoColors.white,
+                  size: 16,
+                ),
+              )
+            else
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: CupertinoColors.systemGrey3,
+                    width: 2,
+                  ),
+                  shape: BoxShape.circle,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

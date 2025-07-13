@@ -1,5 +1,5 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import '../../providers/profile_provider.dart';
 import 'widgets/dashboard_header.dart';
@@ -78,14 +78,13 @@ class DashboardContent extends StatelessWidget {
               },
             ),
           SafeArea(
-            child: RefreshIndicator(
-              onRefresh: handleRefresh ?? () async {},
-              backgroundColor: Colors.white,
-              color: const Color(0xFF34A0A4),
-              child: CustomScrollView(
-                controller: scrollController,
-                physics: const BouncingScrollPhysics(),
-                slivers: [
+            child: CustomScrollView(
+              controller: scrollController,
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                CupertinoSliverRefreshControl(
+                  onRefresh: handleRefresh ?? () async {},
+                ),
                   SliverToBoxAdapter(
                     child: DashboardHeader(
                       greeting: getGreeting != null ? getGreeting!() : '',
@@ -94,10 +93,7 @@ class DashboardContent extends StatelessWidget {
                       calorieProgress:
                           (dailyCalories ?? 0) / (calorieGoal ?? 1),
                       waterProgress: (waterIntake ?? 0) / (waterGoal ?? 1),
-                    )
-                        .animate()
-                        .fadeIn(duration: 600.ms)
-                        .slideY(begin: -0.3, end: 0),
+                    ),
                   ),
                   SliverToBoxAdapter(
                     child: Padding(
@@ -110,56 +106,40 @@ class DashboardContent extends StatelessWidget {
                         waterProgress: (waterIntake ?? 0) / (waterGoal ?? 1),
                         waterCurrent: waterIntake ?? 0,
                         waterGoal: waterGoal ?? 0,
-                      )
-                          .animate()
-                          .fadeIn(delay: 200.ms, duration: 600.ms)
-                          .slideY(begin: 0.3, end: 0),
+                      ),
                     ),
                   ),
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: MacroGrid(macros: macros ?? {})
-                          .animate()
-                          .fadeIn(delay: 400.ms, duration: 600.ms)
-                          .slideY(begin: 0.3, end: 0),
+                      child: MacroGrid(macros: macros ?? {}),
                     ),
                   ),
                   const SliverToBoxAdapter(child: SizedBox(height: 16)),
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: const RecentActivities()
-                          .animate()
-                          .fadeIn(delay: 600.ms, duration: 600.ms)
-                          .slideY(begin: 0.3, end: 0),
+                      child: const RecentActivities(),
                     ),
                   ),
                   const SliverToBoxAdapter(child: SizedBox(height: 16)),
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: const RecentMeals()
-                          .animate()
-                          .fadeIn(delay: 800.ms, duration: 600.ms)
-                          .slideY(begin: 0.3, end: 0),
+                      child: const RecentMeals(),
                     ),
                   ),
                   const SliverToBoxAdapter(child: SizedBox(height: 16)),
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: const FastingCard()
-                          .animate()
-                          .fadeIn(delay: 1000.ms, duration: 600.ms)
-                          .slideY(begin: 0.3, end: 0),
+                      child: const FastingCard(),
                     ),
                   ),
                   const SliverToBoxAdapter(child: SizedBox(height: 32)),
                 ],
               ),
             ),
-          ),
           if (isRefreshing ?? false)
             Positioned(
               top: 100,
@@ -185,9 +165,8 @@ class DashboardContent extends StatelessWidget {
                       SizedBox(
                         width: 20,
                         height: 20,
-                        child: CircularProgressIndicator(
+                        child: CupertinoActivityIndicator(
                           color: Color(0xFF34A0A4),
-                          strokeWidth: 2,
                         ),
                       ),
                       SizedBox(width: 12),
@@ -196,13 +175,14 @@ class DashboardContent extends StatelessWidget {
                         style: TextStyle(
                           color: Color(0xFF34A0A4),
                           fontWeight: FontWeight.w500,
+                          letterSpacing: -0.41,
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-            ).animate().fadeIn(duration: 200.ms).slideY(begin: -1, end: 0),
+            ),
         ],
       ),
     );
