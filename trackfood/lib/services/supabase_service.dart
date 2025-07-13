@@ -177,10 +177,18 @@ class SupabaseService {
       'product_code': productCode,
     };
 
-    final response = await client.from('diary_entries').insert(newEntry);
-
-    if (response.error != null) {
-      throw Exception(response.error!.message);
+    try {
+      await client.from('diary_entries').insert(newEntry);
+    } on PostgrestException catch (e) {
+      // Handle potential database errors gracefully
+      print('Supabase error in addDiaryEntry: ${e.message}');
+      throw Exception('Failed to add diary entry: ${e.message}');
+    } catch (e) {
+      // Handle other generic errors
+      print('Generic error in addDiaryEntry: $e');
+      throw Exception(
+        'An unexpected error occurred while adding a diary entry.',
+      );
     }
   }
 
@@ -276,18 +284,21 @@ class SupabaseService {
 
   // === Product Search ===
 
-  /// Searches for products in the local Supabase DB.
+  /// Searches for products in the local Supabase DB using a more sophisticated search logic.
   Future<List<FoodItem>> searchProducts(String query) async {
-    if (query.isEmpty) return [];
+    if (query.trim().length < 3) return [];
     try {
-      final response = await client
-          .from('products')
-          .select()
-          .textSearch(
-            'name',
-            query,
-            config: 'german',
-          ); // Use text search for better results
+      // Split the query into words and create a search pattern for each word
+      final searchTerms = query.split(' ').where((s) => s.isNotEmpty).map((s) => '%$s%').toList();
+      
+      var request = client.from('products').select();
+      
+      // Chain `ilike` filters for each search term
+      for (final term in searchTerms) {
+        request = request.ilike('name', term);
+      }
+
+      final response = await request;
 
       return (response as List).map((json) => FoodItem.fromJson(json)).toList();
     } catch (e) {
@@ -341,14 +352,13 @@ class SupabaseService {
       if (response.isEmpty) {
         return 0;
       }
-      
+
       // Sum up all entries for the day (sensor + manual)
       int totalSteps = 0;
       for (var record in response) {
         totalSteps += (record['steps'] as int?) ?? 0;
       }
       return totalSteps;
-
     } catch (e) {
       print('Error fetching steps: $e');
       return 0;
@@ -394,7 +404,9 @@ class SupabaseService {
         request = request.eq('category', category);
       }
 
-      final response = await request.order('created_at', ascending: false).range(offset, offset + limit - 1);
+      final response = await request
+          .order('created_at', ascending: false)
+          .range(offset, offset + limit - 1);
       return (response as List).map((json) => Recipe.fromJson(json)).toList();
     } catch (e) {
       print('Error fetching recipes: $e');
@@ -405,16 +417,14 @@ class SupabaseService {
   Future<List<String>> getRecipeCategories() async {
     try {
       // Fetch all categories from the recipes table, similar to the web app
-      final response = await client
-          .from('recipes')
-          .select('category');
+      final response = await client.from('recipes').select('category');
 
       // Process the data on the client side
       final allCategories = (response as List)
           .map((row) => row['category'] as String?)
           .where((cat) => cat != null && cat.isNotEmpty)
           .toList();
-      
+
       // Get unique categories and sort them
       final uniqueCategories = Set<String>.from(allCategories).toList();
       uniqueCategories.sort();

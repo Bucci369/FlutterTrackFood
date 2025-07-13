@@ -11,7 +11,9 @@ class StepsCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final stepState = ref.watch(stepProvider);
-    final progress = (stepState.goal > 0) ? (stepState.steps / stepState.goal).clamp(0.0, 1.0) : 0.0;
+    final progress = (stepState.goal > 0)
+        ? (stepState.steps / stepState.goal).clamp(0.0, 1.0)
+        : 0.0;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -26,7 +28,10 @@ class StepsCard extends ConsumerWidget {
             radius: 40.0,
             lineWidth: 8.0,
             percent: progress,
-            center: const Icon(CupertinoIcons.flame_fill, color: AppColors.systemOrange),
+            center: const Icon(
+              CupertinoIcons.flame_fill,
+              color: AppColors.systemOrange,
+            ),
             progressColor: AppColors.systemOrange,
             backgroundColor: AppColors.tertiarySystemFill,
             circularStrokeCap: CircularStrokeCap.round,
@@ -39,7 +44,9 @@ class StepsCard extends ConsumerWidget {
                 Text('Schritte', style: AppTypography.title3),
                 Text(
                   '${stepState.steps} / ${stepState.goal}',
-                  style: AppTypography.headline.copyWith(color: AppColors.label),
+                  style: AppTypography.headline.copyWith(
+                    color: AppColors.label,
+                  ),
                 ),
               ],
             ),

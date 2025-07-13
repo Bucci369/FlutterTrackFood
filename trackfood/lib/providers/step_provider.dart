@@ -57,13 +57,15 @@ class StepNotifier extends StateNotifier<StepState> {
         // This gives total steps since boot. We need to calculate steps for today.
         // A more robust implementation would store the initial step count at the start of the day.
         // For simplicity, we'll just add the delta. This part can be improved later.
-        
+
         // Let's assume for now we just want to add the sensor data as a new entry.
         // A proper implementation requires handling daily resets.
         // For this version, we will focus on manual adding and displaying total.
       },
       onError: (error) {
-        state = state.copyWith(error: 'Fehler beim Schrittzähler-Sensor: $error');
+        state = state.copyWith(
+          error: 'Fehler beim Schrittzähler-Sensor: $error',
+        );
       },
     );
   }

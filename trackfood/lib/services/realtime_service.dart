@@ -7,15 +7,15 @@ import 'package:trackfood/models/user_activity.dart';
 
 class RealtimeService {
   final SupabaseClient client = Supabase.instance.client;
-  
+
   // Subscription references for cleanup
   final List<RealtimeChannel> _activeChannels = [];
-  
+
   // Current user ID
   String? get currentUserId => client.auth.currentUser?.id;
 
   // === Diary Entries Real-time ===
-  
+
   /// Subscribe to diary entries changes for current user
   RealtimeChannel subscribeToDiaryEntries({
     required Function(DiaryEntry) onInsert,
@@ -25,11 +25,13 @@ class RealtimeService {
   }) {
     if (currentUserId == null) {
       onError?.call('User not authenticated');
-      throw Exception('User must be authenticated to subscribe to diary entries');
+      throw Exception(
+        'User must be authenticated to subscribe to diary entries',
+      );
     }
 
     final channel = client.channel('diary_entries_$currentUserId');
-    
+
     channel
         .onPostgresChanges(
           event: PostgresChangeEvent.insert,
@@ -92,7 +94,7 @@ class RealtimeService {
   }
 
   // === Water Intake Real-time ===
-  
+
   /// Subscribe to water intake changes for current user
   RealtimeChannel subscribeToWaterIntake({
     required Function(WaterIntake) onInsert,
@@ -101,11 +103,13 @@ class RealtimeService {
   }) {
     if (currentUserId == null) {
       onError?.call('User not authenticated');
-      throw Exception('User must be authenticated to subscribe to water intake');
+      throw Exception(
+        'User must be authenticated to subscribe to water intake',
+      );
     }
 
     final channel = client.channel('water_intake_$currentUserId');
-    
+
     channel
         .onPostgresChanges(
           event: PostgresChangeEvent.insert,
@@ -150,7 +154,7 @@ class RealtimeService {
   }
 
   // === Fasting Sessions Real-time ===
-  
+
   /// Subscribe to fasting sessions changes for current user
   RealtimeChannel subscribeToFastingSessions({
     required Function(FastingSession) onInsert,
@@ -159,11 +163,13 @@ class RealtimeService {
   }) {
     if (currentUserId == null) {
       onError?.call('User not authenticated');
-      throw Exception('User must be authenticated to subscribe to fasting sessions');
+      throw Exception(
+        'User must be authenticated to subscribe to fasting sessions',
+      );
     }
 
     final channel = client.channel('fasting_sessions_$currentUserId');
-    
+
     channel
         .onPostgresChanges(
           event: PostgresChangeEvent.insert,
@@ -208,7 +214,7 @@ class RealtimeService {
   }
 
   // === User Activities Real-time ===
-  
+
   /// Subscribe to user activities changes for current user
   RealtimeChannel subscribeToUserActivities({
     required Function(UserActivity) onInsert,
@@ -218,11 +224,13 @@ class RealtimeService {
   }) {
     if (currentUserId == null) {
       onError?.call('User not authenticated');
-      throw Exception('User must be authenticated to subscribe to user activities');
+      throw Exception(
+        'User must be authenticated to subscribe to user activities',
+      );
     }
 
     final channel = client.channel('user_activities_$currentUserId');
-    
+
     channel
         .onPostgresChanges(
           event: PostgresChangeEvent.insert,
@@ -285,7 +293,7 @@ class RealtimeService {
   }
 
   // === Profile Changes Real-time ===
-  
+
   /// Subscribe to profile changes for current user
   RealtimeChannel subscribeToProfile({
     required Function(Map<String, dynamic>) onUpdate,
@@ -297,7 +305,7 @@ class RealtimeService {
     }
 
     final channel = client.channel('profile_$currentUserId');
-    
+
     channel
         .onPostgresChanges(
           event: PostgresChangeEvent.update,
@@ -323,14 +331,14 @@ class RealtimeService {
   }
 
   // === Community Products Real-time ===
-  
+
   /// Subscribe to new approved products (community feature)
   RealtimeChannel subscribeToProducts({
     required Function(Map<String, dynamic>) onInsert,
     Function(String)? onError,
   }) {
     final channel = client.channel('products_community');
-    
+
     channel
         .onPostgresChanges(
           event: PostgresChangeEvent.update,
@@ -346,7 +354,7 @@ class RealtimeService {
               // Only notify if product was just approved
               final oldVerified = payload.oldRecord['is_verified'] as bool?;
               final newVerified = payload.newRecord['is_verified'] as bool?;
-              
+
               if (oldVerified == false && newVerified == true) {
                 onInsert(payload.newRecord);
               }
@@ -371,7 +379,7 @@ class RealtimeService {
     Function(String)? onError,
   }) {
     final channel = client.channel('recipes');
-    
+
     channel
         .onPostgresChanges(
           event: PostgresChangeEvent.insert,
@@ -416,9 +424,8 @@ class RealtimeService {
     return channel;
   }
 
-
   // === Connection Management ===
-  
+
   /// Unsubscribe from a specific channel
   Future<void> unsubscribe(RealtimeChannel channel) async {
     try {
@@ -457,12 +464,12 @@ class RealtimeService {
 /// Provider for RealtimeService
 final realtimeServiceProvider = Provider<RealtimeService>((ref) {
   final service = RealtimeService();
-  
+
   // Cleanup when provider is disposed
   ref.onDispose(() {
     service.dispose();
   });
-  
+
   return service;
 });
 

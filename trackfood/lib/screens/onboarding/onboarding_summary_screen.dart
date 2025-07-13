@@ -85,11 +85,12 @@ class _OnboardingSummaryScreenState
     HapticFeedback.mediumImpact();
 
     try {
-      // Use the notifier to update the profile
       final profileNotifier = ref.read(profileProvider.notifier);
-      final updatedProfile = profile.copyWith(onboardingCompleted: true);
 
-      await profileNotifier.updateProfile(updatedProfile);
+      // Set onboarding as completed and save the final profile to the database.
+      // The `profile` object already contains the correct values from the flow.
+      final finalProfile = profile.copyWith(onboardingCompleted: true);
+      await profileNotifier.updateProfile(finalProfile);
 
       if (mounted) {
         Navigator.of(context).pushAndRemoveUntil(

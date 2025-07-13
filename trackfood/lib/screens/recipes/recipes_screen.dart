@@ -38,9 +38,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
     final state = ref.watch(recipesProvider);
 
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('Rezepte'),
-      ),
+      navigationBar: const CupertinoNavigationBar(middle: Text('Rezepte')),
       child: SafeArea(
         child: Column(
           children: [
@@ -54,15 +52,18 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
                       padding: const EdgeInsets.all(16),
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        childAspectRatio: 0.75,
-                      ),
-                      itemCount: state.recipes.length + (state.canLoadMore ? 1 : 0),
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                            childAspectRatio: 0.75,
+                          ),
+                      itemCount:
+                          state.recipes.length + (state.canLoadMore ? 1 : 0),
                       itemBuilder: (context, index) {
                         if (index == state.recipes.length) {
-                          return const Center(child: CupertinoActivityIndicator());
+                          return const Center(
+                            child: CupertinoActivityIndicator(),
+                          );
                         }
                         final recipe = state.recipes[index];
                         return _buildRecipeCard(recipe);
@@ -105,9 +106,13 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: CupertinoButton(
-              color: isSelected ? AppColors.primary : AppColors.tertiarySystemFill,
+              color: isSelected
+                  ? AppColors.primary
+                  : AppColors.tertiarySystemFill,
               onPressed: () {
-                ref.read(recipesProvider.notifier).setCategory(isAllCategory ? null : category);
+                ref
+                    .read(recipesProvider.notifier)
+                    .setCategory(isAllCategory ? null : category);
               },
               child: Text(
                 category,
@@ -125,7 +130,8 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
   Widget _buildRecipeCard(Recipe recipe) {
     return GestureDetector(
       onTap: () async {
-        if (recipe.link != null && await canLaunchUrl(Uri.parse(recipe.link!))) {
+        if (recipe.link != null &&
+            await canLaunchUrl(Uri.parse(recipe.link!))) {
           await launchUrl(Uri.parse(recipe.link!));
         }
       },

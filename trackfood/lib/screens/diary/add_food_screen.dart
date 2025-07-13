@@ -14,7 +14,7 @@ import 'barcode_scanner_screen.dart';
 // A simple provider to manage the search query
 final searchQueryProvider = StateProvider<String>((ref) => '');
 
-// A future provider to fetch search results from Supabase and OpenFoodFacts
+// A future provider to fetch and combine search results from Supabase and OpenFoodFacts
 final foodSearchProvider = FutureProvider<List<FoodItem>>((ref) async {
   final query = ref.watch(searchQueryProvider);
   if (query.length < 3) {
@@ -23,26 +23,43 @@ final foodSearchProvider = FutureProvider<List<FoodItem>>((ref) async {
 
   final supabaseService = ref.watch(supabaseServiceProvider);
 
-  // 1. Search in Supabase first
-  final supabaseResults = await supabaseService.searchProducts(query);
-  if (supabaseResults.isNotEmpty) {
-    return supabaseResults;
-  }
-
-  // 2. Fallback to OpenFoodFacts if no results in Supabase
-  final response = await http.get(
-    Uri.parse(
-      'https://world.openfoodfacts.org/cgi/search.pl?search_terms=$query&search_simple=1&action=process&json=1&page_size=20',
+  // 1. Fetch results from Supabase and OpenFoodFacts in parallel
+  final results = await Future.wait([
+    supabaseService.searchProducts(query),
+    http.get(
+      Uri.parse(
+        'https://world.openfoodfacts.org/cgi/search.pl?search_terms=$query&search_simple=1&action=process&json=1&page_size=20',
+      ),
     ),
-  );
+  ]);
 
-  if (response.statusCode == 200) {
-    final data = json.decode(response.body);
+  // 2. Process Supabase results
+  final supabaseResults = results[0] as List<FoodItem>;
+
+  // 3. Process OpenFoodFacts results
+  final List<FoodItem> offResults = [];
+  final offResponse = results[1] as http.Response;
+  if (offResponse.statusCode == 200) {
+    final data = json.decode(offResponse.body);
     final products = data['products'] as List;
-    return products.map((product) => FoodItem.fromJson(product)).toList();
-  } else {
-    throw Exception('Failed to load food items from OpenFoodFacts');
+    offResults.addAll(products.map((product) => FoodItem.fromJson(product)));
   }
+
+  // 4. Combine and rank results: Supabase results first, then OpenFoodFacts
+  final combined = <String, FoodItem>{};
+  
+  // Add Supabase results first to prioritize them
+  for (var item in supabaseResults) {
+    combined[item.code] = item;
+  }
+  
+  // Add OpenFoodFacts results, but don't overwrite existing ones from Supabase
+  for (var item in offResults) {
+    combined.putIfAbsent(item.code, () => item);
+  }
+
+  // Convert the map back to a list, maintaining the prioritized order
+  return combined.values.toList();
 });
 
 class AddFoodScreen extends ConsumerStatefulWidget {

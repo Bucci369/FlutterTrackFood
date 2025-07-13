@@ -493,8 +493,9 @@ class _ActivitiesScreenState extends ConsumerState<ActivitiesScreen> {
             actions: [
               CupertinoDialogAction(
                 onPressed: () {
-                  Navigator.of(context).pop(); // Close dialog
-                  Navigator.of(context).pop(); // Go back to dashboard
+                  Navigator.of(context).pop(); // Close the success dialog
+                  // We stay on the ActivitiesScreen to allow adding more activities.
+                  // The user can navigate back manually using the back button.
                 },
                 child: Text('OK', style: TextStyle(color: AppColors.primary)),
               ),

@@ -16,13 +16,21 @@ class FoodItem {
   });
 
   factory FoodItem.fromJson(Map<String, dynamic> json) {
+    // Helper function to safely parse values that could be num or String
+    double? _parseDouble(dynamic value) {
+      if (value == null) return null;
+      if (value is num) return value.toDouble();
+      if (value is String) return double.tryParse(value);
+      return null;
+    }
+
     return FoodItem(
-      code: json['code'] ?? '',
-      productName: json['product_name'] ?? 'Unknown Product',
+      code: json['code'] ?? json['id'] ?? '', // Handle both 'code' and 'id'
+      productName: json['product_name'] ?? json['name'] ?? 'Unknown Product',
       imageUrl: json['image_url'],
-      nutriments: Nutriments.fromJson(json['nutriments'] ?? {}),
+      nutriments: Nutriments.fromJson(json['nutriments'] ?? {}, _parseDouble),
       servingSize: json['serving_size'],
-      servingQuantity: (json['serving_quantity'] as num?)?.toDouble(),
+      servingQuantity: _parseDouble(json['serving_quantity']),
     );
   }
 }
@@ -46,15 +54,15 @@ class Nutriments {
     this.salt100g,
   });
 
-  factory Nutriments.fromJson(Map<String, dynamic> json) {
+  factory Nutriments.fromJson(Map<String, dynamic> json, double? Function(dynamic) _parseDouble) {
     return Nutriments(
-      energyKcal100g: (json['energy-kcal_100g'] as num?)?.toDouble(),
-      proteins100g: (json['proteins_100g'] as num?)?.toDouble(),
-      carbohydrates100g: (json['carbohydrates_100g'] as num?)?.toDouble(),
-      fat100g: (json['fat_100g'] as num?)?.toDouble(),
-      fiber100g: (json['fiber_100g'] as num?)?.toDouble(),
-      sugars100g: (json['sugars_100g'] as num?)?.toDouble(),
-      salt100g: (json['salt_100g'] as num?)?.toDouble(),
+      energyKcal100g: _parseDouble(json['energy-kcal_100g'] ?? json['calories_per_100g']),
+      proteins100g: _parseDouble(json['proteins_100g'] ?? json['protein_per_100g']),
+      carbohydrates100g: _parseDouble(json['carbohydrates_100g'] ?? json['carbs_per_100g']),
+      fat100g: _parseDouble(json['fat_100g'] ?? json['fat_per_100g']),
+      fiber100g: _parseDouble(json['fiber_100g'] ?? json['fiber_per_100g']),
+      sugars100g: _parseDouble(json['sugars_100g'] ?? json['sugar_per_100g']),
+      salt100g: _parseDouble(json['salt_100g'] ?? json['salt_per_100g']),
     );
   }
 }

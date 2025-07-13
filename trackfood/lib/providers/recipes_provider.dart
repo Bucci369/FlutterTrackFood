@@ -91,7 +91,9 @@ class RecipesNotifier extends StateNotifier<RecipesState> {
   }
 }
 
-final recipesProvider = StateNotifierProvider<RecipesNotifier, RecipesState>((ref) {
+final recipesProvider = StateNotifierProvider<RecipesNotifier, RecipesState>((
+  ref,
+) {
   final supabaseService = ref.watch(supabaseServiceProvider);
   return RecipesNotifier(supabaseService);
 });
