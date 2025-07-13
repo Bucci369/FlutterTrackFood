@@ -1,5 +1,5 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart'; // Keep Cupertino for consistency
+import 'package:flutter/material.dart'; // Material is still needed for some utilities like Colors
 import 'package:flutter/services.dart';
 import 'package:confetti/confetti.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -29,8 +29,9 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
   @override
   void initState() {
     super.initState();
-    _confettiController =
-        ConfettiController(duration: const Duration(seconds: 2));
+    _confettiController = ConfettiController(
+      duration: const Duration(seconds: 2),
+    );
     _backgroundController = AnimationController(
       duration: const Duration(seconds: 15),
       vsync: this,
@@ -111,31 +112,44 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
       final client = supabaseService.client;
 
       // Map Flutter values to database-compatible values
-      final databaseGoal =
-          _mapGoalToDatabase(profile.goal ?? 'maintain_weight');
-      final databaseActivity =
-          _mapActivityToDatabase(profile.activityLevel ?? 'moderately_active');
+      final databaseGoal = _mapGoalToDatabase(
+        profile.goal ?? 'maintain_weight',
+      );
+      final databaseActivity = _mapActivityToDatabase(
+        profile.activityLevel ?? 'moderately_active',
+      );
 
-      await client.from('profiles').update({
-        'onboarding_completed': true,
-        'age': profile.age,
-        'gender': profile.gender,
-        'height_cm': profile.heightCm,
-        'weight_kg': profile.weightKg,
-        'activity_level': databaseActivity,
-        'goal': databaseGoal,
-        'target_weight_kg': profile.targetWeightKg,
-        'diet_type': profile.dietType,
-        'is_glutenfree': profile.isGlutenfree ?? false,
-        'first_name': profile.name.split(' ').first,
-        'last_name': profile.name.split(' ').length > 1
-            ? profile.name.split(' ').skip(1).join(' ')
-            : '',
-      }).eq('id', userId);
+      await client
+          .from('profiles')
+          .update({
+            'onboarding_completed': true,
+            'age': profile.age,
+            'gender': profile.gender,
+            'height_cm': profile.heightCm,
+            'weight_kg': profile.weightKg,
+            'activity_level': databaseActivity,
+            'goal': databaseGoal,
+            'target_weight_kg': profile.targetWeightKg,
+            'diet_type': profile.dietType,
+            'is_glutenfree': profile.isGlutenfree ?? false,
+            'first_name': profile.name.split(' ').first,
+            'last_name': profile.name.split(' ').length > 1
+                ? profile.name.split(' ').skip(1).join(' ')
+                : '',
+          })
+          .eq('id', userId);
 
       if (mounted) {
         // The AuthWrapper will automatically show the dashboard when onboarding is completed
-        Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+        // Changed to CupertinoPageRoute for consistency, assuming '/' leads to a Cupertino screen
+        Navigator.of(context).pushAndRemoveUntil(
+          CupertinoPageRoute(
+            builder: (context) => const CupertinoPageScaffold(
+              child: Center(child: Text('Dashboard Placeholder')),
+            ),
+          ), // Replace with your actual dashboard
+          (route) => false,
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -176,26 +190,27 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
     final progressPercentage = goal == 'weight_loss'
         ? ((weight - targetWeight) / (weight == 0 ? 1 : weight) * 100).round()
         : goal == 'weight_gain'
-            ? ((targetWeight - weight) / (weight == 0 ? 1 : weight) * 100)
-                .round()
-            : 0;
+        ? ((targetWeight - weight) / (weight == 0 ? 1 : weight) * 100).round()
+        : 0;
 
     return CupertinoPageScaffold(
-      child: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/image/background2.png'),
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(
-              Colors.black26,
-              BlendMode.darken,
-            ),
-          ),
+      // Use CupertinoPageScaffold for the main layout
+      navigationBar: CupertinoNavigationBar(
+        middle: Text(
+          'Zusammenfassung',
+          style: CupertinoTheme.of(
+            context,
+          ).textTheme.navTitleTextStyle.copyWith(color: Colors.white),
         ),
-        child: Stack(
-          children: [
-            // Animated gradient overlay
-            AnimatedBuilder(
+        backgroundColor:
+            Colors.transparent, // Make it transparent for the background effect
+        border: const Border(), // Remove the default border
+      ),
+      child: Stack(
+        children: [
+          // Background Animation
+          Positioned.fill(
+            child: AnimatedBuilder(
               animation: _backgroundController,
               builder: (context, child) {
                 return Container(
@@ -204,248 +219,146 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        const Color(0xFF99D98C).withValues(alpha: 0.7),
-                        const Color(0xFF76C893).withValues(alpha: 0.6),
-                        const Color(0xFF52B69A).withValues(alpha: 0.7),
-                        const Color(0xFF34A0A4).withValues(alpha: 0.8),
+                        CupertinoColors.systemPurple.withOpacity(
+                          0.7 +
+                              0.1 *
+                                  math.sin(
+                                    _backgroundController.value * 2 * math.pi,
+                                  ),
+                        ),
+                        CupertinoColors.activeBlue.withOpacity(
+                          0.7 +
+                              0.1 *
+                                  math.cos(
+                                    _backgroundController.value * 2 * math.pi,
+                                  ),
+                        ),
                       ],
-                      transform: GradientRotation(
-                          _backgroundController.value * 2 * 3.14159),
                     ),
                   ),
                 );
               },
             ),
-
-            SafeArea(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 20),
-
-                      // Celebration icon
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white.withValues(alpha: 0.2),
-                        ),
-                        child: const Icon(
-                          CupertinoIcons.star_circle_fill,
-                          size: 50,
-                          color: Colors.white,
-                        ),
-                      )
-                          .animate()
-                          .scale(
-                              delay: 100.ms,
-                              duration: 600.ms,
-                              curve: Curves.elasticOut)
-                          .shimmer(
-                              delay: 200.ms,
-                              duration: 1000.ms,
-                              color: Colors.white),
-
-                      const SizedBox(height: 24),
-
-                      // Title
-                      const Text(
-                        'Perfekt!',
-                        style: TextStyle(
-                          fontSize: 36,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                        textAlign: TextAlign.center,
-                      )
-                          .animate()
-                          .fadeIn(delay: 200.ms, duration: 600.ms)
-                          .slideY(begin: 0.3, end: 0),
-
-                      const SizedBox(height: 8),
-
-                      const Text(
-                        'Dein persönlicher Plan ist bereit!',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w300,
-                        ),
-                        textAlign: TextAlign.center,
-                      )
-                          .animate()
-                          .fadeIn(delay: 300.ms, duration: 600.ms)
-                          .slideY(begin: 0.2, end: 0),
-
-                      const SizedBox(height: 40),
-
-                      // Progress Chart
-                      _buildProgressChart(weight, targetWeight, goal)
-                          .animate()
-                          .fadeIn(delay: 800.ms, duration: 800.ms)
-                          .scale(
-                              begin: const Offset(0.9, 0.9),
-                              delay: 800.ms,
-                              duration: 800.ms),
-
-                      const SizedBox(height: 32),
-
-                      // Summary Cards
-                      _buildSummaryCard(
+          ),
+          // Confetti overlay
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirection: -math.pi / 2, // From top
+              maxBlastForce: 20,
+              minBlastForce: 10,
+              emissionFrequency: 0.05,
+              numberOfParticles: 20,
+              gravity: 0.2,
+              shouldLoop: false,
+              colors: const [
+                CupertinoColors.systemYellow,
+                CupertinoColors.systemBlue,
+                CupertinoColors.systemPink,
+                CupertinoColors.systemGreen,
+              ],
+            ),
+          ),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+                  Text(
+                    'Hallo, ${profile.name.split(' ').first}!',
+                    style: CupertinoTheme.of(context)
+                        .textTheme
+                        .navLargeTitleTextStyle
+                        .copyWith(color: Colors.white),
+                  ).animate().fadeIn(duration: 500.ms, delay: 300.ms),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Hier ist eine Zusammenfassung deiner Daten und dein Weg zum Ziel.',
+                    style: CupertinoTheme.of(context).textTheme.textStyle
+                        .copyWith(color: Colors.white.withOpacity(0.8)),
+                  ).animate().fadeIn(duration: 500.ms, delay: 500.ms),
+                  const SizedBox(height: 30),
+                  _buildProgressChart(weight, targetWeight, goal)
+                      .animate()
+                      .slideY(begin: 0.2, duration: 600.ms, delay: 700.ms)
+                      .fadeIn(duration: 600.ms, delay: 700.ms),
+                  const SizedBox(height: 20),
+                  _buildSummaryCard(
                         'BMI',
                         bmi.toStringAsFixed(1),
                         _getBMICategory(bmi),
-                        CupertinoIcons.gauge,
+                        CupertinoIcons.graph_circle,
                         _getBMIColor(bmi),
                       )
-                          .animate()
-                          .fadeIn(delay: 1000.ms, duration: 600.ms)
-                          .slideY(begin: 0.3, end: 0),
-
-                      const SizedBox(height: 16),
-
-                      _buildSummaryCard(
+                      .animate()
+                      .slideY(begin: 0.2, duration: 600.ms, delay: 800.ms)
+                      .fadeIn(duration: 600.ms, delay: 800.ms),
+                  const SizedBox(height: 15),
+                  _buildSummaryCard(
                         _getGoalTitle(goal),
-                        '$progressPercentage%',
-                        _getGoalDescription(goal),
+                        '${targetWeight.toStringAsFixed(1)} kg',
+                        '${_getGoalDescription(goal)}: ${progressPercentage.abs()}%',
                         _getGoalIcon(goal),
                         _getGoalColor(goal),
                       )
-                          .animate()
-                          .fadeIn(delay: 1100.ms, duration: 600.ms)
-                          .slideY(begin: 0.3, end: 0),
-
-                      const SizedBox(height: 16),
-
-                      _buildSummaryCard(
-                        'Ernährung',
+                      .animate()
+                      .slideY(begin: 0.2, duration: 600.ms, delay: 900.ms)
+                      .fadeIn(duration: 600.ms, delay: 900.ms),
+                  const SizedBox(height: 15),
+                  _buildSummaryCard(
+                        'Ernährungstyp',
                         _getDietDisplayName(profile.dietType ?? 'standard'),
                         profile.isGlutenfree == true
                             ? 'Glutenfrei'
-                            : 'Mit Gluten',
+                            : 'Nicht glutenfrei',
                         CupertinoIcons.heart_fill,
-                        const Color(0xFFE8B86D),
+                        CupertinoColors.systemPink,
                       )
-                          .animate()
-                          .fadeIn(delay: 1200.ms, duration: 600.ms)
-                          .slideY(begin: 0.3, end: 0),
-
-                      const SizedBox(height: 32),
-
-                      // Motivational text
-                      GlassmorphicContainer(
-                        width: double.infinity,
-                        height: 80,
-                        borderRadius: 20,
-                        blur: 20,
-                        alignment: Alignment.center,
-                        border: 2,
-                        linearGradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.white.withValues(alpha: 0.25),
-                            Colors.white.withValues(alpha: 0.1),
-                          ],
-                        ),
-                        borderGradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.white.withValues(alpha: 0.3),
-                            Colors.white.withValues(alpha: 0.1),
-                          ],
-                        ),
-                        child: const Text(
-                          '✨ Du bist startklar für deine Reise!',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      )
-                          .animate()
-                          .fadeIn(delay: 1300.ms, duration: 600.ms)
-                          .slideY(begin: 0.2, end: 0),
-
-                      const SizedBox(height: 40),
-
-                      // Action Button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: CupertinoButton.filled(
-                          onPressed: _isLoading
-                              ? null
-                              : () => _handleComplete(profile),
-                          borderRadius: BorderRadius.circular(16),
-                          child: _isLoading
-                              ? const CupertinoActivityIndicator(
-                                  color: CupertinoColors.white,
-                                )
-                              : const Text(
-                                  'Los geht\'s!',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: -0.41,
-                                    color: CupertinoColors.white,
-                                  ),
-                                ),
-                        ),
-                      )
-                          .animate()
-                          .fadeIn(delay: 1400.ms, duration: 600.ms)
-                          .slideY(begin: 0.5, end: 0)
-                          .scale(
-                              begin: const Offset(0.95, 0.95), delay: 1400.ms),
-
-                      const SizedBox(height: 24),
-                    ],
+                      .animate()
+                      .slideY(begin: 0.2, duration: 600.ms, delay: 1000.ms)
+                      .fadeIn(duration: 600.ms, delay: 1000.ms),
+                  const SizedBox(height: 30),
+                  Center(
+                    child: CupertinoButton.filled(
+                      onPressed: _isLoading
+                          ? null
+                          : () => _handleComplete(profile),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 40,
+                        vertical: 15,
+                      ),
+                      child: _isLoading
+                          ? const CupertinoActivityIndicator(
+                              color: Colors.white,
+                            )
+                          : const Text(
+                              'Los geht\'s!',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                    ).animate().fadeIn(duration: 500.ms, delay: 1100.ms),
                   ),
-                ),
-              ),
-            ),
-
-            // Confetti
-            Align(
-              alignment: Alignment.topCenter,
-              child: ConfettiWidget(
-                confettiController: _confettiController,
-                blastDirectionality: BlastDirectionality.explosive,
-                shouldLoop: false,
-                colors: const [
-                  Color(0xFFFFD700),
-                  Color(0xFFFF6347),
-                  Color(0xFF4682B4),
-                  Color(0xFF32CD32),
-                  Color(0xFF9370DB),
-                  Color(0xFF99D98C),
-                  Color(0xFF34A0A4),
+                  const SizedBox(height: 20),
                 ],
-                gravity: 0.3,
-                emissionFrequency: 0.03,
-                numberOfParticles: 20,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildProgressChart(
-      double currentWeight, double targetWeight, String goal) {
-    // Chart visualization (simplified for now)
-    // Future: Add calorie deficit calculations
-
+    double currentWeight,
+    double targetWeight,
+    String goal,
+  ) {
     return GlassmorphicContainer(
       width: double.infinity,
       height: 280,
@@ -457,16 +370,16 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          Colors.white.withValues(alpha: 0.25),
-          Colors.white.withValues(alpha: 0.1),
+          Colors.white.withOpacity(0.25), // Corrected: Use withOpacity
+          Colors.white.withOpacity(0.1), // Corrected: Use withOpacity
         ],
       ),
       borderGradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          Colors.white.withValues(alpha: 0.3),
-          Colors.white.withValues(alpha: 0.1),
+          Colors.white.withOpacity(0.3), // Corrected: Use withOpacity
+          Colors.white.withOpacity(0.1), // Corrected: Use withOpacity
         ],
       ),
       child: Padding(
@@ -533,16 +446,18 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
                       final t = i / 40;
                       final x = t * 6;
                       // Gewicht: S-Kurve
-                      final weightY = startWeight +
+                      final weightY =
+                          startWeight +
                           (endWeight - startWeight) *
                               (0.5 - 0.5 * math.cos(math.pi * t));
                       // Goldene Linie: S-Kurve, aber immer knapp unterhalb der Gewichtskurve
-                      final calorieY = weightY -
+                      final calorieY =
+                          weightY -
                           1.2 +
                           0.5 *
-                              math.sin(math.pi * t -
-                                  math.pi /
-                                      2); // optisch ansprechend, immer sichtbar
+                              math.sin(
+                                math.pi * t - math.pi / 2,
+                              ); // optisch ansprechend, immer sichtbar
                       calorieSpots.add(FlSpot(x, calorieY));
                       weightSpots.add(FlSpot(x, weightY));
                     }
@@ -552,8 +467,12 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
                     LineChartData(
                       minX: 0,
                       maxX: 6,
-                      minY: endWeight - 2,
-                      maxY: startWeight + 2,
+                      minY: goal == 'weight_loss'
+                          ? targetWeight - 2
+                          : currentWeight - 2,
+                      maxY: goal == 'weight_loss'
+                          ? currentWeight + 2
+                          : targetWeight + 2,
                       lineBarsData: [
                         // Gewichtslinie (S-Kurve)
                         if (weightSpots.isNotEmpty)
@@ -571,11 +490,15 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
                                     radius: 6,
                                     color: Colors.white,
                                     strokeWidth: 3,
-                                    strokeColor: Colors.white.withValues(alpha: 0.8),
+                                    strokeColor: Colors.white.withOpacity(
+                                      0.8,
+                                    ), // Corrected: Use withOpacity
                                   );
                                 }
                                 return FlDotCirclePainter(
-                                    radius: 0, color: Colors.transparent);
+                                  radius: 0,
+                                  color: Colors.transparent,
+                                );
                               },
                             ),
                             belowBarData: BarAreaData(
@@ -584,8 +507,12 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                                 colors: [
-                                  Colors.white.withValues(alpha: 0.3),
-                                  Colors.white.withValues(alpha: 0.1),
+                                  Colors.white.withOpacity(
+                                    0.3,
+                                  ), // Corrected: Use withOpacity
+                                  Colors.white.withOpacity(
+                                    0.1,
+                                  ), // Corrected: Use withOpacity
                                 ],
                               ),
                             ),
@@ -606,23 +533,22 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
                                     radius: 6,
                                     color: const Color(0xFFFFD700),
                                     strokeWidth: 3,
-                                    strokeColor:
-                                        Colors.white.withValues(alpha: 0.8),
+                                    strokeColor: Colors.white.withOpacity(
+                                      0.8,
+                                    ), // Corrected: Use withOpacity
                                   );
                                 }
                                 return FlDotCirclePainter(
-                                    radius: 0, color: Colors.transparent);
+                                  radius: 0,
+                                  color: Colors.transparent,
+                                );
                               },
                             ),
                             belowBarData: BarAreaData(show: false),
                           ),
                       ],
-                      titlesData: FlTitlesData(
-                        show: false,
-                      ),
-                      gridData: FlGridData(
-                        show: false,
-                      ),
+                      titlesData: FlTitlesData(show: false),
+                      gridData: FlGridData(show: false),
                       borderData: FlBorderData(show: false),
                     ),
                   );
@@ -635,8 +561,13 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
     );
   }
 
-  Widget _buildSummaryCard(String title, String value, String description,
-      IconData icon, Color color) {
+  Widget _buildSummaryCard(
+    String title,
+    String value,
+    String description,
+    IconData icon,
+    Color color,
+  ) {
     return GlassmorphicContainer(
       width: double.infinity,
       height: 80,
@@ -648,16 +579,16 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          Colors.white.withValues(alpha: 0.25),
-          Colors.white.withValues(alpha: 0.1),
+          Colors.white.withOpacity(0.25), // Corrected: Use withOpacity
+          Colors.white.withOpacity(0.1), // Corrected: Use withOpacity
         ],
       ),
       borderGradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          Colors.white.withValues(alpha: 0.3),
-          Colors.white.withValues(alpha: 0.1),
+          Colors.white.withOpacity(0.3), // Corrected: Use withOpacity
+          Colors.white.withOpacity(0.1), // Corrected: Use withOpacity
         ],
       ),
       child: Padding(
@@ -669,7 +600,7 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
               height: 48,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: color.withValues(alpha: 0.2),
+                color: color.withOpacity(0.2), // Corrected: Use withOpacity
               ),
               child: Icon(icon, size: 24, color: Colors.white),
             ),
@@ -683,7 +614,9 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
                     title,
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.white.withValues(alpha: 0.8),
+                      color: Colors.white.withOpacity(
+                        0.8,
+                      ), // Corrected: Use withOpacity
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -704,7 +637,9 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
                           description,
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.white.withValues(alpha: 0.7),
+                            color: Colors.white.withOpacity(
+                              0.7,
+                            ), // Corrected: Use withOpacity
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -729,10 +664,10 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
   }
 
   Color _getBMIColor(double bmi) {
-    if (bmi < 18.5) return Colors.blue;
-    if (bmi < 25) return Colors.green;
-    if (bmi < 30) return Colors.orange;
-    return Colors.red;
+    if (bmi < 18.5) return CupertinoColors.systemBlue;
+    if (bmi < 25) return CupertinoColors.systemGreen;
+    if (bmi < 30) return CupertinoColors.systemOrange;
+    return CupertinoColors.systemRed;
   }
 
   String _getGoalTitle(String goal) {
@@ -777,13 +712,13 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
   Color _getGoalColor(String goal) {
     switch (goal) {
       case 'weight_loss':
-        return Colors.green;
+        return CupertinoColors.systemGreen;
       case 'weight_gain':
-        return Colors.blue;
+        return CupertinoColors.systemBlue;
       case 'muscle_gain':
-        return Colors.purple;
+        return CupertinoColors.systemPurple;
       default:
-        return Colors.grey;
+        return CupertinoColors.systemGrey;
     }
   }
 

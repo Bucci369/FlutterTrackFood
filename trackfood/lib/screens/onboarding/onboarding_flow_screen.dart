@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import '../../providers/profile_provider.dart';
 import '../../models/profile.dart';
@@ -44,21 +43,21 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
     'weight_loss',
     'weight_gain',
     'maintain_weight',
-    'muscle_gain'
+    'muscle_gain',
   ];
   final List<String> _activityLevels = [
     'sedentary',
     'lightly_active',
     'moderately_active',
     'very_active',
-    'extremely_active'
+    'extremely_active',
   ];
   final List<String> _dietTypes = [
     'standard',
     'vegan',
     'vegetarian',
     'keto',
-    'other'
+    'other',
   ];
 
   @override
@@ -142,7 +141,8 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
   bool _canProceed() {
     switch (_currentPage) {
       case 0:
-        return _firstNameController.text.isNotEmpty && _lastNameController.text.isNotEmpty;
+        return _firstNameController.text.isNotEmpty &&
+            _lastNameController.text.isNotEmpty;
       case 1:
         return _ageController.text.isNotEmpty &&
             (int.tryParse(_ageController.text) ?? 0) > 0;
@@ -198,7 +198,8 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                         Color(0xFF34A0A4).withValues(alpha: 0.7),
                       ],
                       transform: GradientRotation(
-                          _backgroundController.value * 2 * 3.14159),
+                        _backgroundController.value * 2 * 3.14159,
+                      ),
                     ),
                   ),
                 );
@@ -219,8 +220,10 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                             if (_currentPage > 0)
                               IconButton(
                                 onPressed: _previousPage,
-                                icon: const Icon(CupertinoIcons.back,
-                                    color: Colors.white),
+                                icon: const Icon(
+                                  CupertinoIcons.back,
+                                  color: Colors.white,
+                                ),
                               )
                             else
                               const SizedBox(width: 48),
@@ -234,8 +237,10 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                             ),
                             IconButton(
                               onPressed: () => Navigator.of(context).pop(),
-                              icon:
-                                  const Icon(CupertinoIcons.xmark, color: Colors.white),
+                              icon: const Icon(
+                                CupertinoIcons.xmark,
+                                color: Colors.white,
+                              ),
                             ),
                           ],
                         ),
@@ -345,13 +350,37 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
       subtitle: 'Dein Alter hilft uns bei der Berechnung',
       icon: CupertinoIcons.gift,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTextField(
+          Text(
+            'Alter in Jahren',
+            style: const TextStyle(
+              color: CupertinoColors.label,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          CupertinoTextField(
             controller: _ageController,
-            label: 'Alter in Jahren',
-            hint: 'z.B. 25',
-            icon: CupertinoIcons.calendar,
             keyboardType: TextInputType.number,
+            placeholder: 'z.B. 25',
+            prefix: Padding(
+              padding: const EdgeInsets.only(left: 8, right: 8),
+              child: Icon(
+                CupertinoIcons.calendar,
+                color: CupertinoColors.systemGrey,
+                size: 22,
+              ),
+            ),
+            style: const TextStyle(color: CupertinoColors.label, fontSize: 18),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            decoration: BoxDecoration(
+              color: CupertinoColors.systemGrey6,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: CupertinoColors.systemGrey3),
+            ),
+            onChanged: (_) => setState(() {}),
           ),
         ],
       ),
@@ -365,53 +394,55 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
       icon: CupertinoIcons.person_2,
       child: Column(
         children: [
-          ..._genders.map((gender) => Container(
-                margin: const EdgeInsets.only(bottom: 16),
-                child: GestureDetector(
-                  onTap: () => setState(() => _selectedGender = gender),
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
+          ..._genders.map(
+            (gender) => Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              child: GestureDetector(
+                onTap: () => setState(() => _selectedGender = gender),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    color: _selectedGender == gender
+                        ? CupertinoColors.systemGrey5
+                        : CupertinoColors.systemGrey6,
+                    border: Border.all(
                       color: _selectedGender == gender
-                          ? Colors.white.withValues(alpha: 0.2)
-                          : Colors.white.withValues(alpha: 0.1),
-                      border: Border.all(
-                        color: _selectedGender == gender
-                            ? Colors.white
-                            : Colors.white.withValues(alpha: 0.3),
-                        width: _selectedGender == gender ? 2 : 1,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          _getGenderIcon(gender),
-                          color: Colors.white,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 20),
-                        Expanded(
-                          child: Text(
-                            _getGenderDisplayName(gender),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                        if (_selectedGender == gender)
-                          const Icon(
-                            CupertinoIcons.check_mark_circled_solid,
-                            color: Colors.white,
-                            size: 28,
-                          ),
-                      ],
+                          ? CupertinoColors.activeBlue
+                          : CupertinoColors.systemGrey3,
+                      width: _selectedGender == gender ? 2 : 1,
                     ),
                   ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        _getGenderIcon(gender),
+                        color: CupertinoColors.label,
+                        size: 28,
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: Text(
+                          _getGenderDisplayName(gender),
+                          style: const TextStyle(
+                            color: CupertinoColors.label,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      if (_selectedGender == gender)
+                        const Icon(
+                          CupertinoIcons.check_mark_circled_solid,
+                          color: CupertinoColors.activeBlue,
+                          size: 28,
+                        ),
+                    ],
+                  ),
                 ),
-              )),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -423,13 +454,37 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
       subtitle: 'In Zentimetern',
       icon: CupertinoIcons.textformat_size,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTextField(
+          Text(
+            'Größe in cm',
+            style: const TextStyle(
+              color: CupertinoColors.label,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          CupertinoTextField(
             controller: _heightController,
-            label: 'Größe in cm',
-            hint: 'z.B. 175',
-            icon: CupertinoIcons.textformat_size,
             keyboardType: TextInputType.number,
+            placeholder: 'z.B. 175',
+            prefix: Padding(
+              padding: const EdgeInsets.only(left: 8, right: 8),
+              child: Icon(
+                CupertinoIcons.textformat_size,
+                color: CupertinoColors.systemGrey,
+                size: 22,
+              ),
+            ),
+            style: const TextStyle(color: CupertinoColors.label, fontSize: 18),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            decoration: BoxDecoration(
+              color: CupertinoColors.systemGrey6,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: CupertinoColors.systemGrey3),
+            ),
+            onChanged: (_) => setState(() {}),
           ),
         ],
       ),
@@ -442,13 +497,37 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
       subtitle: 'In Kilogramm',
       icon: CupertinoIcons.sportscourt,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTextField(
+          Text(
+            'Aktuelles Gewicht in kg',
+            style: const TextStyle(
+              color: CupertinoColors.label,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          CupertinoTextField(
             controller: _weightController,
-            label: 'Aktuelles Gewicht in kg',
-            hint: 'z.B. 70',
-            icon: CupertinoIcons.gauge,
             keyboardType: TextInputType.number,
+            placeholder: 'z.B. 70',
+            prefix: Padding(
+              padding: const EdgeInsets.only(left: 8, right: 8),
+              child: Icon(
+                CupertinoIcons.gauge,
+                color: CupertinoColors.systemGrey,
+                size: 22,
+              ),
+            ),
+            style: const TextStyle(color: CupertinoColors.label, fontSize: 18),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            decoration: BoxDecoration(
+              color: CupertinoColors.systemGrey6,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: CupertinoColors.systemGrey3),
+            ),
+            onChanged: (_) => setState(() {}),
           ),
         ],
       ),
@@ -461,36 +540,58 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
       subtitle: 'Was möchtest du erreichen?',
       icon: CupertinoIcons.flag,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTextField(
+          Text(
+            'Zielgewicht in kg',
+            style: const TextStyle(
+              color: CupertinoColors.label,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          CupertinoTextField(
             controller: _targetWeightController,
-            label: 'Zielgewicht in kg',
-            hint: 'z.B. 65',
-            icon: CupertinoIcons.scope,
             keyboardType: TextInputType.number,
+            placeholder: 'z.B. 65',
+            prefix: Padding(
+              padding: const EdgeInsets.only(left: 8, right: 8),
+              child: Icon(
+                CupertinoIcons.scope,
+                color: CupertinoColors.systemGrey,
+                size: 22,
+              ),
+            ),
+            style: const TextStyle(color: CupertinoColors.label, fontSize: 18),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            decoration: BoxDecoration(
+              color: CupertinoColors.systemGrey6,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: CupertinoColors.systemGrey3),
+            ),
+            onChanged: (_) => setState(() {}),
           ),
           const SizedBox(height: 24),
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              color: Colors.white.withValues(alpha: 0.1),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.3),
-              ),
+              color: CupertinoColors.systemGrey6,
+              border: Border.all(color: CupertinoColors.systemGrey3),
             ),
             child: Column(
               children: [
                 const Icon(
                   CupertinoIcons.info_circle,
-                  color: Colors.white,
+                  color: CupertinoColors.label,
                   size: 24,
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Tipp: Ein gesundes Zielgewicht liegt in der Regel 0,5-1 kg pro Woche vom aktuellen Gewicht entfernt.',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.9),
+                    color: CupertinoColors.label,
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                   ),
@@ -505,122 +606,64 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
   }
 
   Widget _buildGoalsPage() {
-    return Container(
-      color: CupertinoColors.systemBackground,
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header with back button
-              Row(
-                children: [
-                  CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: _previousPage,
-                    child: const Icon(
-                      CupertinoIcons.back,
-                      color: CupertinoColors.label,
-                      size: 28,
-                    ),
-                  ),
-                  const Expanded(
-                    child: Text(
-                      'Was sind deine Ziele?',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: CupertinoColors.label,
-                        letterSpacing: -0.41,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const SizedBox(width: 48),
-                ],
-              ),
-              
-              const SizedBox(height: 48),
-              
-              // Goals cards
-              Expanded(
-                child: ListView(
-                  children: [
-                    _buildGoalCard(
-                      'weight_loss',
-                      'Gewichtsverlust',
-                      '🏃‍♂️',
-                      Colors.blue,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildGoalCard(
-                      'maintain_weight',
-                      'Verbesserte\nGesundheit',
-                      '❤️',
-                      Colors.red,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildGoalCard(
-                      'weight_gain',
-                      'Mehr Energie',
-                      '⚡',
-                      Colors.blue,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildGoalCard(
-                      'muscle_gain',
-                      'Mentales Wohlbefinden',
-                      '🧘‍♀️',
-                      Colors.pink,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildGoalCard(
-                      'maintain_weight',
-                      'Bessere Verdauung',
-                      '🍎',
-                      Colors.purple,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildGoalCard(
-                      'weight_loss',
-                      'Immunsystem stärken',
-                      '🛡️',
-                      Colors.cyan,
-                    ),
-                  ],
-                ),
-              ),
-              
-              // Continue button
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: CupertinoButton(
-                  color: const Color(0xFF00C853),
-                  borderRadius: BorderRadius.circular(16),
-                  onPressed: _canProceed() ? _nextPage : null,
-                  child: const Text(
-                    'Weiter',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: -0.41,
-                      color: CupertinoColors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+    return _buildPageContent(
+      title: 'Was sind deine Ziele?',
+      subtitle: 'Wähle dein Hauptziel aus',
+      icon: CupertinoIcons.star,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ...[
+            _buildGoalCard(
+              'weight_loss',
+              'Gewichtsverlust',
+              '🏃‍♂️',
+              CupertinoColors.activeBlue,
+            ),
+            const SizedBox(height: 16),
+            _buildGoalCard(
+              'maintain_weight',
+              'Verbesserte\nGesundheit',
+              '❤️',
+              CupertinoColors.systemRed,
+            ),
+            const SizedBox(height: 16),
+            _buildGoalCard(
+              'weight_gain',
+              'Mehr Energie',
+              '⚡',
+              CupertinoColors.activeOrange,
+            ),
+            const SizedBox(height: 16),
+            _buildGoalCard(
+              'muscle_gain',
+              'Mentales Wohlbefinden',
+              '🧘‍♀️',
+              CupertinoColors.systemPink,
+            ),
+            const SizedBox(height: 16),
+            _buildGoalCard(
+              'maintain_weight',
+              'Bessere Verdauung',
+              '🍎',
+              CupertinoColors.systemPurple,
+            ),
+            const SizedBox(height: 16),
+            _buildGoalCard(
+              'weight_loss',
+              'Immunsystem stärken',
+              '🛡️',
+              CupertinoColors.systemTeal,
+            ),
+          ],
+        ],
       ),
     );
   }
 
   Widget _buildGoalCard(String goal, String title, String emoji, Color color) {
     final isSelected = _selectedGoal == goal;
-    
+
     return GestureDetector(
       onTap: () => setState(() => _selectedGoal = goal),
       child: Container(
@@ -628,9 +671,9 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
         decoration: BoxDecoration(
           color: CupertinoColors.systemGrey6,
           borderRadius: BorderRadius.circular(24),
-          border: isSelected 
-            ? Border.all(color: const Color(0xFF00C853), width: 2)
-            : null,
+          border: isSelected
+              ? Border.all(color: const Color(0xFF00C853), width: 2)
+              : null,
         ),
         child: Row(
           children: [
@@ -642,10 +685,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Center(
-                child: Text(
-                  emoji,
-                  style: const TextStyle(fontSize: 28),
-                ),
+                child: Text(emoji, style: const TextStyle(fontSize: 28)),
               ),
             ),
             const SizedBox(width: 20),
@@ -698,23 +738,22 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
       subtitle: 'Was passt zu deinem Lebensstil?',
       icon: CupertinoIcons.heart_fill,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
             'Ernährungsart:',
             style: TextStyle(
-              color: Colors.white,
+              color: CupertinoColors.label,
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
           ),
-          // Diet types grid - more compact
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3, // 3 columns instead of 2
-              childAspectRatio: 0.9, // Slightly taller
+              crossAxisCount: 3,
+              childAspectRatio: 0.9,
               crossAxisSpacing: 8,
               mainAxisSpacing: 8,
             ),
@@ -729,12 +768,12 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     color: isSelected
-                        ? Colors.white.withValues(alpha: 0.3)
-                        : Colors.white.withValues(alpha: 0.1),
+                        ? CupertinoColors.systemGrey5
+                        : CupertinoColors.systemGrey6,
                     border: Border.all(
                       color: isSelected
-                          ? Colors.white
-                          : Colors.white.withValues(alpha: 0.3),
+                          ? CupertinoColors.activeBlue
+                          : CupertinoColors.systemGrey3,
                       width: isSelected ? 2 : 1,
                     ),
                   ),
@@ -749,7 +788,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                       Text(
                         _getDietDisplayName(dietType),
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: CupertinoColors.label,
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                         ),
@@ -761,23 +800,19 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                         const SizedBox(height: 2),
                         Icon(
                           CupertinoIcons.check_mark_circled_solid,
-                          color: Colors.white,
+                          color: CupertinoColors.activeBlue,
                           size: 14,
                         ),
                       ],
                     ],
                   ),
                 ),
-              )
-                  .animate(delay: Duration(milliseconds: 100 * index))
-                  .fadeIn(duration: 600.ms)
-                  .scale(begin: const Offset(0.8, 0.8));
+              );
             },
           ),
 
           const SizedBox(height: 20),
 
-          // Glutenfree checkbox - more compact
           GestureDetector(
             onTap: () => setState(() => _isGlutenfree = !_isGlutenfree),
             child: Container(
@@ -785,12 +820,12 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 color: _isGlutenfree
-                    ? Colors.white.withValues(alpha: 0.3)
-                    : Colors.white.withValues(alpha: 0.1),
+                    ? CupertinoColors.systemGrey5
+                    : CupertinoColors.systemGrey6,
                 border: Border.all(
                   color: _isGlutenfree
-                      ? Colors.white
-                      : Colors.white.withValues(alpha: 0.3),
+                      ? CupertinoColors.activeBlue
+                      : CupertinoColors.systemGrey3,
                   width: _isGlutenfree ? 2 : 1,
                 ),
               ),
@@ -802,9 +837,11 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                     height: 20,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(4),
-                      color: _isGlutenfree ? Colors.white : Colors.transparent,
+                      color: _isGlutenfree
+                          ? CupertinoColors.activeBlue
+                          : Colors.transparent,
                       border: Border.all(
-                        color: Colors.white,
+                        color: CupertinoColors.activeBlue,
                         width: 2,
                       ),
                     ),
@@ -812,20 +849,17 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                         ? const Icon(
                             CupertinoIcons.check_mark,
                             size: 14,
-                            color: Color(0xFF34A0A4),
+                            color: CupertinoColors.white,
                           )
                         : null,
                   ),
                   const SizedBox(width: 12),
-                  const Text(
-                    '🌾',
-                    style: TextStyle(fontSize: 20),
-                  ),
+                  const Text('🌾', style: TextStyle(fontSize: 20)),
                   const SizedBox(width: 6),
                   const Text(
                     'Glutenfrei',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: CupertinoColors.label,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
@@ -861,13 +895,8 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                     shape: BoxShape.circle,
                     color: Colors.white.withValues(alpha: 0.2),
                   ),
-                  child: Icon(
-                    icon,
-                    size: 40,
-                    color: Colors.white,
-                  ),
-                ).animate().scale(
-                    delay: 200.ms, duration: 600.ms, curve: Curves.elasticOut),
+                  child: Icon(icon, size: 40, color: Colors.white),
+                ),
                 const SizedBox(height: 24),
                 Text(
                   title,
@@ -877,10 +906,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                     color: Colors.white,
                   ),
                   textAlign: TextAlign.center,
-                )
-                    .animate()
-                    .fadeIn(delay: 400.ms, duration: 600.ms)
-                    .slideY(begin: 0.3, end: 0),
+                ),
                 const SizedBox(height: 8),
                 Text(
                   subtitle,
@@ -890,10 +916,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                     fontWeight: FontWeight.w300,
                   ),
                   textAlign: TextAlign.center,
-                )
-                    .animate()
-                    .fadeIn(delay: 600.ms, duration: 600.ms)
-                    .slideY(begin: 0.2, end: 0),
+                ),
               ],
             ),
           ),
@@ -931,10 +954,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                 ),
               ),
             ),
-          )
-              .animate()
-              .fadeIn(delay: 800.ms, duration: 800.ms)
-              .slideY(begin: 0.2, end: 0),
+          ),
         ],
       ),
     );
@@ -947,33 +967,36 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
     required IconData icon,
     TextInputType? keyboardType,
   }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      style: const TextStyle(color: Colors.white, fontSize: 18),
-      textAlign: TextAlign.center,
-      onChanged: (_) => setState(() {}),
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
-        hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
-        prefixIcon: Icon(icon, color: Colors.white.withValues(alpha: 0.8)),
-        filled: true,
-        fillColor: Colors.white.withValues(alpha: 0.1),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: CupertinoColors.label,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+        const SizedBox(height: 8),
+        CupertinoTextField(
+          controller: controller,
+          keyboardType: keyboardType,
+          placeholder: hint,
+          prefix: Padding(
+            padding: const EdgeInsets.only(left: 8, right: 8),
+            child: Icon(icon, color: CupertinoColors.systemGrey, size: 22),
+          ),
+          style: const TextStyle(color: CupertinoColors.label, fontSize: 18),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          decoration: BoxDecoration(
+            color: CupertinoColors.systemGrey6,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: CupertinoColors.systemGrey3),
+          ),
+          onChanged: (_) => setState(() {}),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Colors.white, width: 2),
-        ),
-      ),
+      ],
     );
   }
 
@@ -996,18 +1019,15 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
               ? Colors.white.withValues(alpha: 0.2)
               : Colors.white.withValues(alpha: 0.1),
           border: Border.all(
-            color:
-                isSelected ? Colors.white : Colors.white.withValues(alpha: 0.3),
+            color: isSelected
+                ? Colors.white
+                : Colors.white.withValues(alpha: 0.3),
             width: isSelected ? 2 : 1,
           ),
         ),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: Colors.white,
-              size: 20,
-            ),
+            Icon(icon, color: Colors.white, size: 20),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
