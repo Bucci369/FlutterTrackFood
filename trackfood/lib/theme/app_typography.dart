@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'app_colors.dart';
 
 /// iOS-spezifische Typografie für ein natives und modernes App-Erlebnis
 class AppTypography {

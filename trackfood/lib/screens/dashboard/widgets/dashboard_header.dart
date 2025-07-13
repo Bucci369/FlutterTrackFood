@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:glassmorphism/glassmorphism.dart';
+import '../../../theme/app_colors.dart';
+import '../../../theme/app_typography.dart';
 
 class DashboardHeader extends StatelessWidget {
   final String greeting;
@@ -66,21 +66,16 @@ class DashboardHeader extends StatelessWidget {
                 children: [
                   Text(
                     '$greeting, $userName! 👋',
-                    style: const TextStyle(
+                    style: AppTypography.largeTitle.copyWith(
+                      color: AppColors.label,
                       fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: -0.41,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     _formatDate(date),
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white.withValues(alpha: 0.8),
-                      fontWeight: FontWeight.w300,
-                      letterSpacing: -0.41,
+                    style: AppTypography.body.copyWith(
+                      color: AppColors.secondaryLabel,
                     ),
                   ),
                 ],
@@ -94,11 +89,11 @@ class DashboardHeader extends StatelessWidget {
                       height: 32,
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.orange,
+                        color: CupertinoColors.systemOrange,
                       ),
                       child: const Icon(
                         CupertinoIcons.flame,
-                        color: Colors.white,
+                        color: CupertinoColors.white,
                         size: 18,
                       ),
                     ),
@@ -109,11 +104,11 @@ class DashboardHeader extends StatelessWidget {
                       height: 32,
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.blue,
+                        color: CupertinoColors.systemBlue,
                       ),
                       child: const Icon(
                         CupertinoIcons.drop,
-                        color: Colors.white,
+                        color: CupertinoColors.white,
                         size: 18,
                       ),
                     ),
@@ -125,79 +120,73 @@ class DashboardHeader extends StatelessWidget {
           const SizedBox(height: 20),
 
           // Goal card
-          GlassmorphicContainer(
+          Container(
             width: double.infinity,
-            height: 100,
-            borderRadius: 16,
-            blur: 20,
-            alignment: Alignment.center,
-            border: 2,
-            linearGradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withValues(alpha: 0.25),
-                Colors.white.withValues(alpha: 0.1),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: const Color(0xFFF6F1E7), // Apple White
+              border: Border.all(
+                color: AppColors.separator,
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: CupertinoColors.systemGrey.withOpacity(0.1),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
               ],
             ),
-            borderGradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withValues(alpha: 0.3),
-                Colors.white.withValues(alpha: 0.1),
-              ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+            child: Row(
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.primary.withOpacity(0.2),
+                    border: Border.all(
+                      color: AppColors.primary.withOpacity(0.4),
+                      width: 2,
+                    ),
+                  ),
+                  child: Icon(
+                    CupertinoIcons.flag,
+                    color: AppColors.label,
+                    size: 26,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white.withValues(alpha: 0.2),
-                        ),
-                        child: const Icon(
-                          CupertinoIcons.flag,
-                          color: Colors.white,
-                          size: 20,
+                      Text(
+                        'Dein Tagesziel',
+                        style: AppTypography.headline.copyWith(
+                          color: AppColors.label,
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Dein Tagesziel',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: -0.41,
-                              ),
-                            ),
-                            SizedBox(height: 2),
-                            Text(
-                              'Bleib dran! Du schaffst das 💪',
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 14,
-                                letterSpacing: -0.41,
-                              ),
-                            ),
-                          ],
+                      const SizedBox(height: 4),
+                      Text(
+                        'Bleib dran! Du schaffst das 💪',
+                        style: AppTypography.body.copyWith(
+                          color: AppColors.secondaryLabel,
                         ),
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+                Container(
+                  width: 4,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

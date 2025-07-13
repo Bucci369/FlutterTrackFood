@@ -1,24 +1,14 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'providers/profile_provider.dart';
 import 'providers/chat_provider.dart';
 
-class AppProviders extends StatelessWidget {
-  final Widget child;
-  const AppProviders({required this.child, super.key});
+final profileProvider = ChangeNotifierProvider<ProfileProvider>((ref) {
+  return ProfileProvider();
+});
 
-  @override
-  Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider<ProfileProvider>(
-          create: (_) => ProfileProvider(),
-        ),
-        ChangeNotifierProvider<ChatProvider>(
-          create: (_) => ChatProvider(),
-        ),
-      ],
-      child: child,
-    );
-  }
-}
+final chatProvider = ChangeNotifierProvider<ChatProvider>((ref) {
+  return ChatProvider();
+});
+
+/// Provider to control the main tab navigation
+final tabControllerProvider = StateProvider<int>((ref) => 0);

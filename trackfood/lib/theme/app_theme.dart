@@ -4,6 +4,22 @@ import 'app_typography.dart';
 
 /// Zentrales App-Theme, das ein modernes und natives iOS-Design umsetzt.
 class AppTheme {
+  /// Dunkles Theme für die App
+  static CupertinoThemeData get darkTheme => CupertinoThemeData(
+    brightness: Brightness.dark,
+    primaryColor: const Color.fromARGB(255, 69, 101, 204),
+    scaffoldBackgroundColor: CupertinoColors.black,
+    barBackgroundColor: CupertinoColors.darkBackgroundGray.withOpacity(0.85),
+    textTheme: const CupertinoTextThemeData(
+      textStyle: AppTypography.body,
+      actionTextStyle: AppTypography.button,
+      tabLabelTextStyle: AppTypography.tabLabel,
+      navTitleTextStyle: AppTypography.headline,
+      navLargeTitleTextStyle: AppTypography.largeTitle,
+      pickerTextStyle: AppTypography.body,
+      dateTimePickerTextStyle: AppTypography.body,
+    ),
+  );
   AppTheme._();
 
   /// Helles Theme für die App

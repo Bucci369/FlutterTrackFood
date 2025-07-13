@@ -1,14 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'screens/auth/auth_wrapper.dart';
 import 'screens/dashboard/dashboard_screen.dart';
 import 'screens/diary/diary_screen.dart';
-import 'screens/onboarding/onboarding_flow_screen.dart';
+import 'screens/onboarding/onboardingFlowScreen.dart';
 import 'screens/chat/chat_screen.dart';
 import 'screens/profile/profile_screen.dart';
 import 'screens/splash/splash_screen.dart'; // Import the new splash screen
-import 'app_providers.dart';
 import 'theme/app_theme.dart';
 
 Future<void> main() async {
@@ -20,7 +20,7 @@ Future<void> main() async {
     // Disable debug output for production
     // debug: kDebugMode,
   );
-  runApp(AppProviders(child: const MyApp()));
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {

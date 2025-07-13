@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:provider/provider.dart';
 import 'auth_screen.dart';
-import '../onboarding/onboarding_flow_screen.dart';
+import '../onboarding/onboardingFlowScreen.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../../services/supabase_service.dart';
-import '../../providers/profile_provider.dart';
+import '../../app_providers.dart';
 
-class AuthWrapper extends StatefulWidget {
+class AuthWrapper extends ConsumerStatefulWidget {
   const AuthWrapper({super.key});
 
   @override
-  State<AuthWrapper> createState() => _AuthWrapperState();
+  ConsumerState<AuthWrapper> createState() => _AuthWrapperState();
 }
 
-class _AuthWrapperState extends State<AuthWrapper> {
+class _AuthWrapperState extends ConsumerState<AuthWrapper> {
   final SupabaseService _supabaseService = SupabaseService();
   bool _isOnboardingCompleted = false;
 
@@ -22,7 +22,9 @@ class _AuthWrapperState extends State<AuthWrapper> {
   void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 2), () {
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     });
     _setupAuthListener();
   }
@@ -36,30 +38,36 @@ class _AuthWrapperState extends State<AuthWrapper> {
           final userId = _supabaseService.currentUserId;
           if (userId != null) {
             final profile = await _supabaseService.getProfile(userId);
-            setState(() {
-              _isOnboardingCompleted = profile?.onboardingCompleted ?? false;
-            });
-            // ProfileProvider mit dem Profil synchronisieren
-            if (profile != null && mounted) {
-              context.read<ProfileProvider>().setProfile(profile);
-            } else if (mounted) {
-              await context.read<ProfileProvider>().loadProfile();
+            if (mounted) {
+              setState(() {
+                _isOnboardingCompleted = profile?.onboardingCompleted ?? false;
+              });
+              // ProfileProvider mit dem Profil synchronisieren
+              if (profile != null) {
+                ref.read(profileProvider).setProfile(profile);
+              } else {
+                await ref.read(profileProvider).loadProfile();
+              }
             }
           } else {
+            if (mounted) {
+              setState(() {
+                _isOnboardingCompleted = false;
+              });
+            }
+          }
+        } else if (event == AuthChangeEvent.signedOut) {
+          if (mounted) {
             setState(() {
               _isOnboardingCompleted = false;
             });
-          }
-        } else if (event == AuthChangeEvent.signedOut) {
-          setState(() {
-            _isOnboardingCompleted = false;
-          });
-          // ProfileProvider bei Logout leeren
-          if (mounted) {
-            context.read<ProfileProvider>().clearProfile();
+            // ProfileProvider bei Logout leeren
+            ref.read(profileProvider).clearProfile();
           }
         }
-        setState(() {});
+        if (mounted) {
+          setState(() {});
+        }
       }
     });
   }

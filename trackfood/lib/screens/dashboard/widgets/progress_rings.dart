@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:glassmorphism/glassmorphism.dart';
+import 'package:flutter/cupertino.dart';
+import '../../../theme/app_colors.dart';
+import '../../../theme/app_typography.dart';
 import 'dart:math' as math;
 
 class ProgressRings extends StatefulWidget {
@@ -63,27 +64,22 @@ class _ProgressRingsState extends State<ProgressRings>
 
   @override
   Widget build(BuildContext context) {
-    return GlassmorphicContainer(
+    return Container(
       width: double.infinity,
-      height: 180,
-      borderRadius: 20,
-      blur: 20,
-      alignment: Alignment.center,
-      border: 2,
-      linearGradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          Colors.white.withValues(alpha: 0.25),
-          Colors.white.withValues(alpha: 0.1),
-        ],
-      ),
-      borderGradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          Colors.white.withValues(alpha: 0.3),
-          Colors.white.withValues(alpha: 0.1),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: const Color(0xFFF6F1E7), // Apple White
+        border: Border.all(
+          color: AppColors.separator,
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: CupertinoColors.systemGrey.withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
         ],
       ),
       child: Padding(
@@ -115,17 +111,16 @@ class _ProgressRingsState extends State<ProgressRings>
                               children: [
                                 Text(
                                   '${widget.caloriesCurrent.toInt()}',
-                                  style: const TextStyle(
-                                    fontSize: 20,
+                                  style: AppTypography.title2.copyWith(
+                                    color: AppColors.label,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
                                   ),
                                 ),
                                 Text(
                                   '${widget.caloriesGoal.toInt()}',
-                                  style: TextStyle(
+                                  style: AppTypography.body.copyWith(
+                                    color: AppColors.secondaryLabel,
                                     fontSize: 12,
-                                    color: Colors.white.withValues(alpha: 0.7),
                                   ),
                                 ),
                               ],
@@ -140,15 +135,15 @@ class _ProgressRingsState extends State<ProgressRings>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        Icons.local_fire_department,
-                        color: Colors.orange.withValues(alpha: 0.8),
+                        CupertinoIcons.flame_fill,
+                        color: CupertinoColors.systemOrange,
                         size: 18,
                       ),
                       const SizedBox(width: 4),
-                      const Text(
+                      Text(
                         'Kalorien',
-                        style: TextStyle(
-                          color: Colors.white,
+                        style: AppTypography.body.copyWith(
+                          color: AppColors.label,
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
@@ -186,17 +181,16 @@ class _ProgressRingsState extends State<ProgressRings>
                               children: [
                                 Text(
                                   '${widget.waterCurrent.toInt()}',
-                                  style: const TextStyle(
-                                    fontSize: 20,
+                                  style: AppTypography.title2.copyWith(
+                                    color: AppColors.label,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
                                   ),
                                 ),
                                 Text(
                                   '${widget.waterGoal.toInt()}',
-                                  style: TextStyle(
+                                  style: AppTypography.body.copyWith(
+                                    color: AppColors.secondaryLabel,
                                     fontSize: 12,
-                                    color: Colors.white.withValues(alpha: 0.7),
                                   ),
                                 ),
                               ],
@@ -211,15 +205,15 @@ class _ProgressRingsState extends State<ProgressRings>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        Icons.water_drop,
-                        color: Colors.blue.withValues(alpha: 0.8),
+                        CupertinoIcons.drop_fill,
+                        color: CupertinoColors.systemBlue,
                         size: 18,
                       ),
                       const SizedBox(width: 4),
-                      const Text(
+                      Text(
                         'Gläser',
-                        style: TextStyle(
-                          color: Colors.white,
+                        style: AppTypography.body.copyWith(
+                          color: AppColors.label,
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
@@ -254,7 +248,7 @@ class ProgressRingPainter extends CustomPainter {
 
     // Background circle
     final backgroundPaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.2)
+      ..color = AppColors.separator
       ..strokeWidth = strokeWidth
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
