@@ -678,6 +678,10 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
         return 'Gewichtszunahme';
       case 'muscle_gain':
         return 'Muskelaufbau';
+      case 'improved_health':
+        return 'Immunsystem stärken';
+      case 'more_energy':
+        return 'Mehr Energie';
       default:
         return 'Zielfortschritt';
     }
@@ -691,6 +695,10 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
         return 'Geplante Zunahme';
       case 'muscle_gain':
         return 'Muskelzuwachs';
+      case 'improved_health':
+        return 'Gesundheit verbessern';
+      case 'more_energy':
+        return 'Mehr Energie';
       default:
         return 'Fortschritt';
     }
@@ -704,6 +712,10 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
         return CupertinoIcons.arrow_up;
       case 'muscle_gain':
         return CupertinoIcons.sportscourt;
+      case 'improved_health':
+        return CupertinoIcons.heart_fill;
+      case 'more_energy':
+        return CupertinoIcons.bolt;
       default:
         return CupertinoIcons.flag;
     }
@@ -717,6 +729,10 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
         return CupertinoColors.systemBlue;
       case 'muscle_gain':
         return CupertinoColors.systemPurple;
+      case 'improved_health':
+        return CupertinoColors.systemPink;
+      case 'more_energy':
+        return CupertinoColors.systemYellow;
       default:
         return CupertinoColors.systemGrey;
     }
