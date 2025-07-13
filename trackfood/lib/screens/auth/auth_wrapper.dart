@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'auth_screen.dart';
 import '../onboarding/onboarding_flow_screen.dart';
 import '../dashboard/dashboard_screen.dart';
-import '../../widgets/animated_logo.dart';
 import '../../services/supabase_service.dart';
 import '../../providers/profile_provider.dart';
 
@@ -18,15 +17,12 @@ class AuthWrapper extends StatefulWidget {
 class _AuthWrapperState extends State<AuthWrapper> {
   final SupabaseService _supabaseService = SupabaseService();
   bool _isOnboardingCompleted = false;
-  bool _showSplash = true;
 
   @override
   void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 2), () {
-      setState(() {
-        _showSplash = false;
-      });
+      setState(() {});
     });
     _setupAuthListener();
   }
@@ -72,11 +68,6 @@ class _AuthWrapperState extends State<AuthWrapper> {
   Widget build(BuildContext context) {
     print('User: ${_supabaseService.currentUser}');
     print('OnboardingCompleted: $_isOnboardingCompleted');
-    if (_showSplash) {
-      return const Scaffold(
-        body: CustomAnimatedLogo(),
-      );
-    }
     if (_supabaseService.currentUser == null) {
       return const AuthScreen();
     } else if (!_isOnboardingCompleted) {

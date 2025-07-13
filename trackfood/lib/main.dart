@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'screens/auth/auth_wrapper.dart';
@@ -8,6 +7,7 @@ import 'screens/diary/diary_screen.dart';
 import 'screens/onboarding/onboarding_flow_screen.dart';
 import 'screens/chat/chat_screen.dart';
 import 'screens/profile/profile_screen.dart';
+import 'screens/splash/splash_screen.dart'; // Import the new splash screen
 import 'app_providers.dart';
 import 'theme/app_theme.dart';
 
@@ -17,7 +17,8 @@ Future<void> main() async {
   await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
-    debug: true,
+    // Disable debug output for production
+    // debug: kDebugMode,
   );
   runApp(AppProviders(child: const MyApp()));
 }
@@ -28,12 +29,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoApp(
-      title: 'TrackFood App',
+      title: 'TrackFood',
       theme: AppTheme.lightTheme,
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
-        '/': (context) => const AuthWrapper(),
+        '/': (context) => const SplashScreen(),
+        '/auth': (context) => const AuthWrapper(),
         '/dashboard': (context) => const DashboardScreen(),
         '/diary': (context) => const DiaryScreen(),
         '/onboarding': (context) => const OnboardingFlowScreen(),
