@@ -1,10 +1,9 @@
-import 'package:flutter/cupertino.dart'; // Keep Cupertino for consistency
-import 'package:flutter/material.dart'; // Material is still needed for some utilities like Colors
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:confetti/confetti.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:glassmorphism/glassmorphism.dart';
 import 'package:provider/provider.dart';
 import 'dart:math' as math;
 import '../../models/profile.dart';
@@ -24,35 +23,41 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
   late ConfettiController _confettiController;
   late AnimationController _backgroundController;
   late AnimationController _chartController;
+  late AnimationController _pulseController;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _confettiController = ConfettiController(
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 3),
     );
     _backgroundController = AnimationController(
-      duration: const Duration(seconds: 15),
+      duration: const Duration(seconds: 20),
       vsync: this,
     );
     _chartController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
+    _pulseController = AnimationController(
+      duration: const Duration(seconds: 2),
       vsync: this,
     );
 
     _backgroundController.repeat();
+    _pulseController.repeat(reverse: true);
 
-    // Staggered animation start
-    Future.delayed(const Duration(milliseconds: 300), () {
+    // Enhanced staggered animation sequence
+    Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
         _confettiController.play();
         HapticFeedback.lightImpact();
       }
     });
 
-    // Start chart animation after initial elements
-    Future.delayed(const Duration(milliseconds: 800), () {
+    // Start chart animation after UI elements load
+    Future.delayed(const Duration(milliseconds: 1200), () {
       if (mounted) {
         _chartController.forward();
       }
@@ -64,6 +69,7 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
     _confettiController.dispose();
     _backgroundController.dispose();
     _chartController.dispose();
+    _pulseController.dispose();
     super.dispose();
   }
 
@@ -101,6 +107,11 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
 
   Future<void> _handleComplete(Profile profile) async {
     setState(() => _isLoading = true);
+    
+    // Play celebration confetti again on completion
+    _confettiController.play();
+    HapticFeedback.mediumImpact();
+    
     try {
       final supabaseService = SupabaseService();
       final userId = supabaseService.currentUserId;
@@ -140,14 +151,14 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
           .eq('id', userId);
 
       if (mounted) {
-        // The AuthWrapper will automatically show the dashboard when onboarding is completed
-        // Changed to CupertinoPageRoute for consistency, assuming '/' leads to a Cupertino screen
         Navigator.of(context).pushAndRemoveUntil(
           CupertinoPageRoute(
             builder: (context) => const CupertinoPageScaffold(
-              child: Center(child: Text('Dashboard Placeholder')),
+              child: Center(
+                child: Text('Dashboard wird geladen...'),
+              ),
             ),
-          ), // Replace with your actual dashboard
+          ),
           (route) => false,
         );
       }
@@ -182,6 +193,7 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
         child: Center(child: CupertinoActivityIndicator()),
       );
     }
+    
     final weight = profile.weightKg ?? 0.0;
     final height = profile.heightCm ?? 0.0;
     final goal = profile.goal ?? 'maintain_weight';
@@ -194,21 +206,10 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
         : 0;
 
     return CupertinoPageScaffold(
-      // Use CupertinoPageScaffold for the main layout
-      navigationBar: CupertinoNavigationBar(
-        middle: Text(
-          'Zusammenfassung',
-          style: CupertinoTheme.of(
-            context,
-          ).textTheme.navTitleTextStyle.copyWith(color: Colors.white),
-        ),
-        backgroundColor:
-            Colors.transparent, // Make it transparent for the background effect
-        border: const Border(), // Remove the default border
-      ),
+      backgroundColor: CupertinoColors.systemBackground,
       child: Stack(
         children: [
-          // Background Animation
+          // Enhanced animated background with Cupertino colors
           Positioned.fill(
             child: AnimatedBuilder(
               animation: _backgroundController,
@@ -220,133 +221,269 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
                       end: Alignment.bottomRight,
                       colors: [
                         CupertinoColors.systemPurple.withOpacity(
-                          0.7 +
-                              0.1 *
-                                  math.sin(
-                                    _backgroundController.value * 2 * math.pi,
-                                  ),
+                          0.8 + 0.2 * math.sin(_backgroundController.value * 2 * math.pi),
                         ),
-                        CupertinoColors.activeBlue.withOpacity(
-                          0.7 +
-                              0.1 *
-                                  math.cos(
-                                    _backgroundController.value * 2 * math.pi,
-                                  ),
+                        CupertinoColors.systemBlue.withOpacity(
+                          0.8 + 0.2 * math.cos(_backgroundController.value * 2 * math.pi + math.pi / 2),
+                        ),
+                        CupertinoColors.systemIndigo.withOpacity(
+                          0.6 + 0.1 * math.sin(_backgroundController.value * 3 * math.pi),
                         ),
                       ],
+                      transform: GradientRotation(_backgroundController.value * 2 * math.pi / 4),
                     ),
                   ),
                 );
               },
             ),
           ),
-          // Confetti overlay
+          
+          // Enhanced confetti with more particles and colors
           Align(
             alignment: Alignment.topCenter,
             child: ConfettiWidget(
               confettiController: _confettiController,
-              blastDirection: -math.pi / 2, // From top
-              maxBlastForce: 20,
-              minBlastForce: 10,
-              emissionFrequency: 0.05,
-              numberOfParticles: 20,
-              gravity: 0.2,
+              blastDirection: -math.pi / 2,
+              maxBlastForce: 25,
+              minBlastForce: 15,
+              emissionFrequency: 0.03,
+              numberOfParticles: 30,
+              gravity: 0.15,
               shouldLoop: false,
               colors: const [
                 CupertinoColors.systemYellow,
                 CupertinoColors.systemBlue,
                 CupertinoColors.systemPink,
                 CupertinoColors.systemGreen,
+                CupertinoColors.systemOrange,
+                CupertinoColors.systemPurple,
               ],
             ),
           ),
+          
           SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 20),
-                  Text(
-                    'Hallo, ${profile.name.split(' ').first}!',
-                    style: CupertinoTheme.of(context)
-                        .textTheme
-                        .navLargeTitleTextStyle
-                        .copyWith(color: Colors.white),
-                  ).animate().fadeIn(duration: 500.ms, delay: 300.ms),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Hier ist eine Zusammenfassung deiner Daten und dein Weg zum Ziel.',
-                    style: CupertinoTheme.of(context).textTheme.textStyle
-                        .copyWith(color: Colors.white.withOpacity(0.8)),
-                  ).animate().fadeIn(duration: 500.ms, delay: 500.ms),
-                  const SizedBox(height: 30),
-                  _buildProgressChart(weight, targetWeight, goal)
-                      .animate()
-                      .slideY(begin: 0.2, duration: 600.ms, delay: 700.ms)
-                      .fadeIn(duration: 600.ms, delay: 700.ms),
-                  const SizedBox(height: 20),
-                  _buildSummaryCard(
-                        'BMI',
-                        bmi.toStringAsFixed(1),
-                        _getBMICategory(bmi),
-                        CupertinoIcons.graph_circle,
-                        _getBMIColor(bmi),
-                      )
-                      .animate()
-                      .slideY(begin: 0.2, duration: 600.ms, delay: 800.ms)
-                      .fadeIn(duration: 600.ms, delay: 800.ms),
-                  const SizedBox(height: 15),
-                  _buildSummaryCard(
-                        _getGoalTitle(goal),
-                        '${targetWeight.toStringAsFixed(1)} kg',
-                        '${_getGoalDescription(goal)}: ${progressPercentage.abs()}%',
-                        _getGoalIcon(goal),
-                        _getGoalColor(goal),
-                      )
-                      .animate()
-                      .slideY(begin: 0.2, duration: 600.ms, delay: 900.ms)
-                      .fadeIn(duration: 600.ms, delay: 900.ms),
-                  const SizedBox(height: 15),
-                  _buildSummaryCard(
-                        'Ernährungstyp',
-                        _getDietDisplayName(profile.dietType ?? 'standard'),
-                        profile.isGlutenfree == true
-                            ? 'Glutenfrei'
-                            : 'Nicht glutenfrei',
-                        CupertinoIcons.heart_fill,
-                        CupertinoColors.systemPink,
-                      )
-                      .animate()
-                      .slideY(begin: 0.2, duration: 600.ms, delay: 1000.ms)
-                      .fadeIn(duration: 600.ms, delay: 1000.ms),
-                  const SizedBox(height: 30),
-                  Center(
-                    child: CupertinoButton.filled(
-                      onPressed: _isLoading
-                          ? null
-                          : () => _handleComplete(profile),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 40,
-                        vertical: 15,
-                      ),
-                      child: _isLoading
-                          ? const CupertinoActivityIndicator(
-                              color: Colors.white,
-                            )
-                          : const Text(
-                              'Los geht\'s!',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
+            child: Column(
+              children: [
+                // Modern Header
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          CupertinoButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Icon(
+                              CupertinoIcons.back,
+                              color: CupertinoColors.white,
+                              size: 24,
                             ),
-                    ).animate().fadeIn(duration: 500.ms, delay: 1100.ms),
+                          ),
+                          Text(
+                            'Schritt 6 von 6',
+                            style: CupertinoTheme.of(context).textTheme.textStyle.copyWith(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: CupertinoColors.white.withOpacity(0.9),
+                            ),
+                          ),
+                          SizedBox(width: 40), // Balance the back button
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Container(
+                        height: 4,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(2),
+                          color: CupertinoColors.white.withOpacity(0.3),
+                        ),
+                        child: FractionallySizedBox(
+                          alignment: Alignment.centerLeft,
+                          widthFactor: 1.0,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(2),
+                              color: CupertinoColors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 20),
-                ],
-              ),
+                ),
+
+                // Content
+                Expanded(
+                  child: CupertinoScrollbar(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 20),
+                          
+                          // Welcome message with enhanced animation
+                          Text(
+                            'Perfekt, ${profile.name.split(' ').first}! 🎉',
+                            style: CupertinoTheme.of(context)
+                                .textTheme
+                                .navLargeTitleTextStyle
+                                .copyWith(
+                                  color: CupertinoColors.white,
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ).animate()
+                           .fadeIn(duration: 600.ms, delay: 300.ms)
+                           .slideY(begin: 0.3, end: 0)
+                           .then() // Chain animations
+                           .shimmer(duration: 1500.ms, color: CupertinoColors.white.withOpacity(0.3)),
+                          
+                          const SizedBox(height: 12),
+                          
+                          Text(
+                            'Dein persönlicher Ernährungsplan ist bereit! Hier ist deine Zusammenfassung:',
+                            style: CupertinoTheme.of(context).textTheme.textStyle.copyWith(
+                              color: CupertinoColors.white.withOpacity(0.9),
+                              fontSize: 17,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ).animate()
+                           .fadeIn(duration: 600.ms, delay: 500.ms)
+                           .slideY(begin: 0.2, end: 0),
+                          
+                          const SizedBox(height: 40),
+                          
+                          // Enhanced Progress Chart
+                          _buildProgressChart(weight, targetWeight, goal)
+                              .animate()
+                              .slideY(begin: 0.3, duration: 800.ms, delay: 700.ms)
+                              .fadeIn(duration: 800.ms, delay: 700.ms)
+                              .scale(begin: const Offset(0.9, 0.9), end: const Offset(1, 1)),
+                          
+                          const SizedBox(height: 24),
+                          
+                          // Summary Cards with enhanced animations
+                          _buildModernSummaryCard(
+                            'BMI Bewertung',
+                            bmi.toStringAsFixed(1),
+                            _getBMICategory(bmi),
+                            CupertinoIcons.heart_circle,
+                            _getBMIColor(bmi),
+                            0,
+                          ).animate()
+                           .slideX(begin: -0.3, duration: 600.ms, delay: 900.ms)
+                           .fadeIn(duration: 600.ms, delay: 900.ms),
+                          
+                          const SizedBox(height: 16),
+                          
+                          _buildModernSummaryCard(
+                            _getGoalTitle(goal),
+                            '${targetWeight.toStringAsFixed(1)} kg',
+                            '${_getGoalDescription(goal)}: ${progressPercentage.abs()}%',
+                            _getGoalIcon(goal),
+                            _getGoalColor(goal),
+                            1,
+                          ).animate()
+                           .slideX(begin: 0.3, duration: 600.ms, delay: 1000.ms)
+                           .fadeIn(duration: 600.ms, delay: 1000.ms),
+                          
+                          const SizedBox(height: 16),
+                          
+                          _buildModernSummaryCard(
+                            'Ernährungstyp',
+                            _getDietDisplayName(profile.dietType ?? 'standard'),
+                            profile.isGlutenfree == true ? 'Glutenfrei' : 'Normales Gluten',
+                            CupertinoIcons.leaf_arrow_circlepath,
+                            CupertinoColors.systemGreen,
+                            2,
+                          ).animate()
+                           .slideX(begin: -0.3, duration: 600.ms, delay: 1100.ms)
+                           .fadeIn(duration: 600.ms, delay: 1100.ms),
+                          
+                          const SizedBox(height: 40),
+                          
+                          // Enhanced completion button with pulse animation
+                          Center(
+                            child: AnimatedBuilder(
+                              animation: _pulseController,
+                              builder: (context, child) {
+                                return Transform.scale(
+                                  scale: 1.0 + (_pulseController.value * 0.05),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: CupertinoColors.white.withOpacity(0.3),
+                                          blurRadius: 20 + (_pulseController.value * 10),
+                                          offset: const Offset(0, 5),
+                                        ),
+                                      ],
+                                    ),
+                                    child: CupertinoButton.filled(
+                                      onPressed: _isLoading ? null : () => _handleComplete(profile),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 50,
+                                        vertical: 18,
+                                      ),
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: _isLoading
+                                          ? Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                CupertinoActivityIndicator(
+                                                  color: CupertinoColors.white,
+                                                ),
+                                                const SizedBox(width: 12),
+                                                Text(
+                                                  'Wird gespeichert...',
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: CupertinoColors.white,
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          : Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(
+                                                  CupertinoIcons.rocket,
+                                                  color: CupertinoColors.white,
+                                                  size: 20,
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Text(
+                                                  'Los geht\'s!',
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: CupertinoColors.white,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ).animate()
+                           .fadeIn(duration: 600.ms, delay: 1200.ms)
+                           .slideY(begin: 0.3, end: 0),
+                          
+                          const SizedBox(height: 40),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -354,304 +491,265 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
     );
   }
 
-  Widget _buildProgressChart(
-    double currentWeight,
-    double targetWeight,
-    String goal,
-  ) {
-    return GlassmorphicContainer(
+  Widget _buildProgressChart(double currentWeight, double targetWeight, String goal) {
+    return Container(
       width: double.infinity,
-      height: 280,
-      borderRadius: 20,
-      blur: 20,
-      alignment: Alignment.center,
-      border: 2,
-      linearGradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          Colors.white.withOpacity(0.25), // Corrected: Use withOpacity
-          Colors.white.withOpacity(0.1), // Corrected: Use withOpacity
-        ],
-      ),
-      borderGradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          Colors.white.withOpacity(0.3), // Corrected: Use withOpacity
-          Colors.white.withOpacity(0.1), // Corrected: Use withOpacity
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Text(
-              'Dein Weg zum Ziel',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 12,
-                  height: 3,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                const Text(
-                  'Gewicht',
-                  style: TextStyle(color: Colors.white, fontSize: 12),
-                ),
-                const SizedBox(width: 16),
-                Container(
-                  width: 12,
-                  height: 3,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFD700),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                const Text(
-                  'Kalorien-Defizit',
-                  style: TextStyle(color: Colors.white, fontSize: 12),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: AnimatedBuilder(
-                animation: _chartController,
-                builder: (context, child) {
-                  final animationProgress = _chartController.value;
-
-                  // Gewichtskurve: nur zwischen Start- und Zielgewicht
-                  List<FlSpot> weightSpots = [];
-                  List<FlSpot> calorieSpots = [];
-                  final startWeight = currentWeight;
-                  final endWeight = targetWeight;
-
-                  if (animationProgress > 0) {
-                    final progressPoints = (animationProgress * 40).round();
-                    for (int i = 0; i <= progressPoints && i <= 40; i++) {
-                      final t = i / 40;
-                      final x = t * 6;
-                      // Gewicht: S-Kurve
-                      final weightY =
-                          startWeight +
-                          (endWeight - startWeight) *
-                              (0.5 - 0.5 * math.cos(math.pi * t));
-                      // Goldene Linie: S-Kurve, aber immer knapp unterhalb der Gewichtskurve
-                      final calorieY =
-                          weightY -
-                          1.2 +
-                          0.5 *
-                              math.sin(
-                                math.pi * t - math.pi / 2,
-                              ); // optisch ansprechend, immer sichtbar
-                      calorieSpots.add(FlSpot(x, calorieY));
-                      weightSpots.add(FlSpot(x, weightY));
-                    }
-                  }
-
-                  return LineChart(
-                    LineChartData(
-                      minX: 0,
-                      maxX: 6,
-                      minY: goal == 'weight_loss'
-                          ? targetWeight - 2
-                          : currentWeight - 2,
-                      maxY: goal == 'weight_loss'
-                          ? currentWeight + 2
-                          : targetWeight + 2,
-                      lineBarsData: [
-                        // Gewichtslinie (S-Kurve)
-                        if (weightSpots.isNotEmpty)
-                          LineChartBarData(
-                            spots: weightSpots,
-                            isCurved: true,
-                            color: Colors.white,
-                            barWidth: 3,
-                            dotData: FlDotData(
-                              show: animationProgress > 0.9,
-                              getDotPainter: (spot, percent, barData, index) {
-                                if (index == 0 ||
-                                    index == weightSpots.length - 1) {
-                                  return FlDotCirclePainter(
-                                    radius: 6,
-                                    color: Colors.white,
-                                    strokeWidth: 3,
-                                    strokeColor: Colors.white.withOpacity(
-                                      0.8,
-                                    ), // Corrected: Use withOpacity
-                                  );
-                                }
-                                return FlDotCirclePainter(
-                                  radius: 0,
-                                  color: Colors.transparent,
-                                );
-                              },
-                            ),
-                            belowBarData: BarAreaData(
-                              show: animationProgress > 0.7,
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Colors.white.withOpacity(
-                                    0.3,
-                                  ), // Corrected: Use withOpacity
-                                  Colors.white.withOpacity(
-                                    0.1,
-                                  ), // Corrected: Use withOpacity
-                                ],
-                              ),
-                            ),
-                          ),
-                        // Goldene Linie: optisch animiert
-                        if (calorieSpots.isNotEmpty)
-                          LineChartBarData(
-                            spots: calorieSpots,
-                            isCurved: true,
-                            color: const Color(0xFFFFD700),
-                            barWidth: 3,
-                            dotData: FlDotData(
-                              show: animationProgress > 0.9,
-                              getDotPainter: (spot, percent, barData, index) {
-                                if (index == 0 ||
-                                    index == calorieSpots.length - 1) {
-                                  return FlDotCirclePainter(
-                                    radius: 6,
-                                    color: const Color(0xFFFFD700),
-                                    strokeWidth: 3,
-                                    strokeColor: Colors.white.withOpacity(
-                                      0.8,
-                                    ), // Corrected: Use withOpacity
-                                  );
-                                }
-                                return FlDotCirclePainter(
-                                  radius: 0,
-                                  color: Colors.transparent,
-                                );
-                              },
-                            ),
-                            belowBarData: BarAreaData(show: false),
-                          ),
-                      ],
-                      titlesData: FlTitlesData(show: false),
-                      gridData: FlGridData(show: false),
-                      borderData: FlBorderData(show: false),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
+      height: 300,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        color: CupertinoColors.white.withOpacity(0.15),
+        border: Border.all(
+          color: CupertinoColors.white.withOpacity(0.3),
+          width: 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: CupertinoColors.systemGrey.withOpacity(0.2),
+            blurRadius: 30,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Icon(
+                CupertinoIcons.chart_bar_alt_fill,
+                color: CupertinoColors.white,
+                size: 24,
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Dein Weg zum Ziel',
+                style: TextStyle(
+                  color: CupertinoColors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          
+          // Legend with better styling
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildLegendItem('Gewichtsverlauf', CupertinoColors.white),
+              const SizedBox(width: 24),
+              _buildLegendItem('Zielbereich', CupertinoColors.systemYellow),
+            ],
+          ),
+          const SizedBox(height: 20),
+          
+          Expanded(
+            child: AnimatedBuilder(
+              animation: _chartController,
+              builder: (context, child) {
+                final animationProgress = _chartController.value;
+                
+                List<FlSpot> weightSpots = [];
+                List<FlSpot> targetSpots = [];
+                final startWeight = currentWeight;
+                final endWeight = targetWeight;
+
+                if (animationProgress > 0) {
+                  final progressPoints = (animationProgress * 50).round();
+                  for (int i = 0; i <= progressPoints && i <= 50; i++) {
+                    final t = i / 50;
+                    final x = t * 6;
+                    
+                    // Enhanced S-curve for weight progression
+                    final weightY = startWeight + (endWeight - startWeight) * 
+                        (1 - math.cos(math.pi * t)) / 2;
+                    
+                    // Target zone with slight variation
+                    final targetY = endWeight + 0.8 * math.sin(math.pi * t * 3);
+                    
+                    weightSpots.add(FlSpot(x, weightY));
+                    targetSpots.add(FlSpot(x, targetY));
+                  }
+                }
+
+                return LineChart(
+                  LineChartData(
+                    minX: 0,
+                    maxX: 6,
+                    minY: goal == 'weight_loss' ? targetWeight - 3 : currentWeight - 3,
+                    maxY: goal == 'weight_loss' ? currentWeight + 3 : targetWeight + 3,
+                    lineBarsData: [
+                      // Main weight line
+                      if (weightSpots.isNotEmpty)
+                        LineChartBarData(
+                          spots: weightSpots,
+                          isCurved: true,
+                          color: CupertinoColors.white,
+                          barWidth: 4,
+                          dotData: FlDotData(
+                            show: animationProgress > 0.8,
+                            getDotPainter: (spot, percent, barData, index) {
+                              if (index == 0 || index == weightSpots.length - 1) {
+                                return FlDotCirclePainter(
+                                  radius: 8,
+                                  color: CupertinoColors.white,
+                                  strokeWidth: 3,
+                                  strokeColor: CupertinoColors.systemBlue,
+                                );
+                              }
+                              return FlDotCirclePainter(radius: 0, color: Colors.transparent);
+                            },
+                          ),
+                          belowBarData: BarAreaData(
+                            show: animationProgress > 0.6,
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                CupertinoColors.white.withOpacity(0.3),
+                                CupertinoColors.white.withOpacity(0.05),
+                              ],
+                            ),
+                          ),
+                        ),
+                      
+                      // Target zone line
+                      if (targetSpots.isNotEmpty)
+                        LineChartBarData(
+                          spots: targetSpots,
+                          isCurved: true,
+                          color: CupertinoColors.systemYellow,
+                          barWidth: 3,
+                          dotData: FlDotData(show: false),
+                          dashArray: [8, 4],
+                        ),
+                    ],
+                    titlesData: FlTitlesData(show: false),
+                    gridData: FlGridData(show: false),
+                    borderData: FlBorderData(show: false),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildSummaryCard(
+  Widget _buildLegendItem(String label, Color color) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 16,
+          height: 3,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          label,
+          style: TextStyle(
+            color: CupertinoColors.white.withOpacity(0.9),
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildModernSummaryCard(
     String title,
     String value,
     String description,
     IconData icon,
     Color color,
+    int index,
   ) {
-    return GlassmorphicContainer(
+    return Container(
       width: double.infinity,
-      height: 80,
-      borderRadius: 16,
-      blur: 20,
-      alignment: Alignment.center,
-      border: 2,
-      linearGradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          Colors.white.withOpacity(0.25), // Corrected: Use withOpacity
-          Colors.white.withOpacity(0.1), // Corrected: Use withOpacity
-        ],
-      ),
-      borderGradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          Colors.white.withOpacity(0.3), // Corrected: Use withOpacity
-          Colors.white.withOpacity(0.1), // Corrected: Use withOpacity
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: color.withOpacity(0.2), // Corrected: Use withOpacity
-              ),
-              child: Icon(icon, size: 24, color: Colors.white),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white.withOpacity(
-                        0.8,
-                      ), // Corrected: Use withOpacity
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Row(
-                    children: [
-                      Text(
-                        value,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          description,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.white.withOpacity(
-                              0.7,
-                            ), // Corrected: Use withOpacity
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: CupertinoColors.white.withOpacity(0.15),
+        border: Border.all(
+          color: CupertinoColors.white.withOpacity(0.3),
+          width: 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: CupertinoColors.systemGrey.withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: color.withOpacity(0.2),
+              border: Border.all(
+                color: color.withOpacity(0.4),
+                width: 2,
+              ),
+            ),
+            child: Icon(icon, size: 26, color: CupertinoColors.white),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: CupertinoColors.white.withOpacity(0.9),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: CupertinoColors.white,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  description,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: CupertinoColors.white.withOpacity(0.7),
+                    fontWeight: FontWeight.w400,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          // Subtle indicator
+          Container(
+            width: 4,
+            height: 40,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -679,7 +777,7 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
       case 'muscle_gain':
         return 'Muskelaufbau';
       case 'improved_health':
-        return 'Immunsystem stärken';
+        return 'Gesundheit';
       case 'more_energy':
         return 'Mehr Energie';
       default:
@@ -696,9 +794,9 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
       case 'muscle_gain':
         return 'Muskelzuwachs';
       case 'improved_health':
-        return 'Gesundheit verbessern';
+        return 'Gesundheitsverbesserung';
       case 'more_energy':
-        return 'Mehr Energie';
+        return 'Energiesteigerung';
       default:
         return 'Fortschritt';
     }
@@ -707,17 +805,17 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
   IconData _getGoalIcon(String goal) {
     switch (goal) {
       case 'weight_loss':
-        return CupertinoIcons.arrow_down;
+        return CupertinoIcons.arrow_down_circle;
       case 'weight_gain':
-        return CupertinoIcons.arrow_up;
+        return CupertinoIcons.arrow_up_circle;
       case 'muscle_gain':
         return CupertinoIcons.sportscourt;
       case 'improved_health':
-        return CupertinoIcons.heart_fill;
+        return CupertinoIcons.heart_circle;
       case 'more_energy':
-        return CupertinoIcons.bolt;
+        return CupertinoIcons.bolt_circle;
       default:
-        return CupertinoIcons.flag;
+        return CupertinoIcons.flag_circle;
     }
   }
 
