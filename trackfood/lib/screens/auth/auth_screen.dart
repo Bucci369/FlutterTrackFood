@@ -1,9 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:glassmorphism/glassmorphism.dart';
-import '../../services/supabase_service.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -14,7 +14,6 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
-  final SupabaseService _supabaseService = SupabaseService();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -103,22 +102,23 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
 
   void _showSnackBar(String message,
       {bool isError = false, bool isSuccess = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: Text(isError ? 'Fehler' : isSuccess ? 'Erfolg' : 'Information'),
         content: Text(
           message,
-          style:
-              const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+          style: const TextStyle(
+            fontWeight: FontWeight.w500,
+            letterSpacing: -0.41,
+          ),
         ),
-        backgroundColor: isError
-            ? const Color(0xFFE74C3C)
-            : isSuccess
-                ? const Color(0xFF27AE60)
-                : const Color(0xFF34A0A4),
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 8,
+        actions: [
+          CupertinoDialogAction(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
       ),
     );
   }
@@ -127,9 +127,9 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
-    return Scaffold(
+    return CupertinoPageScaffold(
       resizeToAvoidBottomInset: false,
-      body: Container(
+      child: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/image/background1.png'),
@@ -220,7 +220,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
-                              letterSpacing: 0.5,
+                              letterSpacing: -0.41,
                             ),
                           )
                               .animate()
@@ -279,7 +279,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                                 _buildTextField(
                                   controller: _emailController,
                                   label: 'E-Mail Adresse',
-                                  icon: Icons.email_outlined,
+                                  icon: CupertinoIcons.mail,
                                   keyboardType: TextInputType.emailAddress,
                                   validator: (value) {
                                     if (value?.isEmpty ?? true) {
@@ -299,21 +299,23 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                                 _buildTextField(
                                   controller: _passwordController,
                                   label: 'Passwort',
-                                  icon: Icons.lock_outline,
+                                  icon: CupertinoIcons.lock,
                                   obscureText: _obscurePassword,
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _obscurePassword
-                                          ? Icons.visibility_off
-                                          : Icons.visibility,
-                                      color:
-                                          Colors.white.withValues(alpha: 0.7),
-                                    ),
+                                  suffixIcon: CupertinoButton(
+                                    padding: EdgeInsets.zero,
                                     onPressed: () {
                                       setState(() =>
                                           _obscurePassword = !_obscurePassword);
                                       HapticFeedback.selectionClick();
                                     },
+                                    child: Icon(
+                                      _obscurePassword
+                                          ? CupertinoIcons.eye_slash
+                                          : CupertinoIcons.eye,
+                                      color:
+                                          Colors.white.withValues(alpha: 0.7),
+                                      size: 20,
+                                    ),
                                   ),
                                   validator: (value) {
                                     if (value?.isEmpty ?? true) {
@@ -381,7 +383,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                       const SizedBox(height: 32),
 
                       // Switch auth mode
-                      TextButton(
+                      CupertinoButton(
                         onPressed: () {
                           setState(() {
                             _isLogin = !_isLogin;
@@ -397,13 +399,14 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                             color: Colors.white.withValues(alpha: 0.9),
                             fontWeight: FontWeight.w500,
                             fontSize: 16,
+                            letterSpacing: -0.41,
                           ),
                         ),
                       ).animate().fadeIn(delay: 1000.ms, duration: 600.ms),
 
                       if (_isLogin) ...[
                         const SizedBox(height: 8),
-                        TextButton(
+                        CupertinoButton(
                           onPressed: () =>
                               _showSnackBar('Passwort-Reset kommt bald!'),
                           child: Text(
@@ -411,6 +414,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                             style: TextStyle(
                               color: Colors.white.withValues(alpha: 0.7),
                               fontSize: 14,
+                              letterSpacing: -0.41,
                             ),
                           ),
                         ),
@@ -437,36 +441,59 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
     Widget? suffixIcon,
     String? Function(String?)? validator,
   }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      obscureText: obscureText,
-      validator: validator,
-      style: const TextStyle(color: Colors.white, fontSize: 16),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
-        prefixIcon: Icon(icon, color: Colors.white.withValues(alpha: 0.8)),
-        suffixIcon: suffixIcon,
-        filled: true,
-        fillColor: Colors.white.withValues(alpha: 0.1),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: Colors.white.withValues(alpha: 0.1),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.3),
+          width: 1,
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Colors.white, width: 2),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Colors.red, width: 2),
-        ),
-        errorStyle: const TextStyle(color: Colors.red, fontSize: 12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 16, top: 12),
+            child: Text(
+              label,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.8),
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                letterSpacing: -0.41,
+              ),
+            ),
+          ),
+          CupertinoTextField(
+            controller: controller,
+            keyboardType: keyboardType,
+            obscureText: obscureText,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              letterSpacing: -0.41,
+            ),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.transparent),
+            ),
+            prefix: Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: Icon(
+                icon,
+                color: Colors.white.withValues(alpha: 0.8),
+                size: 20,
+              ),
+            ),
+            suffix: suffixIcon != null
+                ? Padding(
+                    padding: const EdgeInsets.only(right: 16),
+                    child: suffixIcon,
+                  )
+                : null,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          ),
+        ],
       ),
     );
   }
@@ -475,23 +502,15 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
     return SizedBox(
       width: double.infinity,
       height: 56,
-      child: ElevatedButton(
+      child: CupertinoButton.filled(
         onPressed: _isLoading ? null : _handleAuth,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: const Color(0xFF34A0A4),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          elevation: 8,
-          shadowColor: Colors.black.withValues(alpha: 0.3),
-        ),
+        borderRadius: BorderRadius.circular(16),
         child: _isLoading
             ? const SizedBox(
                 width: 24,
                 height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF34A0A4)),
+                child: CupertinoActivityIndicator(
+                  color: CupertinoColors.white,
                 ),
               )
             : Text(
@@ -499,7 +518,8 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
+                  letterSpacing: -0.41,
+                  color: CupertinoColors.white,
                 ),
               ),
       ),
@@ -510,27 +530,28 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
     return SizedBox(
       width: double.infinity,
       height: 56,
-      child: ElevatedButton.icon(
+      child: CupertinoButton(
         onPressed: _isLoading ? null : _handleGoogleSignIn,
-        icon: SvgPicture.asset(
-          'assets/image/google_logo.svg',
-          height: 24,
-        ),
-        label: const Text(
-          'Mit Google fortfahren',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.3,
-          ),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white.withValues(alpha: 0.9),
-          foregroundColor: Colors.black87,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          side: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
-          elevation: 4,
+        borderRadius: BorderRadius.circular(16),
+        color: Colors.white.withValues(alpha: 0.9),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              'assets/image/google_logo.svg',
+              height: 24,
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'Mit Google fortfahren',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.41,
+                color: Colors.black87,
+              ),
+            ),
+          ],
         ),
       ),
     );

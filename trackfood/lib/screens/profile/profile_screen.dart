@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../../providers/profile_provider.dart';
 import '../../models/profile.dart';
@@ -106,19 +106,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Profil erfolgreich aktualisiert'),
-            backgroundColor: Colors.green,
+        showCupertinoDialog(
+          context: context,
+          builder: (context) => CupertinoAlertDialog(
+            title: const Text('Erfolg'),
+            content: const Text('Profil erfolgreich aktualisiert'),
+            actions: [
+              CupertinoDialogAction(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
           ),
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+        showCupertinoDialog(
+          context: context,
+          builder: (context) => CupertinoAlertDialog(
+            title: const Text('Fehler'),
             content: Text('Fehler beim Speichern: $e'),
-            backgroundColor: Colors.red,
+            actions: [
+              CupertinoDialogAction(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
           ),
         );
       }
@@ -133,39 +147,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        title: const Text('Mein Profil'),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        actions: [
-          if (!_isLoading)
-            TextButton(
-              onPressed: _saveProfile,
-              child: const Text(
-                'Speichern',
-                style: TextStyle(
-                  color: Colors.green,
-                  fontWeight: FontWeight.w600,
+    return CupertinoPageScaffold(
+      backgroundColor: CupertinoColors.systemGroupedBackground,
+      navigationBar: CupertinoNavigationBar(
+        middle: const Text('Mein Profil'),
+        backgroundColor: CupertinoColors.systemBackground.resolveFrom(context),
+        border: null,
+        trailing: _isLoading
+            ? const CupertinoActivityIndicator()
+            : CupertinoButton(
+                padding: EdgeInsets.zero,
+                onPressed: _saveProfile,
+                child: const Text(
+                  'Speichern',
+                  style: TextStyle(
+                    color: Color(0xFF34A0A4),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-            ),
-          if (_isLoading)
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-            ),
-        ],
       ),
-      body: Consumer<ProfileProvider>(
+      child: Consumer<ProfileProvider>(
         builder: (context, profileProvider, child) {
           if (profileProvider.isLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CupertinoActivityIndicator());
           }
 
           if (profileProvider.profile == null) {
@@ -225,24 +230,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: DropdownButtonFormField<String>(
-                            value: _selectedGender,
-                            decoration: const InputDecoration(
-                              labelText: 'Geschlecht',
-                            ),
-                            items: const [
-                              DropdownMenuItem(
-                                  value: 'male', child: Text('Männlich')),
-                              DropdownMenuItem(
-                                  value: 'female', child: Text('Weiblich')),
-                              DropdownMenuItem(
-                                  value: 'other', child: Text('Divers')),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Geschlecht',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: CupertinoColors.label,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              CupertinoButton(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                color: CupertinoColors.systemGrey6,
+                                borderRadius: BorderRadius.circular(8),
+                                onPressed: () => _showGenderPicker(),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      _getGenderDisplayText(_selectedGender),
+                                      style: const TextStyle(color: CupertinoColors.label),
+                                    ),
+                                    const Icon(CupertinoIcons.chevron_down, size: 18),
+                                  ],
+                                ),
+                              ),
                             ],
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedGender = value;
-                              });
-                            },
                           ),
                         ),
                       ],
@@ -312,52 +328,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 _buildSection(
                   title: 'Ziele & Aktivität',
                   children: [
-                    DropdownButtonFormField<String>(
-                      value: _selectedGoal,
-                      decoration: const InputDecoration(
-                        labelText: 'Hauptziel',
-                      ),
-                      items: const [
-                        DropdownMenuItem(
-                            value: 'lose_weight', child: Text('Abnehmen')),
-                        DropdownMenuItem(
-                            value: 'maintain_weight',
-                            child: Text('Gewicht halten')),
-                        DropdownMenuItem(
-                            value: 'gain_weight', child: Text('Zunehmen')),
-                        DropdownMenuItem(
-                            value: 'build_muscle',
-                            child: Text('Muskeln aufbauen')),
-                      ],
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedGoal = value;
-                        });
-                      },
+                    _buildCupertinoSelector(
+                      label: 'Hauptziel',
+                      value: _getGoalDisplayText(_selectedGoal),
+                      onTap: () => _showGoalPicker(),
                     ),
                     const SizedBox(height: 16),
-                    DropdownButtonFormField<String>(
-                      value: _selectedActivityLevel,
-                      decoration: const InputDecoration(
-                        labelText: 'Aktivitätslevel',
-                      ),
-                      items: const [
-                        DropdownMenuItem(
-                            value: 'sedentary', child: Text('Wenig aktiv')),
-                        DropdownMenuItem(
-                            value: 'light', child: Text('Leicht aktiv')),
-                        DropdownMenuItem(
-                            value: 'moderate', child: Text('Mäßig aktiv')),
-                        DropdownMenuItem(
-                            value: 'active', child: Text('Sehr aktiv')),
-                        DropdownMenuItem(
-                            value: 'very_active', child: Text('Extrem aktiv')),
-                      ],
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedActivityLevel = value;
-                        });
-                      },
+                    _buildCupertinoSelector(
+                      label: 'Aktivitätslevel',
+                      value: _getActivityDisplayText(_selectedActivityLevel),
+                      onTap: () => _showActivityPicker(),
                     ),
                   ],
                 ),
@@ -365,38 +345,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 _buildSection(
                   title: 'Ernährungspräferenzen',
                   children: [
-                    DropdownButtonFormField<String>(
-                      value: _selectedDietType,
-                      decoration: const InputDecoration(
-                        labelText: 'Ernährungsform',
-                      ),
-                      items: const [
-                        DropdownMenuItem(
-                            value: null, child: Text('Keine Einschränkungen')),
-                        DropdownMenuItem(
-                            value: 'vegetarian', child: Text('Vegetarisch')),
-                        DropdownMenuItem(value: 'vegan', child: Text('Vegan')),
-                        DropdownMenuItem(value: 'keto', child: Text('Ketogen')),
-                        DropdownMenuItem(value: 'paleo', child: Text('Paleo')),
-                        DropdownMenuItem(
-                            value: 'mediterranean', child: Text('Mediterran')),
-                      ],
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedDietType = value;
-                        });
-                      },
+                    _buildCupertinoSelector(
+                      label: 'Ernährungsform',
+                      value: _getDietDisplayText(_selectedDietType),
+                      onTap: () => _showDietPicker(),
                     ),
                     const SizedBox(height: 16),
-                    CheckboxListTile(
-                      title: const Text('Glutenfrei'),
+                    _buildCupertinoSwitch(
+                      label: 'Glutenfrei',
                       value: _isGlutenfree,
                       onChanged: (value) {
                         setState(() {
-                          _isGlutenfree = value ?? false;
+                          _isGlutenfree = value;
                         });
                       },
-                      activeColor: Colors.green,
                     ),
                   ],
                 ),
@@ -416,11 +378,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: CupertinoColors.systemBackground.resolveFrom(context),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: CupertinoColors.systemGrey.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -434,7 +396,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Colors.black87,
+              color: CupertinoColors.label,
             ),
           ),
           const SizedBox(height: 16),
@@ -448,9 +410,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.green.shade50,
+        color: const Color(0xFF34A0A4).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.green.shade200),
+        border: Border.all(color: const Color(0xFF34A0A4).withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -460,7 +422,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Colors.black87,
+              color: CupertinoColors.label,
             ),
           ),
           const SizedBox(height: 16),
@@ -514,9 +476,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 12,
-            color: Colors.grey.shade600,
+            color: CupertinoColors.secondaryLabel,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -526,18 +488,363 @@ class _ProfileScreenState extends State<ProfileScreen> {
           style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w600,
-            color: Colors.black87,
+            color: CupertinoColors.label,
           ),
         ),
         if (subtitle.isNotEmpty)
           Text(
             subtitle,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12,
-              color: Colors.grey.shade600,
+              color: CupertinoColors.secondaryLabel,
             ),
           ),
       ],
+    );
+  }
+
+  // === CUPERTINO HELPER WIDGETS ===
+
+  Widget _buildCupertinoSelector({
+    required String label,
+    required String value,
+    required VoidCallback onTap,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: CupertinoColors.label,
+          ),
+        ),
+        const SizedBox(height: 8),
+        CupertinoButton(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          color: CupertinoColors.systemGrey6,
+          borderRadius: BorderRadius.circular(8),
+          onPressed: onTap,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                value,
+                style: const TextStyle(color: CupertinoColors.label),
+              ),
+              const Icon(CupertinoIcons.chevron_down, size: 18),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCupertinoSwitch({
+    required String label,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: CupertinoColors.label,
+          ),
+        ),
+        CupertinoSwitch(
+          value: value,
+          onChanged: onChanged,
+          activeTrackColor: const Color(0xFF34A0A4),
+        ),
+      ],
+    );
+  }
+
+  // === DISPLAY TEXT METHODS ===
+
+  String _getGenderDisplayText(String? gender) {
+    switch (gender) {
+      case 'male':
+        return 'Männlich';
+      case 'female':
+        return 'Weiblich';
+      case 'other':
+        return 'Divers';
+      default:
+        return 'Auswählen';
+    }
+  }
+
+  String _getGoalDisplayText(String? goal) {
+    switch (goal) {
+      case 'lose_weight':
+        return 'Abnehmen';
+      case 'maintain_weight':
+        return 'Gewicht halten';
+      case 'gain_weight':
+        return 'Zunehmen';
+      case 'build_muscle':
+        return 'Muskeln aufbauen';
+      default:
+        return 'Auswählen';
+    }
+  }
+
+  String _getActivityDisplayText(String? activity) {
+    switch (activity) {
+      case 'sedentary':
+        return 'Wenig aktiv';
+      case 'light':
+        return 'Leicht aktiv';
+      case 'moderate':
+        return 'Mäßig aktiv';
+      case 'active':
+        return 'Sehr aktiv';
+      case 'very_active':
+        return 'Extrem aktiv';
+      default:
+        return 'Auswählen';
+    }
+  }
+
+  String _getDietDisplayText(String? diet) {
+    switch (diet) {
+      case null:
+        return 'Keine Einschränkungen';
+      case 'standard':
+        return 'Standard';
+      case 'vegetarian':
+        return 'Vegetarisch';
+      case 'vegan':
+        return 'Vegan';
+      case 'keto':
+        return 'Ketogen';
+      case 'paleo':
+        return 'Paleo';
+      case 'mediterranean':
+        return 'Mediterran';
+      default:
+        return 'Auswählen';
+    }
+  }
+
+  // === PICKER METHODS ===
+
+  void _showGenderPicker() {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => Container(
+        height: 250,
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        child: Column(
+          children: [
+            Container(
+              height: 50,
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(color: CupertinoColors.separator, width: 0.5),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CupertinoButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Abbrechen'),
+                  ),
+                  CupertinoButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Fertig'),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: CupertinoPicker(
+                itemExtent: 40,
+                onSelectedItemChanged: (index) {
+                  final genders = ['male', 'female', 'other'];
+                  setState(() {
+                    _selectedGender = genders[index];
+                  });
+                },
+                children: const [
+                  Center(child: Text('Männlich')),
+                  Center(child: Text('Weiblich')),
+                  Center(child: Text('Divers')),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showGoalPicker() {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => Container(
+        height: 250,
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        child: Column(
+          children: [
+            Container(
+              height: 50,
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(color: CupertinoColors.separator, width: 0.5),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CupertinoButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Abbrechen'),
+                  ),
+                  CupertinoButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Fertig'),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: CupertinoPicker(
+                itemExtent: 40,
+                onSelectedItemChanged: (index) {
+                  final goals = ['lose_weight', 'maintain_weight', 'gain_weight', 'build_muscle'];
+                  setState(() {
+                    _selectedGoal = goals[index];
+                  });
+                },
+                children: const [
+                  Center(child: Text('Abnehmen')),
+                  Center(child: Text('Gewicht halten')),
+                  Center(child: Text('Zunehmen')),
+                  Center(child: Text('Muskeln aufbauen')),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showActivityPicker() {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => Container(
+        height: 250,
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        child: Column(
+          children: [
+            Container(
+              height: 50,
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(color: CupertinoColors.separator, width: 0.5),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CupertinoButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Abbrechen'),
+                  ),
+                  CupertinoButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Fertig'),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: CupertinoPicker(
+                itemExtent: 40,
+                onSelectedItemChanged: (index) {
+                  final activities = ['sedentary', 'light', 'moderate', 'active', 'very_active'];
+                  setState(() {
+                    _selectedActivityLevel = activities[index];
+                  });
+                },
+                children: const [
+                  Center(child: Text('Wenig aktiv')),
+                  Center(child: Text('Leicht aktiv')),
+                  Center(child: Text('Mäßig aktiv')),
+                  Center(child: Text('Sehr aktiv')),
+                  Center(child: Text('Extrem aktiv')),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showDietPicker() {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => Container(
+        height: 250,
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        child: Column(
+          children: [
+            Container(
+              height: 50,
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(color: CupertinoColors.separator, width: 0.5),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CupertinoButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Abbrechen'),
+                  ),
+                  CupertinoButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Fertig'),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: CupertinoPicker(
+                itemExtent: 40,
+                onSelectedItemChanged: (index) {
+                  final diets = [null, 'standard', 'vegetarian', 'vegan', 'keto', 'paleo', 'mediterranean'];
+                  setState(() {
+                    _selectedDietType = diets[index];
+                  });
+                },
+                children: const [
+                  Center(child: Text('Keine Einschränkungen')),
+                  Center(child: Text('Standard')),
+                  Center(child: Text('Vegetarisch')),
+                  Center(child: Text('Vegan')),
+                  Center(child: Text('Ketogen')),
+                  Center(child: Text('Paleo')),
+                  Center(child: Text('Mediterran')),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

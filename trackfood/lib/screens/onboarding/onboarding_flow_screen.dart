@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +30,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
   final TextEditingController _weightController = TextEditingController();
+  final TextEditingController _targetWeightController = TextEditingController();
 
   // Selected values
   String? _selectedGender;
@@ -85,11 +87,12 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
     _ageController.dispose();
     _heightController.dispose();
     _weightController.dispose();
+    _targetWeightController.dispose();
     super.dispose();
   }
 
   void _nextPage() {
-    if (_currentPage < 6) {
+    if (_currentPage < 7) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -121,6 +124,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
       gender: _selectedGender ?? 'other',
       heightCm: double.tryParse(_heightController.text) ?? 170.0,
       weightKg: double.tryParse(_weightController.text) ?? 70.0,
+      targetWeightKg: double.tryParse(_targetWeightController.text),
       goal: _selectedGoal ?? 'maintain_weight',
       activityLevel: _selectedActivityLevel ?? 'moderately_active',
       dietType: _selectedDietType,
@@ -131,7 +135,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
     Provider.of<ProfileProvider>(context, listen: false).setProfile(profile);
 
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const OnboardingSummaryScreen()),
+      CupertinoPageRoute(builder: (context) => const OnboardingSummaryScreen()),
     );
   }
 
@@ -151,8 +155,11 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
         return _weightController.text.isNotEmpty &&
             (double.tryParse(_weightController.text) ?? 0) > 0;
       case 5:
-        return _selectedGoal != null && _selectedActivityLevel != null;
+        return _targetWeightController.text.isNotEmpty &&
+            (double.tryParse(_targetWeightController.text) ?? 0) > 0;
       case 6:
+        return _selectedGoal != null && _selectedActivityLevel != null;
+      case 7:
         return _selectedDietType != null;
       default:
         return false;
@@ -161,8 +168,8 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
+    return CupertinoPageScaffold(
+      child: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/image/background2.png'),
@@ -212,13 +219,13 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                             if (_currentPage > 0)
                               IconButton(
                                 onPressed: _previousPage,
-                                icon: const Icon(Icons.arrow_back_ios,
+                                icon: const Icon(CupertinoIcons.back,
                                     color: Colors.white),
                               )
                             else
                               const SizedBox(width: 48),
                             Text(
-                              'Schritt ${_currentPage + 1} von 7',
+                              'Schritt ${_currentPage + 1} von 8',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,
@@ -228,17 +235,28 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                             IconButton(
                               onPressed: () => Navigator.of(context).pop(),
                               icon:
-                                  const Icon(Icons.close, color: Colors.white),
+                                  const Icon(CupertinoIcons.xmark, color: Colors.white),
                             ),
                           ],
                         ),
                         const SizedBox(height: 16),
-                        LinearProgressIndicator(
-                          value: (_currentPage + 1) / 7,
-                          backgroundColor: Colors.white.withValues(alpha: 0.3),
-                          valueColor:
-                              const AlwaysStoppedAnimation<Color>(Colors.white),
-                          minHeight: 4,
+                        Container(
+                          height: 4,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                          child: FractionallySizedBox(
+                            alignment: Alignment.centerLeft,
+                            widthFactor: (_currentPage + 1) / 8,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -259,6 +277,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                         _buildGenderPage(),
                         _buildHeightPage(),
                         _buildWeightPage(),
+                        _buildTargetWeightPage(),
                         _buildGoalsPage(),
                         _buildDietPage(),
                       ],
@@ -271,23 +290,16 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                     child: SizedBox(
                       width: double.infinity,
                       height: 56,
-                      child: ElevatedButton(
+                      child: CupertinoButton.filled(
                         onPressed: _canProceed() ? _nextPage : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: const Color(0xFF34A0A4),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16)),
-                          elevation: 8,
-                          disabledBackgroundColor:
-                              Colors.white.withValues(alpha: 0.5),
-                        ),
+                        borderRadius: BorderRadius.circular(16),
                         child: Text(
-                          _currentPage == 6 ? 'Fertigstellen' : 'Weiter',
+                          _currentPage == 7 ? 'Fertigstellen' : 'Weiter',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 0.5,
+                            color: CupertinoColors.white,
                           ),
                         ),
                       ),
@@ -306,21 +318,21 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
     return _buildPageContent(
       title: 'Wie heißt du?',
       subtitle: 'Bitte gib Vor- und Nachname ein',
-      icon: Icons.person_outline,
+      icon: CupertinoIcons.person,
       child: Column(
         children: [
           _buildTextField(
             controller: _firstNameController,
             label: 'Vorname',
             hint: 'z.B. Max',
-            icon: Icons.person,
+            icon: CupertinoIcons.person,
           ),
           const SizedBox(height: 16),
           _buildTextField(
             controller: _lastNameController,
             label: 'Nachname',
             hint: 'z.B. Mustermann',
-            icon: Icons.person,
+            icon: CupertinoIcons.person,
           ),
         ],
       ),
@@ -331,14 +343,14 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
     return _buildPageContent(
       title: 'Wie alt bist du?',
       subtitle: 'Dein Alter hilft uns bei der Berechnung',
-      icon: Icons.cake_outlined,
+      icon: CupertinoIcons.gift,
       child: Column(
         children: [
           _buildTextField(
             controller: _ageController,
             label: 'Alter in Jahren',
             hint: 'z.B. 25',
-            icon: Icons.calendar_today,
+            icon: CupertinoIcons.calendar,
             keyboardType: TextInputType.number,
           ),
         ],
@@ -350,7 +362,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
     return _buildPageContent(
       title: 'Geschlecht',
       subtitle: 'Für präzise Kalorienwerte',
-      icon: Icons.wc_outlined,
+      icon: CupertinoIcons.person_2,
       child: Column(
         children: [
           ..._genders.map((gender) => Container(
@@ -391,7 +403,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                         ),
                         if (_selectedGender == gender)
                           const Icon(
-                            Icons.check_circle,
+                            CupertinoIcons.check_mark_circled_solid,
                             color: Colors.white,
                             size: 28,
                           ),
@@ -409,14 +421,14 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
     return _buildPageContent(
       title: 'Körpergröße',
       subtitle: 'In Zentimetern',
-      icon: Icons.height_outlined,
+      icon: CupertinoIcons.textformat_size,
       child: Column(
         children: [
           _buildTextField(
             controller: _heightController,
             label: 'Größe in cm',
             hint: 'z.B. 175',
-            icon: Icons.straighten,
+            icon: CupertinoIcons.textformat_size,
             keyboardType: TextInputType.number,
           ),
         ],
@@ -426,17 +438,66 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
 
   Widget _buildWeightPage() {
     return _buildPageContent(
-      title: 'Gewicht',
+      title: 'Aktuelles Gewicht',
       subtitle: 'In Kilogramm',
-      icon: Icons.fitness_center_outlined,
+      icon: CupertinoIcons.sportscourt,
       child: Column(
         children: [
           _buildTextField(
             controller: _weightController,
-            label: 'Gewicht in kg',
+            label: 'Aktuelles Gewicht in kg',
             hint: 'z.B. 70',
-            icon: Icons.monitor_weight,
+            icon: CupertinoIcons.gauge,
             keyboardType: TextInputType.number,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTargetWeightPage() {
+    return _buildPageContent(
+      title: 'Zielgewicht',
+      subtitle: 'Was möchtest du erreichen?',
+      icon: CupertinoIcons.flag,
+      child: Column(
+        children: [
+          _buildTextField(
+            controller: _targetWeightController,
+            label: 'Zielgewicht in kg',
+            hint: 'z.B. 65',
+            icon: CupertinoIcons.scope,
+            keyboardType: TextInputType.number,
+          ),
+          const SizedBox(height: 24),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.white.withValues(alpha: 0.1),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.3),
+              ),
+            ),
+            child: Column(
+              children: [
+                const Icon(
+                  CupertinoIcons.info_circle,
+                  color: Colors.white,
+                  size: 24,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Tipp: Ein gesundes Zielgewicht liegt in der Regel 0,5-1 kg pro Woche vom aktuellen Gewicht entfernt.',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.9),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -447,7 +508,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
     return _buildPageContent(
       title: 'Deine Ziele',
       subtitle: 'Was möchtest du erreichen?',
-      icon: Icons.flag_outlined,
+      icon: CupertinoIcons.flag,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -514,7 +575,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                       if (isSelected) ...[
                         const SizedBox(height: 4),
                         Icon(
-                          Icons.check_circle,
+                          CupertinoIcons.check_mark_circled_solid,
                           color: Colors.white,
                           size: 16,
                         ),
@@ -559,7 +620,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
     return _buildPageContent(
       title: 'Ernährungspräferenzen',
       subtitle: 'Was passt zu deinem Lebensstil?',
-      icon: Icons.restaurant_outlined,
+      icon: CupertinoIcons.heart_fill,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -623,7 +684,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                       if (isSelected) ...[
                         const SizedBox(height: 2),
                         Icon(
-                          Icons.check_circle,
+                          CupertinoIcons.check_mark_circled_solid,
                           color: Colors.white,
                           size: 14,
                         ),
@@ -673,7 +734,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
                     ),
                     child: _isGlutenfree
                         ? const Icon(
-                            Icons.check,
+                            CupertinoIcons.check_mark,
                             size: 14,
                             color: Color(0xFF34A0A4),
                           )
@@ -886,7 +947,7 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
             ),
             if (isSelected)
               const Icon(
-                Icons.check_circle,
+                CupertinoIcons.check_mark_circled_solid,
                 color: Colors.white,
                 size: 18,
               ),
@@ -912,13 +973,13 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
   IconData _getGenderIcon(String gender) {
     switch (gender) {
       case 'male':
-        return Icons.male;
+        return CupertinoIcons.person;
       case 'female':
-        return Icons.female;
+        return CupertinoIcons.person;
       case 'other':
-        return Icons.transgender;
+        return CupertinoIcons.person_2;
       default:
-        return Icons.person;
+        return CupertinoIcons.person;
     }
   }
 
@@ -940,15 +1001,15 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
   IconData _getGoalIcon(String goal) {
     switch (goal) {
       case 'weight_loss':
-        return Icons.trending_down;
+        return CupertinoIcons.arrow_down;
       case 'weight_gain':
-        return Icons.trending_up;
+        return CupertinoIcons.arrow_up;
       case 'maintain_weight':
-        return Icons.trending_flat;
+        return CupertinoIcons.minus;
       case 'muscle_gain':
-        return Icons.fitness_center;
+        return CupertinoIcons.sportscourt;
       default:
-        return Icons.flag;
+        return CupertinoIcons.flag;
     }
   }
 
@@ -972,17 +1033,17 @@ class _OnboardingFlowScreenState extends State<OnboardingFlowScreen>
   IconData _getActivityIcon(String level) {
     switch (level) {
       case 'sedentary':
-        return Icons.chair;
+        return CupertinoIcons.house;
       case 'lightly_active':
-        return Icons.directions_walk;
+        return CupertinoIcons.person_crop_circle;
       case 'moderately_active':
-        return Icons.directions_run;
+        return CupertinoIcons.play;
       case 'very_active':
-        return Icons.fitness_center;
+        return CupertinoIcons.sportscourt;
       case 'extremely_active':
-        return Icons.sports_gymnastics;
+        return CupertinoIcons.sportscourt;
       default:
-        return Icons.directions_walk;
+        return CupertinoIcons.person_crop_circle;
     }
   }
 

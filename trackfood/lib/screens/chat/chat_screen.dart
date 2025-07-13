@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/chat_provider.dart';
@@ -37,10 +38,11 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Row(
+    return CupertinoPageScaffold(
+      backgroundColor: CupertinoColors.systemBackground,
+      navigationBar: CupertinoNavigationBar(
+        middle: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               width: 32,
@@ -52,7 +54,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: const Icon(
-                Icons.auto_awesome,
+                CupertinoIcons.sparkles,
                 size: 18,
                 color: Colors.white,
               ),
@@ -63,25 +65,28 @@ class _ChatScreenState extends State<ChatScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
+                letterSpacing: -0.41,
               ),
             ),
           ],
         ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              context.read<ChatProvider>().clearChat();
-              setState(() {
-                _showQuickActions = true;
-              });
-            },
+        backgroundColor: CupertinoColors.systemBackground,
+        border: null,
+        trailing: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: () {
+            context.read<ChatProvider>().clearChat();
+            setState(() {
+              _showQuickActions = true;
+            });
+          },
+          child: const Icon(
+            CupertinoIcons.refresh,
+            color: Color(0xFF34A0A4),
           ),
-        ],
+        ),
       ),
-      body: Consumer<ChatProvider>(
+      child: Consumer<ChatProvider>(
         builder: (context, chatProvider, child) {
           // Auto-scroll when new messages arrive
           if (chatProvider.messages.isNotEmpty) {
@@ -140,7 +145,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.error_outline, color: Colors.red.shade600),
+                      Icon(CupertinoIcons.exclamationmark_circle, color: Colors.red.shade600),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -148,11 +153,15 @@ class _ChatScreenState extends State<ChatScreen> {
                           style: TextStyle(color: Colors.red.shade700),
                         ),
                       ),
-                      TextButton(
+                      CupertinoButton(
+                        padding: EdgeInsets.zero,
                         onPressed: chatProvider.clearError,
                         child: Text(
                           'Schließen',
-                          style: TextStyle(color: Colors.red.shade600),
+                          style: TextStyle(
+                            color: Colors.red.shade600,
+                            letterSpacing: -0.41,
+                          ),
                         ),
                       ),
                     ],

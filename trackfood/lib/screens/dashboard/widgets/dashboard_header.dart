@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 
@@ -69,6 +70,7 @@ class DashboardHeader extends StatelessWidget {
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
+                      letterSpacing: -0.41,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -78,6 +80,7 @@ class DashboardHeader extends StatelessWidget {
                       fontSize: 16,
                       color: Colors.white.withValues(alpha: 0.8),
                       fontWeight: FontWeight.w300,
+                      letterSpacing: -0.41,
                     ),
                   ),
                 ],
@@ -94,7 +97,7 @@ class DashboardHeader extends StatelessWidget {
                         color: Colors.orange,
                       ),
                       child: const Icon(
-                        Icons.local_fire_department,
+                        CupertinoIcons.flame,
                         color: Colors.white,
                         size: 18,
                       ),
@@ -109,7 +112,7 @@ class DashboardHeader extends StatelessWidget {
                         color: Colors.blue,
                       ),
                       child: const Icon(
-                        Icons.water_drop,
+                        CupertinoIcons.drop,
                         color: Colors.white,
                         size: 18,
                       ),
@@ -160,7 +163,7 @@ class DashboardHeader extends StatelessWidget {
                           color: Colors.white.withValues(alpha: 0.2),
                         ),
                         child: const Icon(
-                          Icons.flag,
+                          CupertinoIcons.flag,
                           color: Colors.white,
                           size: 20,
                         ),
@@ -176,6 +179,7 @@ class DashboardHeader extends StatelessWidget {
                                 color: Colors.white,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
+                                letterSpacing: -0.41,
                               ),
                             ),
                             SizedBox(height: 2),
@@ -184,6 +188,7 @@ class DashboardHeader extends StatelessWidget {
                               style: TextStyle(
                                 color: Colors.white70,
                                 fontSize: 14,
+                                letterSpacing: -0.41,
                               ),
                             ),
                           ],

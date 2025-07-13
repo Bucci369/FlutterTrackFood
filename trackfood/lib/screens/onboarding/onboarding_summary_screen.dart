@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:confetti/confetti.dart';
@@ -123,6 +124,7 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
         'weight_kg': profile.weightKg,
         'activity_level': databaseActivity,
         'goal': databaseGoal,
+        'target_weight_kg': profile.targetWeightKg,
         'diet_type': profile.dietType,
         'is_glutenfree': profile.isGlutenfree ?? false,
         'first_name': profile.name.split(' ').first,
@@ -137,8 +139,18 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Fehler beim Speichern: $e')),
+        showCupertinoDialog(
+          context: context,
+          builder: (context) => CupertinoAlertDialog(
+            title: const Text('Fehler'),
+            content: Text('Fehler beim Speichern: $e'),
+            actions: [
+              CupertinoDialogAction(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
         );
       }
     } finally {
@@ -152,18 +164,14 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
   Widget build(BuildContext context) {
     final profile = Provider.of<ProfileProvider>(context).profile;
     if (profile == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      return const CupertinoPageScaffold(
+        child: Center(child: CupertinoActivityIndicator()),
       );
     }
     final weight = profile.weightKg ?? 0.0;
     final height = profile.heightCm ?? 0.0;
     final goal = profile.goal ?? 'maintain_weight';
-    final targetWeight = goal == 'weight_loss'
-        ? (weight - 5)
-        : goal == 'weight_gain'
-            ? (weight + 5)
-            : weight;
+    final targetWeight = profile.targetWeightKg ?? weight;
     final bmi = (height > 0) ? weight / ((height / 100) * (height / 100)) : 0.0;
     final progressPercentage = goal == 'weight_loss'
         ? ((weight - targetWeight) / (weight == 0 ? 1 : weight) * 100).round()
@@ -172,8 +180,8 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
                 .round()
             : 0;
 
-    return Scaffold(
-      body: Container(
+    return CupertinoPageScaffold(
+      child: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/image/background2.png'),
@@ -228,7 +236,7 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
                           color: Colors.white.withValues(alpha: 0.2),
                         ),
                         child: const Icon(
-                          Icons.celebration,
+                          CupertinoIcons.star_circle_fill,
                           size: 50,
                           color: Colors.white,
                         ),
@@ -292,7 +300,7 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
                         'BMI',
                         bmi.toStringAsFixed(1),
                         _getBMICategory(bmi),
-                        Icons.monitor_weight,
+                        CupertinoIcons.gauge,
                         _getBMIColor(bmi),
                       )
                           .animate()
@@ -320,8 +328,8 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
                         profile.isGlutenfree == true
                             ? 'Glutenfrei'
                             : 'Mit Gluten',
-                        Icons.restaurant,
-                        Colors.orange,
+                        CupertinoIcons.heart_fill,
+                        const Color(0xFFE8B86D),
                       )
                           .animate()
                           .fadeIn(delay: 1200.ms, duration: 600.ms)
@@ -373,35 +381,22 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
                       SizedBox(
                         width: double.infinity,
                         height: 56,
-                        child: ElevatedButton(
+                        child: CupertinoButton.filled(
                           onPressed: _isLoading
                               ? null
                               : () => _handleComplete(profile),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: const Color(0xFF34A0A4),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            elevation: 8,
-                            disabledBackgroundColor:
-                                Colors.white.withValues(alpha: 0.5),
-                          ),
+                          borderRadius: BorderRadius.circular(16),
                           child: _isLoading
-                              ? const SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    color: Color(0xFF34A0A4),
-                                    strokeWidth: 2,
-                                  ),
+                              ? const CupertinoActivityIndicator(
+                                  color: CupertinoColors.white,
                                 )
                               : const Text(
-                                  'Los geht\'s! 🚀',
+                                  'Los geht\'s!',
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    letterSpacing: 0.5,
+                                    letterSpacing: -0.41,
+                                    color: CupertinoColors.white,
                                   ),
                                 ),
                         ),
@@ -576,7 +571,7 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
                                     radius: 6,
                                     color: Colors.white,
                                     strokeWidth: 3,
-                                    strokeColor: Colors.white.withOpacity(0.8),
+                                    strokeColor: Colors.white.withValues(alpha: 0.8),
                                   );
                                 }
                                 return FlDotCirclePainter(
@@ -769,13 +764,13 @@ class _OnboardingSummaryScreenState extends State<OnboardingSummaryScreen>
   IconData _getGoalIcon(String goal) {
     switch (goal) {
       case 'weight_loss':
-        return Icons.trending_down;
+        return CupertinoIcons.arrow_down;
       case 'weight_gain':
-        return Icons.trending_up;
+        return CupertinoIcons.arrow_up;
       case 'muscle_gain':
-        return Icons.fitness_center;
+        return CupertinoIcons.sportscourt;
       default:
-        return Icons.flag;
+        return CupertinoIcons.flag;
     }
   }
 

@@ -1,7 +1,6 @@
 import 'dashboard_content.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import '../../providers/profile_provider.dart';
 import '../diary/diary_screen.dart';
@@ -202,31 +201,42 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _screens[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.book),
-            label: 'Tagebuch',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: 'Chat',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profil',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: const Color(0xFF34A0A4),
-        onTap: _onItemTapped,
+    return CupertinoPageScaffold(
+      child: CupertinoTabScaffold(
+        tabBar: CupertinoTabBar(
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          activeColor: const Color(0xFF34A0A4),
+          inactiveColor: CupertinoColors.systemGrey,
+          backgroundColor: CupertinoColors.systemBackground.resolveFrom(context),
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.house_fill),
+              activeIcon: Icon(CupertinoIcons.house_fill),
+              label: 'Dashboard',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.book),
+              activeIcon: Icon(CupertinoIcons.book_fill),
+              label: 'Tagebuch',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.chat_bubble),
+              activeIcon: Icon(CupertinoIcons.chat_bubble_fill),
+              label: 'Chat',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.person),
+              activeIcon: Icon(CupertinoIcons.person_fill),
+              label: 'Profil',
+            ),
+          ],
+        ),
+        tabBuilder: (context, index) {
+          return CupertinoTabView(
+            builder: (context) => _screens[index],
+          );
+        },
       ),
     );
   }

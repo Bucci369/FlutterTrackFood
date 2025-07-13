@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CustomButton extends StatelessWidget {
@@ -36,16 +37,19 @@ class CustomButton extends StatelessWidget {
       return SizedBox(
         width: width,
         height: height,
-        child: OutlinedButton(
+        child: CupertinoButton(
           onPressed: isLoading ? null : onPressed,
-          style: OutlinedButton.styleFrom(
-            side: BorderSide(color: primaryColor),
-            shape: RoundedRectangleBorder(
+          padding: padding ?? const EdgeInsets.symmetric(horizontal: 24),
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.transparent,
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: primaryColor, width: 1),
               borderRadius: BorderRadius.circular(12),
             ),
-            padding: padding ?? const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: _buildChild(primaryColor),
           ),
-          child: _buildChild(primaryColor),
         ),
       );
     }
@@ -53,17 +57,10 @@ class CustomButton extends StatelessWidget {
     return SizedBox(
       width: width,
       height: height,
-      child: ElevatedButton(
+      child: CupertinoButton.filled(
         onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: primaryColor,
-          foregroundColor: onPrimaryColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          padding: padding ?? const EdgeInsets.symmetric(horizontal: 24),
-          elevation: 0,
-        ),
+        borderRadius: BorderRadius.circular(12),
+        padding: padding ?? const EdgeInsets.symmetric(horizontal: 24),
         child: _buildChild(onPrimaryColor),
       ),
     );
@@ -71,12 +68,11 @@ class CustomButton extends StatelessWidget {
 
   Widget _buildChild(Color color) {
     if (isLoading) {
-      return SizedBox(
+      return const SizedBox(
         width: 20,
         height: 20,
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          valueColor: AlwaysStoppedAnimation<Color>(color),
+        child: CupertinoActivityIndicator(
+          color: CupertinoColors.white,
         ),
       );
     }
@@ -93,6 +89,7 @@ class CustomButton extends StatelessWidget {
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: isOutlined ? color : null,
+              letterSpacing: -0.41,
             ),
           ),
         ],
@@ -105,6 +102,7 @@ class CustomButton extends StatelessWidget {
         fontSize: 16,
         fontWeight: FontWeight.w600,
         color: isOutlined ? color : null,
+        letterSpacing: -0.41,
       ),
     );
   }

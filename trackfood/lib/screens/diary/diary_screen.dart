@@ -1,6 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'package:provider/provider.dart';
 import '../../providers/profile_provider.dart';
@@ -206,8 +206,8 @@ class _DiaryScreenState extends State<DiaryScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
+    return CupertinoPageScaffold(
+      child: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/image/background2.png'),
@@ -243,81 +243,68 @@ class _DiaryScreenState extends State<DiaryScreen>
             ),
             
             SafeArea(
-              child: RefreshIndicator(
-                onRefresh: _handleRefresh,
-                backgroundColor: Colors.white,
-                color: const Color(0xFF34A0A4),
-                child: CustomScrollView(
-                  controller: _scrollController,
-                  physics: const BouncingScrollPhysics(),
-                  slivers: [
-                    // Date Navigator
-                    SliverToBoxAdapter(
-                      child: DateNavigator(
+              child: CustomScrollView(
+                controller: _scrollController,
+                physics: const BouncingScrollPhysics(),
+                slivers: [
+                  // Cupertino Pull to Refresh
+                  CupertinoSliverRefreshControl(
+                    onRefresh: _handleRefresh,
+                  ),
+                  // Date Navigator
+                  SliverToBoxAdapter(
+                    child: DateNavigator(
+                      selectedDate: _selectedDate,
+                      onDateChanged: _changeDate,
+                    ),
+                  ),
+                  
+                  // Daily Overview
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: _buildDailyOverview(),
+                    ),
+                  ),
+                  
+                  // Water Tracker
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: WaterTrackerCard(
+                        waterIntake: _waterIntake,
                         selectedDate: _selectedDate,
-                        onDateChanged: _changeDate,
-                      )
-                      .animate()
-                      .fadeIn(duration: 600.ms)
-                      .slideY(begin: -0.3, end: 0),
-                    ),
-                    
-                    // Daily Overview
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: _buildDailyOverview()
-                        .animate()
-                        .fadeIn(delay: 200.ms, duration: 600.ms)
-                        .slideY(begin: 0.3, end: 0),
+                        onWaterAdded: () => _loadWaterIntake(),
                       ),
                     ),
-                    
-                    // Water Tracker
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: WaterTrackerCard(
-                          waterIntake: _waterIntake,
-                          selectedDate: _selectedDate,
-                          onWaterAdded: () => _loadWaterIntake(),
-                        )
-                        .animate()
-                        .fadeIn(delay: 400.ms, duration: 600.ms)
-                        .slideY(begin: 0.3, end: 0),
-                      ),
+                  ),
+                  
+                  const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                  
+                  // Meal Cards
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final mealType = MealType.values[index];
+                        final entries = _mealEntries[mealType] ?? [];
+                        final recommendedCalories = (_dailyCalorieGoal * mealType.calorieDistribution).round();
+                        
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: MealCard(
+                            mealType: mealType,
+                            entries: entries,
+                            recommendedCalories: recommendedCalories,
+                            onEntryAdded: () => _loadDiaryData(),
+                          ),
+                        );
+                      },
+                      childCount: MealType.values.length,
                     ),
-                    
-                    const SliverToBoxAdapter(child: SizedBox(height: 16)),
-                    
-                    // Meal Cards
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final mealType = MealType.values[index];
-                          final entries = _mealEntries[mealType] ?? [];
-                          final recommendedCalories = (_dailyCalorieGoal * mealType.calorieDistribution).round();
-                          
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            child: MealCard(
-                              mealType: mealType,
-                              entries: entries,
-                              recommendedCalories: recommendedCalories,
-                              onEntryAdded: () => _loadDiaryData(),
-                            )
-                            .animate(delay: Duration(milliseconds: 600 + (index * 100)))
-                            .fadeIn(duration: 600.ms)
-                            .slideY(begin: 0.3, end: 0),
-                          );
-                        },
-                        childCount: MealType.values.length,
-                      ),
-                    ),
-                    
-                    const SliverToBoxAdapter(child: SizedBox(height: 32)),
-                  ],
-                ),
+                  ),
+                  
+                  const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                ],
               ),
             ),
             
@@ -326,13 +313,11 @@ class _DiaryScreenState extends State<DiaryScreen>
               Container(
                 color: Colors.black.withValues(alpha: 0.3),
                 child: const Center(
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
+                  child: CupertinoActivityIndicator(
+                    color: CupertinoColors.white,
                   ),
                 ),
-              )
-              .animate()
-              .fadeIn(duration: 200.ms),
+              ),
           ],
         ),
       ),
@@ -392,14 +377,22 @@ class _DiaryScreenState extends State<DiaryScreen>
               ],
             ),
             const SizedBox(height: 12),
-            LinearProgressIndicator(
-              value: calorieProgress.clamp(0.0, 1.0),
-              backgroundColor: Colors.white.withValues(alpha: 0.3),
-              valueColor: AlwaysStoppedAnimation<Color>(
-                calorieProgress > 1.0 ? Colors.orange : const Color(0xFF99D98C),
+            Container(
+              height: 8,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(4),
+                color: Colors.white.withValues(alpha: 0.3),
               ),
-              minHeight: 8,
-              borderRadius: BorderRadius.circular(4),
+              child: FractionallySizedBox(
+                alignment: Alignment.centerLeft,
+                widthFactor: calorieProgress.clamp(0.0, 1.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(4),
+                    color: calorieProgress > 1.0 ? Colors.orange : const Color(0xFF99D98C),
+                  ),
+                ),
+              ),
             ),
             const SizedBox(height: 8),
             Row(

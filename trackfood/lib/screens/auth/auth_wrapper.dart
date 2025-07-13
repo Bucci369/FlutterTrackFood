@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:provider/provider.dart';
 import 'auth_screen.dart';
 import '../onboarding/onboarding_flow_screen.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../../widgets/animated_logo.dart';
 import '../../services/supabase_service.dart';
+import '../../providers/profile_provider.dart';
 
 class AuthWrapper extends StatefulWidget {
   const AuthWrapper({super.key});
@@ -41,6 +43,12 @@ class _AuthWrapperState extends State<AuthWrapper> {
             setState(() {
               _isOnboardingCompleted = profile?.onboardingCompleted ?? false;
             });
+            // ProfileProvider mit dem Profil synchronisieren
+            if (profile != null && mounted) {
+              context.read<ProfileProvider>().setProfile(profile);
+            } else if (mounted) {
+              await context.read<ProfileProvider>().loadProfile();
+            }
           } else {
             setState(() {
               _isOnboardingCompleted = false;
@@ -50,6 +58,10 @@ class _AuthWrapperState extends State<AuthWrapper> {
           setState(() {
             _isOnboardingCompleted = false;
           });
+          // ProfileProvider bei Logout leeren
+          if (mounted) {
+            context.read<ProfileProvider>().clearProfile();
+          }
         }
         setState(() {});
       }

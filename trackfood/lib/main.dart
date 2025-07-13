@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -8,6 +9,7 @@ import 'screens/onboarding/onboarding_flow_screen.dart';
 import 'screens/chat/chat_screen.dart';
 import 'screens/profile/profile_screen.dart';
 import 'app_providers.dart';
+import 'theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,39 +27,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return CupertinoApp(
       title: 'TrackFood App',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.green,
-          foregroundColor: Colors.white,
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          ),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Colors.green, width: 2),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: Colors.grey.shade400),
-          ),
-        ),
-      ),
+      theme: AppTheme.lightTheme,
+      debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
         '/': (context) => const AuthWrapper(),
