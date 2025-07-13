@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:trackfood/theme/app_theme.dart';
 import 'package:trackfood/theme/app_colors.dart';
 import 'package:trackfood/theme/app_typography.dart';
+import 'password_reset_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -333,9 +334,10 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget _buildForgotPasswordButton() {
     return CupertinoButton(
       onPressed: () {
-        _showDialog(
-          'Info',
-          'Die Funktion zum Zurücksetzen des Passworts wird in Kürze verfügbar sein.',
+        Navigator.of(context).push(
+          CupertinoPageRoute(
+            builder: (context) => const PasswordResetScreen(),
+          ),
         );
       },
       child: Text(

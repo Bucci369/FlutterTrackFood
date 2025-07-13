@@ -4,6 +4,7 @@ import 'package:trackfood/app_providers.dart';
 import 'package:trackfood/screens/chat/chat_screen.dart';
 import 'package:trackfood/screens/diary/diary_screen.dart';
 import 'package:trackfood/screens/profile/profile_screen.dart';
+import 'package:trackfood/screens/recipes/recipes_screen.dart';
 import 'dashboard_content.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
@@ -54,6 +55,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             label: 'Chat',
           ),
           BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.search_circle_fill), // Example icon
+            label: 'Rezepte',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.person),
             label: 'Profil',
           ),
@@ -70,6 +75,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               case 2:
                 return const ChatScreen();
               case 3:
+                return const RecipesScreen();
+              case 4:
                 return const ProfileScreen();
               default:
                 return const DashboardContent();

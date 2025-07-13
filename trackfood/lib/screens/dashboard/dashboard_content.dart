@@ -4,6 +4,7 @@ import 'package:trackfood/providers/diary_provider.dart';
 import 'package:trackfood/providers/profile_provider.dart' as profile_provider;
 import 'package:trackfood/providers/water_provider.dart';
 import 'package:trackfood/utils/nutrition_utils.dart';
+import 'package:trackfood/widgets/steps_card.dart';
 import '../../theme/app_colors.dart';
 import 'widgets/dashboard_header.dart';
 import 'widgets/progress_rings.dart';
@@ -115,6 +116,12 @@ class DashboardContent extends ConsumerWidget {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: MacroGrid(macros: macros),
+                      ),
+                    ),
+                    const SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+                        child: StepsCard(),
                       ),
                     ),
                     const SliverToBoxAdapter(

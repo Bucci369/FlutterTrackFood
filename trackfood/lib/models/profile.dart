@@ -20,6 +20,7 @@ class Profile {
   final String? intolerances;
   final bool? isGlutenfree;
   final bool? showOnboarding;
+  final String? imageUrl;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -45,6 +46,7 @@ class Profile {
     this.intolerances,
     this.isGlutenfree,
     this.showOnboarding,
+    this.imageUrl,
     this.createdAt,
     this.updatedAt,
   });
@@ -72,6 +74,7 @@ class Profile {
       intolerances: json['intolerances'],
       isGlutenfree: json['is_glutenfree'],
       showOnboarding: json['show_onboarding'],
+      imageUrl: json['image_url'],
       createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
       updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : null,
     );
@@ -100,6 +103,7 @@ class Profile {
       'intolerances': intolerances,
       'is_glutenfree': isGlutenfree,
       'show_onboarding': showOnboarding,
+      'image_url': imageUrl,
       'created_at': createdAt?.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
     };
@@ -127,6 +131,7 @@ class Profile {
     String? intolerances,
     bool? isGlutenfree,
     bool? showOnboarding,
+    String? imageUrl,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -152,6 +157,7 @@ class Profile {
       intolerances: intolerances ?? this.intolerances,
       isGlutenfree: isGlutenfree ?? this.isGlutenfree,
       showOnboarding: showOnboarding ?? this.showOnboarding,
+      imageUrl: imageUrl ?? this.imageUrl,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

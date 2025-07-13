@@ -5,6 +5,7 @@ import 'package:trackfood/models/fasting_session.dart';
 import 'package:trackfood/models/food_item.dart'; // Import FoodItem model
 import 'package:trackfood/models/profile.dart';
 import 'package:trackfood/models/water_intake.dart';
+import 'package:trackfood/models/recipe.dart';
 
 class SupabaseService {
   final SupabaseClient client = Supabase.instance.client;
@@ -291,6 +292,142 @@ class SupabaseService {
       return (response as List).map((json) => FoodItem.fromJson(json)).toList();
     } catch (e) {
       print('Error searching products in Supabase: $e');
+      return [];
+    }
+  }
+
+  // === Profile with Image ===
+
+  /// Updates profile with image URL
+  Future<void> updateProfileImage(String userId, String imageUrl) async {
+    try {
+      await client
+          .from('profiles')
+          .update({'image_url': imageUrl})
+          .eq('id', userId);
+    } catch (e) {
+      print('Error updating profile image: $e');
+      throw Exception('Failed to update profile image');
+    }
+  }
+
+  /// Gets profile image URL
+  Future<String?> getProfileImageUrl(String userId) async {
+    try {
+      final response = await client
+          .from('profiles')
+          .select('image_url')
+          .eq('id', userId)
+          .single();
+      return response['image_url'] as String?;
+    } catch (e) {
+      print('Error fetching profile image: $e');
+      return null;
+    }
+  }
+
+  // === Step Counter ===
+
+  /// Fetches the total steps for a specific date.
+  Future<int> getStepsForDate(String userId, DateTime date) async {
+    try {
+      final dateStr = date.toIso8601String().split('T')[0];
+      final response = await client
+          .from('user_steps')
+          .select('steps')
+          .eq('user_id', userId)
+          .eq('date', dateStr);
+
+      if (response.isEmpty) {
+        return 0;
+      }
+      
+      // Sum up all entries for the day (sensor + manual)
+      int totalSteps = 0;
+      for (var record in response) {
+        totalSteps += (record['steps'] as int?) ?? 0;
+      }
+      return totalSteps;
+
+    } catch (e) {
+      print('Error fetching steps: $e');
+      return 0;
+    }
+  }
+
+  /// Adds a step entry (either from sensor or manual input).
+  Future<void> addSteps({
+    required String userId,
+    required int steps,
+    required String source,
+    required DateTime date,
+  }) async {
+    try {
+      final dateStr = date.toIso8601String().split('T')[0];
+      await client.from('user_steps').insert({
+        'user_id': userId,
+        'date': dateStr,
+        'steps': steps,
+        'source': source,
+      });
+    } catch (e) {
+      print('Error adding steps: $e');
+      throw Exception('Failed to add steps: $e');
+    }
+  }
+
+  // === Recipes ===
+
+  Future<List<Recipe>> getRecipes({
+    int limit = 20,
+    int offset = 0,
+    String? query,
+    String? category,
+  }) async {
+    try {
+      var request = client.from('recipes').select();
+
+      if (query != null && query.isNotEmpty) {
+        request = request.ilike('title', '%$query%');
+      }
+      if (category != null && category.isNotEmpty) {
+        request = request.eq('category', category);
+      }
+
+      final response = await request.order('created_at', ascending: false).range(offset, offset + limit - 1);
+      return (response as List).map((json) => Recipe.fromJson(json)).toList();
+    } catch (e) {
+      print('Error fetching recipes: $e');
+      return [];
+    }
+  }
+
+  Future<List<String>> getRecipeCategories() async {
+    try {
+      // Fetch all categories from the recipes table, similar to the web app
+      final response = await client
+          .from('recipes')
+          .select('category');
+
+      // Process the data on the client side
+      final allCategories = (response as List)
+          .map((row) => row['category'] as String?)
+          .where((cat) => cat != null && cat.isNotEmpty)
+          .toList();
+      
+      // Get unique categories and sort them
+      final uniqueCategories = Set<String>.from(allCategories).toList();
+      uniqueCategories.sort();
+
+      // Move "Schnell & einfach" to the top if it exists
+      if (uniqueCategories.contains('Schnell & einfach')) {
+        uniqueCategories.remove('Schnell & einfach');
+        uniqueCategories.insert(0, 'Schnell & einfach');
+      }
+
+      return uniqueCategories;
+    } catch (e) {
+      print('Error fetching recipe categories: $e');
       return [];
     }
   }

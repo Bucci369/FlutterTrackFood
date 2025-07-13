@@ -47,5 +47,7 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Diese App benötigt Zugriff auf die Kamera, um Barcodes zu scannen.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>Diese App benötigt Zugriff auf deine Bewegungsdaten, um deine Schritte zu zählen.</string>
 </dict>
 </plist>

@@ -10,6 +10,7 @@ import 'screens/onboarding/onboardingFlowScreen.dart';
 import 'screens/chat/chat_screen.dart';
 import 'screens/profile/profile_screen.dart';
 import 'screens/splash/splash_screen.dart'; // Import the new splash screen
+import 'screens/auth/new_password_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,6 +47,7 @@ class MyApp extends StatelessWidget {
         '/onboarding': (context) => const OnboardingFlowScreen(),
         '/chat': (context) => const ChatScreen(),
         '/profile': (context) => const ProfileScreen(),
+        '/reset-password': (context) => const NewPasswordScreen(),
       },
     );
   }
