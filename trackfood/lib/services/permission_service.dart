@@ -1,5 +1,4 @@
 import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter/services.dart';
 import 'dart:io';
 
 class PermissionService {
@@ -66,7 +65,9 @@ class PermissionService {
   }
 
   /// Check if permission is permanently denied
-  static Future<bool> isPermissionPermanentlyDenied(Permission permission) async {
+  static Future<bool> isPermissionPermanentlyDenied(
+    Permission permission,
+  ) async {
     final status = await permission.status;
     return status.isPermanentlyDenied;
   }

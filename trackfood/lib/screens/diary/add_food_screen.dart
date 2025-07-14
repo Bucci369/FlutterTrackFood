@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trackfood/models/food_item.dart';
 import 'package:trackfood/models/meal_type.dart';
@@ -7,6 +8,7 @@ import 'package:trackfood/providers/diary_provider.dart'
 import 'package:trackfood/services/supabase_service.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:async';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'barcode_scanner_screen.dart';
@@ -221,18 +223,21 @@ class _AddFoodScreenState extends ConsumerState<AddFoodScreen> {
   void _showAddFoodDialog(FoodItem food) {
     double quantity = 100;
     final diaryNotifier = ref.read(diaryProvider.notifier);
+    final quantityController = TextEditingController(text: quantity.toString());
 
     showCupertinoDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => CupertinoAlertDialog(
         title: Text(food.productName),
         content: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 8),
-            Text('Menge (in g):'),
+            const Text('Menge (in g):'),
             const SizedBox(height: 8),
             CupertinoTextField(
-              controller: TextEditingController(text: quantity.toString()),
+              controller: quantityController,
               keyboardType: TextInputType.number,
               onChanged: (value) {
                 quantity = double.tryParse(value) ?? 100;
@@ -243,48 +248,130 @@ class _AddFoodScreenState extends ConsumerState<AddFoodScreen> {
         actions: [
           CupertinoDialogAction(
             child: const Text('Abbrechen'),
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () {
+              print('DEBUG: Abbrechen pressed');
+              quantityController.dispose();
+              Navigator.pop(context);
+            },
           ),
           CupertinoDialogAction(
             isDefaultAction: true,
+            child: const Text('Hinzufügen'),
             onPressed: () {
+              print('DEBUG: Hinzufügen pressed');
+              // Get final quantity from controller
+              final finalQuantity =
+                  double.tryParse(quantityController.text) ?? 100;
+              print('DEBUG: Final quantity: $finalQuantity');
+
               final nutriments = food.nutriments;
               if (nutriments.energyKcal100g == null) {
-                // Optional: Show an error if there's no calorie data
+                print('DEBUG: No nutrition data');
+                quantityController.dispose();
+                Navigator.pop(context);
                 return;
               }
+
+              // Calculate nutrition values
+              final calories =
+                  (nutriments.energyKcal100g ?? 0) * (finalQuantity / 100);
+              final protein =
+                  (nutriments.proteins100g ?? 0) * (finalQuantity / 100);
+              final carbs =
+                  (nutriments.carbohydrates100g ?? 0) * (finalQuantity / 100);
+              final fat = (nutriments.fat100g ?? 0) * (finalQuantity / 100);
+              final fiber = (nutriments.fiber100g ?? 0) * (finalQuantity / 100);
+              final sugar =
+                  (nutriments.sugars100g ?? 0) * (finalQuantity / 100);
+              // Correct sodium calculation: use sodium_100g and convert to mg
+              final sodium =
+                  (nutriments.sodium100g ?? 0) * (finalQuantity / 100) * 1000;
+
+              print(
+                'DEBUG: Nutrition values - Calories: $calories, Protein: $protein, Carbs: $carbs, Fat: $fat',
+              );
+              print(
+                'DEBUG: Additional nutrients - Fiber: $fiber, Sugar: $sugar, Sodium: $sodium',
+              );
+
+              print('DEBUG: Adding diary entry...');
               diaryNotifier.addDiaryEntry(
                 mealType: widget.mealType.name,
                 foodName: food.productName,
-                calories: (nutriments.energyKcal100g ?? 0) * (quantity / 100),
-                protein: (nutriments.proteins100g ?? 0) * (quantity / 100),
-                carbs: (nutriments.carbohydrates100g ?? 0) * (quantity / 100),
-                fat: (nutriments.fat100g ?? 0) * (quantity / 100),
-                quantity: quantity,
+                calories: calories,
+                protein: protein,
+                carbs: carbs,
+                fat: fat,
+                fiber: fiber,
+                sugar: sugar,
+                sodium: sodium,
+                quantity: finalQuantity,
                 productCode: food.code,
               );
-              Navigator.of(context).pop(); // Close the dialog
-              Navigator.of(context).pop(); // Go back to diary screen
 
-              // Show a confirmation dialog
-              showCupertinoDialog(
-                context: context,
-                builder: (context) => CupertinoAlertDialog(
-                  title: const Text('Erfolgreich'),
-                  content: Text('${food.productName} wurde hinzugefügt.'),
-                  actions: [
-                    CupertinoDialogAction(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('OK'),
-                    ),
-                  ],
-                ),
-              );
+              quantityController.dispose();
+
+              // Use Navigator.popUntil to ensure we get back to the right screen
+              Navigator.of(context).popUntil((route) {
+                print('DEBUG: Route name: ${route.settings.name}');
+                return route.isFirst || route.settings.name == '/diary';
+              });
+
+              // Show success animation/feedback
+              _showSuccessAnimation(food.productName);
+
+              print('DEBUG: Navigation completed successfully');
             },
-            child: const Text('Hinzufügen'),
           ),
         ],
       ),
     );
+  }
+
+  void _showSuccessAnimation(String foodName) {
+    // Show a iOS-style haptic feedback and overlay
+    showCupertinoDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) => Center(
+        child: Container(
+          width: 150,
+          height: 150,
+          decoration: BoxDecoration(
+            color: CupertinoColors.black.withValues(alpha: 0.8),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                CupertinoIcons.checkmark_circle_fill,
+                color: CupertinoColors.activeGreen,
+                size: 60,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Hinzugefügt!',
+                style: TextStyle(
+                  color: CupertinoColors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    ).then((_) {
+      // Dialog was dismissed
+    });
+
+    // Auto dismiss after 0.8 seconds
+    Timer(const Duration(milliseconds: 800), () {
+      if (mounted && Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+    });
   }
 }

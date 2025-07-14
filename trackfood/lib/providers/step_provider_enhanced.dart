@@ -52,10 +52,10 @@ class EnhancedStepState {
 class EnhancedStepNotifier extends StateNotifier<EnhancedStepState> {
   final SupabaseService _supabaseService;
   final String? _userId;
-  
+
   StreamSubscription<StepCount>? _stepCountSubscription;
   Timer? _saveTimer;
-  
+
   // Keys for SharedPreferences
   static const String _keyDailyBaseline = 'daily_step_baseline';
   static const String _keyLastResetDate = 'last_reset_date';
@@ -64,7 +64,8 @@ class EnhancedStepNotifier extends StateNotifier<EnhancedStepState> {
   int _dailyBaseline = 0;
   DateTime _lastResetDate = DateTime.now();
 
-  EnhancedStepNotifier(this._supabaseService, this._userId) : super(EnhancedStepState()) {
+  EnhancedStepNotifier(this._supabaseService, this._userId)
+    : super(EnhancedStepState()) {
     if (_userId != null) {
       _initialize();
     }
@@ -72,12 +73,13 @@ class EnhancedStepNotifier extends StateNotifier<EnhancedStepState> {
 
   Future<void> _initialize() async {
     state = state.copyWith(isLoading: true);
-    
+
     try {
       // Check permissions first
-      final hasPermissions = await PermissionService.hasAllStepCountingPermissions();
+      final hasPermissions =
+          await PermissionService.hasAllStepCountingPermissions();
       state = state.copyWith(hasPermissions: hasPermissions);
-      
+
       if (!hasPermissions) {
         state = state.copyWith(
           isLoading: false,
@@ -88,13 +90,12 @@ class EnhancedStepNotifier extends StateNotifier<EnhancedStepState> {
 
       // Load saved data
       await _loadSavedData();
-      
+
       // Load steps from database
       await _loadTodaysSteps();
-      
+
       // Start sensor if permissions granted
       await _startSensorListening();
-      
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -107,19 +108,19 @@ class EnhancedStepNotifier extends StateNotifier<EnhancedStepState> {
 
   Future<void> _loadSavedData() async {
     final prefs = await SharedPreferences.getInstance();
-    
+
     _dailyBaseline = prefs.getInt(_keyDailyBaseline) ?? 0;
-    
+
     final lastResetDateStr = prefs.getString(_keyLastResetDate);
     if (lastResetDateStr != null) {
       _lastResetDate = DateTime.parse(lastResetDateStr);
     }
-    
+
     // Check if we need to reset for new day
     final today = DateTime.now();
     final todayStr = today.toIso8601String().split('T')[0];
     final lastResetStr = _lastResetDate.toIso8601String().split('T')[0];
-    
+
     if (todayStr != lastResetStr) {
       // New day - reset baseline
       _dailyBaseline = 0;
@@ -136,15 +137,15 @@ class EnhancedStepNotifier extends StateNotifier<EnhancedStepState> {
 
   Future<void> _loadTodaysSteps() async {
     if (_userId == null) return;
-    
+
     try {
       final today = DateTime.now();
-      final totalSteps = await _supabaseService.getStepsForDate(_userId!, today);
-      
+      final totalSteps = await _supabaseService.getStepsForDate(_userId, today);
+
       // Get step goal from preferences or use default
       final prefs = await SharedPreferences.getInstance();
       final goal = prefs.getInt(_keyStepGoal) ?? 10000;
-      
+
       // Calculate breakdown (this is simplified - in real app you'd query by source)
       final summary = DailyStepSummary(
         date: today,
@@ -153,7 +154,7 @@ class EnhancedStepNotifier extends StateNotifier<EnhancedStepState> {
         manualSteps: 0, // Simplified
         goal: goal,
       );
-      
+
       state = state.copyWith(dailySummary: summary);
     } catch (e) {
       state = state.copyWith(error: 'Fehler beim Laden der Schritte: $e');
@@ -162,7 +163,7 @@ class EnhancedStepNotifier extends StateNotifier<EnhancedStepState> {
 
   Future<void> _startSensorListening() async {
     if (!state.hasPermissions) return;
-    
+
     try {
       _stepCountSubscription = Pedometer.stepCountStream.listen(
         (StepCount event) async {
@@ -175,14 +176,13 @@ class EnhancedStepNotifier extends StateNotifier<EnhancedStepState> {
           );
         },
       );
-      
+
       state = state.copyWith(isListening: true);
-      
+
       // Set up periodic saving
       _saveTimer = Timer.periodic(Duration(minutes: 5), (_) {
         _saveSensorStepsToDatabase();
       });
-      
     } catch (e) {
       state = state.copyWith(
         isListening: false,
@@ -193,16 +193,16 @@ class EnhancedStepNotifier extends StateNotifier<EnhancedStepState> {
 
   Future<void> _handleSensorData(StepCount stepCount) async {
     final totalStepsSinceBoot = stepCount.steps;
-    
+
     // If baseline is 0 or higher than current (device reboot), set new baseline
     if (_dailyBaseline == 0 || _dailyBaseline > totalStepsSinceBoot) {
       _dailyBaseline = totalStepsSinceBoot;
       await _saveDailyData();
     }
-    
+
     // Calculate today's steps
     final todaysSteps = totalStepsSinceBoot - _dailyBaseline;
-    
+
     // Update state
     final currentSummary = state.dailySummary;
     if (currentSummary != null) {
@@ -213,7 +213,7 @@ class EnhancedStepNotifier extends StateNotifier<EnhancedStepState> {
         manualSteps: currentSummary.manualSteps,
         goal: currentSummary.goal,
       );
-      
+
       state = state.copyWith(
         dailySummary: updatedSummary,
         lastUpdate: DateTime.now(),
@@ -223,12 +223,12 @@ class EnhancedStepNotifier extends StateNotifier<EnhancedStepState> {
 
   Future<void> _saveSensorStepsToDatabase() async {
     if (_userId == null || state.dailySummary == null) return;
-    
+
     try {
       final sensorSteps = state.dailySummary!.sensorSteps;
       if (sensorSteps > 0) {
         await _supabaseService.addSteps(
-          userId: _userId!,
+          userId: _userId,
           steps: sensorSteps,
           source: 'sensor',
           date: DateTime.now(),
@@ -243,10 +243,11 @@ class EnhancedStepNotifier extends StateNotifier<EnhancedStepState> {
   /// Request permissions for step counting
   Future<void> requestPermissions() async {
     state = state.copyWith(isLoading: true);
-    
+
     try {
-      final granted = await PermissionService.requestAllStepCountingPermissions();
-      
+      final granted =
+          await PermissionService.requestAllStepCountingPermissions();
+
       if (granted) {
         state = state.copyWith(hasPermissions: true, error: null);
         await _startSensorListening();
@@ -254,7 +255,8 @@ class EnhancedStepNotifier extends StateNotifier<EnhancedStepState> {
       } else {
         state = state.copyWith(
           hasPermissions: false,
-          error: 'Berechtigung wurde verweigert. Bitte in den Einstellungen erlauben.',
+          error:
+              'Berechtigung wurde verweigert. Bitte in den Einstellungen erlauben.',
         );
       }
     } catch (e) {
@@ -270,18 +272,18 @@ class EnhancedStepNotifier extends StateNotifier<EnhancedStepState> {
   /// Add manual steps
   Future<void> addManualSteps(int steps) async {
     if (_userId == null || steps <= 0) return;
-    
+
     state = state.copyWith(isLoading: true);
-    
+
     try {
       // Save to database
       await _supabaseService.addSteps(
-        userId: _userId!,
+        userId: _userId,
         steps: steps,
         source: 'manual',
         date: DateTime.now(),
       );
-      
+
       // Update local state
       final currentSummary = state.dailySummary;
       if (currentSummary != null) {
@@ -292,13 +294,12 @@ class EnhancedStepNotifier extends StateNotifier<EnhancedStepState> {
           manualSteps: currentSummary.manualSteps + steps,
           goal: currentSummary.goal,
         );
-        
+
         state = state.copyWith(
           dailySummary: updatedSummary,
           lastUpdate: DateTime.now(),
         );
       }
-      
     } catch (e) {
       state = state.copyWith(error: 'Fehler beim Hinzufügen: $e');
     } finally {
@@ -309,11 +310,11 @@ class EnhancedStepNotifier extends StateNotifier<EnhancedStepState> {
   /// Update step goal
   Future<void> updateGoal(int newGoal) async {
     if (newGoal <= 0) return;
-    
+
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(_keyStepGoal, newGoal);
-      
+
       final currentSummary = state.dailySummary;
       if (currentSummary != null) {
         final updatedSummary = DailyStepSummary(
@@ -323,7 +324,7 @@ class EnhancedStepNotifier extends StateNotifier<EnhancedStepState> {
           manualSteps: currentSummary.manualSteps,
           goal: newGoal,
         );
-        
+
         state = state.copyWith(dailySummary: updatedSummary);
       }
     } catch (e) {
@@ -342,22 +343,23 @@ class EnhancedStepNotifier extends StateNotifier<EnhancedStepState> {
   void dispose() {
     _stepCountSubscription?.cancel();
     _saveTimer?.cancel();
-    
+
     // Save final sensor data
     if (state.isListening && state.dailySummary?.sensorSteps != null) {
       _saveSensorStepsToDatabase();
     }
-    
+
     super.dispose();
   }
 }
 
 /// Enhanced step provider with full functionality
-final enhancedStepProvider = StateNotifierProvider<EnhancedStepNotifier, EnhancedStepState>((ref) {
-  final supabaseService = ref.watch(supabaseServiceProvider);
-  final userId = ref.watch(profileProvider).profile?.id;
-  return EnhancedStepNotifier(supabaseService, userId);
-});
+final enhancedStepProvider =
+    StateNotifierProvider<EnhancedStepNotifier, EnhancedStepState>((ref) {
+      final supabaseService = ref.watch(supabaseServiceProvider);
+      final userId = ref.watch(profileProvider).profile?.id;
+      return EnhancedStepNotifier(supabaseService, userId);
+    });
 
 /// Simple provider for backward compatibility
 final stepProvider = Provider<EnhancedStepState>((ref) {

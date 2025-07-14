@@ -13,6 +13,9 @@ class DiaryState {
   final double totalProtein;
   final double totalCarbs;
   final double totalFat;
+  final double totalFiber;
+  final double totalSugar;
+  final double totalSodium;
 
   DiaryState({
     required this.selectedDate,
@@ -22,6 +25,9 @@ class DiaryState {
     this.totalProtein = 0.0,
     this.totalCarbs = 0.0,
     this.totalFat = 0.0,
+    this.totalFiber = 0.0,
+    this.totalSugar = 0.0,
+    this.totalSodium = 0.0,
   });
 
   DiaryState copyWith({
@@ -32,6 +38,9 @@ class DiaryState {
     double? totalProtein,
     double? totalCarbs,
     double? totalFat,
+    double? totalFiber,
+    double? totalSugar,
+    double? totalSodium,
   }) {
     return DiaryState(
       selectedDate: selectedDate ?? this.selectedDate,
@@ -41,6 +50,9 @@ class DiaryState {
       totalProtein: totalProtein ?? this.totalProtein,
       totalCarbs: totalCarbs ?? this.totalCarbs,
       totalFat: totalFat ?? this.totalFat,
+      totalFiber: totalFiber ?? this.totalFiber,
+      totalSugar: totalSugar ?? this.totalSugar,
+      totalSodium: totalSodium ?? this.totalSodium,
     );
   }
 }
@@ -72,6 +84,9 @@ class DiaryNotifier extends StateNotifier<DiaryState> {
     );
     final totalCarbs = entries.fold<double>(0, (sum, item) => sum + item.carbG);
     final totalFat = entries.fold<double>(0, (sum, item) => sum + item.fatG);
+    final totalFiber = entries.fold<double>(0, (sum, item) => sum + item.fiberG);
+    final totalSugar = entries.fold<double>(0, (sum, item) => sum + item.sugarG);
+    final totalSodium = entries.fold<double>(0, (sum, item) => sum + item.sodiumMg);
 
     state = state.copyWith(
       groupedEntries: grouped,
@@ -80,6 +95,9 @@ class DiaryNotifier extends StateNotifier<DiaryState> {
       totalProtein: totalProtein,
       totalCarbs: totalCarbs,
       totalFat: totalFat,
+      totalFiber: totalFiber,
+      totalSugar: totalSugar,
+      totalSodium: totalSodium,
     );
   }
 
@@ -99,6 +117,9 @@ class DiaryNotifier extends StateNotifier<DiaryState> {
     required double fat,
     required double quantity,
     String? productCode,
+    double fiber = 0.0,
+    double sugar = 0.0,
+    double sodium = 0.0,
   }) async {
     final userId = _supabaseService.currentUserId;
     if (userId == null) return;
@@ -113,6 +134,9 @@ class DiaryNotifier extends StateNotifier<DiaryState> {
       fat: fat,
       quantity: quantity,
       productCode: productCode,
+      fiber: fiber,
+      sugar: sugar,
+      sodium: sodium,
     );
     await loadEntries(); // Reload to show the new entry
   }

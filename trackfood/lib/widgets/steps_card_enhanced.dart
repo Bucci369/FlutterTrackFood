@@ -12,7 +12,7 @@ class EnhancedStepsCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final stepState = ref.watch(enhancedStepProvider);
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -31,7 +31,7 @@ class EnhancedStepsCard extends ConsumerWidget {
               _buildActionButton(context, ref, stepState),
             ],
           ),
-          
+
           // Status indicator
           if (stepState.error != null)
             _buildErrorBar(context, ref, stepState)
@@ -48,14 +48,14 @@ class EnhancedStepsCard extends ConsumerWidget {
 
   Widget _buildProgressIndicator(EnhancedStepState stepState) {
     Color progressColor = AppColors.systemOrange;
-    
+
     // Change color based on progress
     if (stepState.progress >= 1.0) {
       progressColor = AppColors.systemGreen;
     } else if (stepState.progress >= 0.75) {
       progressColor = AppColors.systemBlue;
     }
-    
+
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -63,17 +63,24 @@ class EnhancedStepsCard extends ConsumerWidget {
           radius: 40.0,
           lineWidth: 8.0,
           percent: stepState.progress,
-          center: stepState.goalAchieved 
-              ? const Icon(CupertinoIcons.checkmark, color: AppColors.systemGreen, size: 32)
-              : const Icon(CupertinoIcons.flame_fill, color: AppColors.systemOrange, size: 28),
+          center: stepState.goalAchieved
+              ? const Icon(
+                  CupertinoIcons.checkmark,
+                  color: AppColors.systemGreen,
+                  size: 32,
+                )
+              : const Icon(
+                  CupertinoIcons.flame_fill,
+                  color: AppColors.systemOrange,
+                  size: 28,
+                ),
           progressColor: progressColor,
           backgroundColor: AppColors.tertiarySystemFill,
           circularStrokeCap: CircularStrokeCap.round,
           animation: true,
           animationDuration: 500,
         ),
-        if (stepState.isLoading)
-          const CupertinoActivityIndicator(),
+        if (stepState.isLoading) const CupertinoActivityIndicator(),
       ],
     );
   }
@@ -84,23 +91,35 @@ class EnhancedStepsCard extends ConsumerWidget {
       children: [
         Text('Schritte', style: AppTypography.title3),
         Text(
-          '${stepState.steps.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}',
+          stepState.steps.toString().replaceAllMapped(
+            RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+            (Match m) => '${m[1]}.',
+          ),
           style: AppTypography.largeTitle.copyWith(color: AppColors.label),
         ),
         Text(
           'Ziel: ${stepState.goal.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}',
-          style: AppTypography.caption1.copyWith(color: AppColors.secondaryLabel),
+          style: AppTypography.caption1.copyWith(
+            color: AppColors.secondaryLabel,
+          ),
         ),
-        if (stepState.dailySummary != null && stepState.dailySummary!.remainingSteps > 0)
+        if (stepState.dailySummary != null &&
+            stepState.dailySummary!.remainingSteps > 0)
           Text(
             'Noch ${stepState.dailySummary!.remainingSteps} Schritte',
-            style: AppTypography.caption1.copyWith(color: AppColors.tertiaryLabel),
+            style: AppTypography.caption1.copyWith(
+              color: AppColors.tertiaryLabel,
+            ),
           ),
       ],
     );
   }
 
-  Widget _buildActionButton(BuildContext context, WidgetRef ref, EnhancedStepState stepState) {
+  Widget _buildActionButton(
+    BuildContext context,
+    WidgetRef ref,
+    EnhancedStepState stepState,
+  ) {
     return CupertinoButton(
       padding: EdgeInsets.zero,
       onPressed: () => _showOptionsMenu(context, ref, stepState),
@@ -108,7 +127,11 @@ class EnhancedStepsCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildErrorBar(BuildContext context, WidgetRef ref, EnhancedStepState stepState) {
+  Widget _buildErrorBar(
+    BuildContext context,
+    WidgetRef ref,
+    EnhancedStepState stepState,
+  ) {
     return Container(
       margin: const EdgeInsets.only(top: 12),
       padding: const EdgeInsets.all(8),
@@ -118,19 +141,28 @@ class EnhancedStepsCard extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Icon(CupertinoIcons.exclamationmark_triangle, 
-               color: AppColors.systemRed, size: 16),
+          Icon(
+            CupertinoIcons.exclamationmark_triangle,
+            color: AppColors.systemRed,
+            size: 16,
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               stepState.error!,
-              style: AppTypography.caption1.copyWith(color: AppColors.systemRed),
+              style: AppTypography.caption1.copyWith(
+                color: AppColors.systemRed,
+              ),
             ),
           ),
           CupertinoButton(
             padding: EdgeInsets.zero,
             onPressed: () => ref.read(enhancedStepProvider.notifier).refresh(),
-            child: Icon(CupertinoIcons.refresh, color: AppColors.systemRed, size: 16),
+            child: Icon(
+              CupertinoIcons.refresh,
+              color: AppColors.systemRed,
+              size: 16,
+            ),
           ),
         ],
       ),
@@ -147,20 +179,29 @@ class EnhancedStepsCard extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Icon(CupertinoIcons.lock_shield, color: AppColors.systemYellow, size: 16),
+          Icon(
+            CupertinoIcons.lock_shield,
+            color: AppColors.systemYellow,
+            size: 16,
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               'Berechtigung für automatisches Tracking erforderlich',
-              style: AppTypography.caption1.copyWith(color: AppColors.systemYellow),
+              style: AppTypography.caption1.copyWith(
+                color: AppColors.systemYellow,
+              ),
             ),
           ),
           CupertinoButton(
             padding: EdgeInsets.zero,
-            onPressed: () => ref.read(enhancedStepProvider.notifier).requestPermissions(),
+            onPressed: () =>
+                ref.read(enhancedStepProvider.notifier).requestPermissions(),
             child: Text(
               'Erlauben',
-              style: AppTypography.caption1.copyWith(color: AppColors.systemYellow),
+              style: AppTypography.caption1.copyWith(
+                color: AppColors.systemYellow,
+              ),
             ),
           ),
         ],
@@ -171,14 +212,15 @@ class EnhancedStepsCard extends ConsumerWidget {
   Widget _buildStatusBar(String text, Color color) {
     return Container(
       margin: const EdgeInsets.only(top: 8),
-      child: Text(
-        text,
-        style: AppTypography.caption1.copyWith(color: color),
-      ),
+      child: Text(text, style: AppTypography.caption1.copyWith(color: color)),
     );
   }
 
-  void _showOptionsMenu(BuildContext context, WidgetRef ref, EnhancedStepState stepState) {
+  void _showOptionsMenu(
+    BuildContext context,
+    WidgetRef ref,
+    EnhancedStepState stepState,
+  ) {
     showCupertinoModalPopup(
       context: context,
       builder: (context) => CupertinoActionSheet(
@@ -265,7 +307,11 @@ class EnhancedStepsCard extends ConsumerWidget {
     );
   }
 
-  void _showGoalDialog(BuildContext context, WidgetRef ref, EnhancedStepState stepState) {
+  void _showGoalDialog(
+    BuildContext context,
+    WidgetRef ref,
+    EnhancedStepState stepState,
+  ) {
     final TextEditingController controller = TextEditingController(
       text: stepState.goal.toString(),
     );

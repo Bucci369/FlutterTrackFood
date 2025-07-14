@@ -49,18 +49,23 @@ class AppColors {
   static const Color systemIndigo = CupertinoColors.systemIndigo;
 
   static const Color systemBackground = CupertinoColors.systemBackground;
-  static const Color secondarySystemBackground = CupertinoColors.secondarySystemBackground;
-  static const Color tertiarySystemBackground = CupertinoColors.tertiarySystemBackground;
-  
-  static const Color systemGroupedBackground = CupertinoColors.systemGroupedBackground;
-  static const Color secondarySystemGroupedBackground = CupertinoColors.secondarySystemGroupedBackground;
-  static const Color tertiarySystemGroupedBackground = CupertinoColors.tertiarySystemGroupedBackground;
+  static const Color secondarySystemBackground =
+      CupertinoColors.secondarySystemBackground;
+  static const Color tertiarySystemBackground =
+      CupertinoColors.tertiarySystemBackground;
+
+  static const Color systemGroupedBackground =
+      CupertinoColors.systemGroupedBackground;
+  static const Color secondarySystemGroupedBackground =
+      CupertinoColors.secondarySystemGroupedBackground;
+  static const Color tertiarySystemGroupedBackground =
+      CupertinoColors.tertiarySystemGroupedBackground;
 
   static const Color systemFill = CupertinoColors.systemFill;
   static const Color secondarySystemFill = CupertinoColors.secondarySystemFill;
   static const Color tertiarySystemFill = CupertinoColors.tertiarySystemFill;
-  static const Color quaternarySystemFill = CupertinoColors.quaternarySystemFill;
-
+  static const Color quaternarySystemFill =
+      CupertinoColors.quaternarySystemFill;
 
   // === FUNCTIONAL COLORS (EXISTING) ===
   static const Color success = CupertinoColors.systemGreen;
@@ -74,6 +79,7 @@ class AppColors {
   static const Color carbsMacro = Color(0xFFFFD60A); // Gelb
   static const Color fatMacro = Color(0xFF34C759); // Grün
   static const Color fiber = Color(0xFF8E44AD); // Lila
+  static const Color sodiumMacro = Color(0xFF4285F4); // Blau
 
   // ----------------------------------------------------------------
   // === TRENDFARBEN & ERWEITERUNGEN 2024/2025 ===

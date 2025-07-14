@@ -49,3 +49,4 @@ Hier ist eine Liste potenzieller neuer Features, die auf einer Analyse führende
 - [x] **Rezept-Browser:** Implementiert mit Anbindung an die Supabase-DB, Suche, Filter und Weiterleitung.
 - [x] **Barcode-Scanner:** Implementiert mit `mobile_scanner` für Live- und Foto-Scans.
 - [x] **Profil-Verwaltung:** Umfassend implementiert und mit allen App-Bereichen verknüpft.
+

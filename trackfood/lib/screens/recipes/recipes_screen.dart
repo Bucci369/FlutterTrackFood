@@ -44,7 +44,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
         child: Column(
           children: [
             _buildSearchBar(notifier),
-            _buildKeywordFilter(state, notifier), // The one and only filter bar
+            _buildCategoryFilter(state, notifier), // Dynamic categories with counts
             Expanded(
               child: state.isLoading && state.recipes.isEmpty
                   ? const Center(child: CupertinoActivityIndicator())
@@ -88,16 +88,26 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
     );
   }
 
-  Widget _buildKeywordFilter(RecipesState state, RecipesNotifier notifier) {
+  Widget _buildCategoryFilter(RecipesState state, RecipesNotifier notifier) {
+    // Show loading state while categories are loading
+    if (state.categoriesLoading) {
+      return const SizedBox(
+        height: 50,
+        child: Center(child: CupertinoActivityIndicator()),
+      );
+    }
+
+    // Show dynamic categories with counts like the webapp
     return SizedBox(
       height: 50,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 8),
-        itemCount: kKeywordFilters.length,
+        itemCount: state.categories.length,
         itemBuilder: (context, index) {
-          final filter = kKeywordFilters[index];
-          final isSelected = state.selectedKeyword == filter['key'];
+          final categoryData = state.categories[index];
+          final isSelected = state.selectedCategory == categoryData.category;
+          
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: CupertinoButton(
@@ -105,11 +115,12 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
               color: isSelected
                   ? AppColors.primary
                   : AppColors.tertiarySystemFill,
-              onPressed: () => notifier.setKeyword(filter['key']),
+              onPressed: () => notifier.setCategory(categoryData.category),
               child: Text(
-                filter['title']!,
+                '${categoryData.category} (${categoryData.count})', // Show count like webapp
                 style: TextStyle(
                   color: isSelected ? CupertinoColors.white : AppColors.label,
+                  fontSize: 14,
                 ),
               ),
             ),

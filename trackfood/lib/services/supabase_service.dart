@@ -162,6 +162,9 @@ class SupabaseService {
     required double fat,
     required double quantity,
     String? productCode,
+    double fiber = 0.0,
+    double sugar = 0.0,
+    double sodium = 0.0,
   }) async {
     final newEntry = {
       'user_id': userId,
@@ -171,6 +174,9 @@ class SupabaseService {
       'protein_g': protein,
       'carb_g': carbs,
       'fat_g': fat,
+      'fiber_g': fiber,
+      'sugar_g': sugar,
+      'sodium_mg': sodium,
       'quantity': quantity,
       'unit': 'g', // Assuming grams for now
       'entry_date': DateTime.now().toIso8601String(),
@@ -303,6 +309,11 @@ class SupabaseService {
       }
 
       final response = await request;
+      
+      print('DEBUG: Supabase search response: ${response.length} products found');
+      if (response.isNotEmpty) {
+        print('DEBUG: First product data: ${response[0]}');
+      }
 
       return (response as List).map((json) => FoodItem.fromJson(json)).toList();
     } catch (e) {
@@ -420,14 +431,53 @@ class SupabaseService {
 
   Future<List<Map<String, dynamic>>> getRecipeCategories() async {
     try {
-      // Fetch all categories from the recipes table, exactly like the web app
-      final response = await client.from('recipes').select('category');
+      // Fetch ALL categories using batching like the webapp does
+      final List<Map<String, dynamic>> allCategories = [];
+      int from = 0;
+      const int batchSize = 1000;
+      
+      while (true) {
+        print('DEBUG: Fetching batch $from to ${from + batchSize - 1}');
+        final response = await client
+            .from('recipes')
+            .select('category')
+            .not('category', 'is', null)
+            .range(from, from + batchSize - 1);
+            
+        print('DEBUG: Batch response length: ${response.length}');
+        if (response.isEmpty) break;
+        
+        allCategories.addAll(response);
+        
+        if (response.length < batchSize) break;
+        from += batchSize;
+      }
 
-      // The web app does the counting on the client, so we provide the raw data.
-      // The provider will handle counting and sorting.
-      return (response as List)
-          .map((row) => {'category': row['category'], 'count': 1})
+      print('DEBUG: Total categories fetched: ${allCategories.length}');
+
+      // Count categories on client side like the webapp does
+      final Map<String, int> categoryCounts = {};
+      for (final row in allCategories) {
+        final category = row['category'] as String?;
+        if (category != null && category.isNotEmpty) {
+          categoryCounts[category] = (categoryCounts[category] ?? 0) + 1;
+        }
+      }
+      
+      print('DEBUG: Unique categories found: ${categoryCounts.keys.toList()}');
+
+      // Convert to list and sort by count (descending)
+      final categories = categoryCounts.entries
+          .map((entry) => {
+                'category': entry.key,
+                'count': entry.value,
+              })
           .toList();
+
+      // Sort by count descending, like the webapp
+      categories.sort((a, b) => (b['count'] as int).compareTo(a['count'] as int));
+
+      return categories;
     } catch (e) {
       print('Error fetching recipe categories: $e');
       return [];

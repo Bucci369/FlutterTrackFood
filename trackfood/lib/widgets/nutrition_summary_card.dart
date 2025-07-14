@@ -9,6 +9,7 @@ class NutritionSummaryCard extends StatelessWidget {
   final double totalCarbs;
   final double totalFat;
   final double totalProtein;
+  final double totalSodium;
 
   const NutritionSummaryCard({
     super.key,
@@ -17,6 +18,7 @@ class NutritionSummaryCard extends StatelessWidget {
     required this.totalCarbs,
     required this.totalFat,
     required this.totalProtein,
+    required this.totalSodium,
   });
 
   @override
@@ -83,6 +85,8 @@ class NutritionSummaryCard extends StatelessWidget {
                     totalProtein,
                     AppColors.proteinMacro,
                   ),
+                  const SizedBox(height: 8),
+                  _buildMacroRow('Natrium', totalSodium, AppColors.sodiumMacro),
                 ],
               ),
             ),

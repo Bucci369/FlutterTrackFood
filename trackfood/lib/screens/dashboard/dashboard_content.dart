@@ -13,6 +13,18 @@ import 'widgets/recent_activities.dart';
 import 'widgets/recent_meals.dart';
 import 'widgets/fasting_card.dart';
 
+// Function to get a greeting based on the time of day
+String getGreeting() {
+  final hour = DateTime.now().hour;
+  if (hour < 12) {
+    return 'Guten Morgen';
+  }
+  if (hour < 18) {
+    return 'Guten Tag';
+  }
+  return 'Guten Abend';
+}
+
 class DashboardContent extends ConsumerWidget {
   final AnimationController? backgroundController;
   final AnimationController? pullRefreshController;
@@ -20,7 +32,6 @@ class DashboardContent extends ConsumerWidget {
   final bool? isRefreshing;
   final DateTime? selectedDate;
   final Future<void> Function()? handleRefresh;
-  final String Function()? getGreeting;
 
   const DashboardContent({
     super.key,
@@ -30,24 +41,15 @@ class DashboardContent extends ConsumerWidget {
     this.isRefreshing,
     this.selectedDate,
     this.handleRefresh,
-    this.getGreeting,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final profileAsync = ref.watch(profile_provider.profileProvider);
+    final profileState = ref.watch(profile_provider.profileProvider);
     final waterIntakeAsync = ref.watch(waterIntakeProvider);
     final diaryState = ref.watch(diaryProvider);
 
-    if (profileAsync.isLoading) {
-      return const Center(child: CupertinoActivityIndicator());
-    }
-
-    if (profileAsync.error != null) {
-      return Center(child: Text('Fehler: ${profileAsync.error}'));
-    }
-
-    final profile = profileAsync.profile;
+    final profile = profileState.profile;
     final dailyCalories = diaryState.totalCalories;
     final calorieGoal = profile != null
         ? calculateDailyCalorieGoal(profile).toDouble()
@@ -56,7 +58,12 @@ class DashboardContent extends ConsumerWidget {
       'protein': diaryState.totalProtein,
       'carbs': diaryState.totalCarbs,
       'fat': diaryState.totalFat,
+      'sodium': diaryState.totalSodium,
     };
+
+    if (profileState.isLoading && profile == null) {
+      return const Center(child: CupertinoActivityIndicator());
+    }
 
     return Container(
       color: const Color(0xFFF6F1E7),
@@ -73,7 +80,7 @@ class DashboardContent extends ConsumerWidget {
                 waterIntakeAsync.when(
                   data: (intake) => SliverToBoxAdapter(
                     child: DashboardHeader(
-                      greeting: getGreeting != null ? getGreeting!() : '',
+                      greeting: getGreeting(),
                       userName: profile?.firstName ?? 'User',
                       date: selectedDate ?? DateTime.now(),
                       calorieProgress: calorieGoal > 0

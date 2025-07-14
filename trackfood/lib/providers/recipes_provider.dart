@@ -4,46 +4,33 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trackfood/models/recipe.dart';
 import 'package:trackfood/services/supabase_service.dart';
 
-// Hardcoded keyword filters from the web app
-const List<Map<String, String>> kKeywordFilters = [
-  {'key': 'schnell', 'title': 'Schnell & einfach'},
-  {'key': 'salat', 'title': 'Salate'},
-  {'key': 'suppe', 'title': 'Suppen'},
-  {'key': 'kuchen', 'title': 'Kuchen'},
-  {'key': 'brot', 'title': 'Brot & Brötchen'},
-  {'key': 'low carb', 'title': 'Low Carb'},
-  {'key': 'vegan', 'title': 'Vegane Hits'},
-  {'key': 'pasta', 'title': 'Pasta'},
-  {'key': 'dessert', 'title': 'Desserts'},
-  {'key': 'frühstück', 'title': 'Frühstück'},
-  {'key': 'grillen', 'title': 'Grillen'},
-  {'key': 'eintopf', 'title': 'Eintöpfe'},
-  {'key': 'auflauf', 'title': 'Aufläufe'},
-  {'key': 'smoothie', 'title': 'Smoothies'},
-  {'key': 'fisch', 'title': 'Fisch'},
-  {'key': 'fleisch', 'title': 'Fleisch'},
-  {'key': 'geflügel', 'title': 'Geflügel'},
-  {'key': 'vegetarisch', 'title': 'Vegetarisch'},
-  {'key': 'glutenfrei', 'title': 'Glutenfrei'},
-  {'key': 'laktosefrei', 'title': 'Laktosefrei'},
-  {'key': 'kalorienarm', 'title': 'Kalorienarm'},
-];
+// Category data structure like the webapp 
+class CategoryWithCount {
+  final String category;
+  final int count;
+
+  CategoryWithCount({required this.category, required this.count});
+}
 
 class RecipesState {
   final List<Recipe> recipes;
-  final String? selectedKeyword; // NEW: For keyword filters
+  final String? selectedCategory; // Changed from selectedKeyword to selectedCategory
   final String searchQuery;
   final bool isLoading;
   final bool canLoadMore;
   final int offset;
+  final List<CategoryWithCount> categories; // Dynamic categories with counts
+  final bool categoriesLoading;
 
   RecipesState({
     this.recipes = const [],
-    this.selectedKeyword,
+    this.selectedCategory,
     this.searchQuery = '',
     this.isLoading = false,
     this.canLoadMore = true,
     this.offset = 0,
+    this.categories = const [],
+    this.categoriesLoading = false,
   });
 
   // A sentinel object to detect if a parameter was passed or not.
@@ -51,21 +38,25 @@ class RecipesState {
 
   RecipesState copyWith({
     List<Recipe>? recipes,
-    Object? selectedKeyword = _sentinel,
+    Object? selectedCategory = _sentinel,
     String? searchQuery,
     bool? isLoading,
     bool? canLoadMore,
     int? offset,
+    List<CategoryWithCount>? categories,
+    bool? categoriesLoading,
   }) {
     return RecipesState(
       recipes: recipes ?? this.recipes,
-      selectedKeyword: selectedKeyword == _sentinel
-          ? this.selectedKeyword
-          : selectedKeyword as String?,
+      selectedCategory: selectedCategory == _sentinel
+          ? this.selectedCategory
+          : selectedCategory as String?,
       searchQuery: searchQuery ?? this.searchQuery,
       isLoading: isLoading ?? this.isLoading,
       canLoadMore: canLoadMore ?? this.canLoadMore,
       offset: offset ?? this.offset,
+      categories: categories ?? this.categories,
+      categoriesLoading: categoriesLoading ?? this.categoriesLoading,
     );
   }
 }
@@ -85,7 +76,28 @@ class RecipesNotifier extends StateNotifier<RecipesState> {
   }
 
   Future<void> _initialize() async {
-    await _loadRecipes(isInitial: true);
+    // Load categories and recipes in parallel like the webapp
+    await Future.wait([
+      _loadCategories(),
+      _loadRecipes(isInitial: true),
+    ]);
+  }
+
+  Future<void> _loadCategories() async {
+    state = state.copyWith(categoriesLoading: true);
+    
+    final categoriesData = await _supabaseService.getRecipeCategories();
+    final categories = categoriesData
+        .map((data) => CategoryWithCount(
+              category: data['category'] as String,
+              count: data['count'] as int,
+            ))
+        .toList();
+    
+    state = state.copyWith(
+      categories: categories,
+      categoriesLoading: false,
+    );
   }
 
   Future<void> _loadRecipes({bool isInitial = false}) async {
@@ -94,12 +106,10 @@ class RecipesNotifier extends StateNotifier<RecipesState> {
 
     state = state.copyWith(isLoading: true);
 
-    // Use selectedKeyword in the query if it exists
-    final query = state.selectedKeyword ?? state.searchQuery;
-
     final newRecipes = await _supabaseService.getRecipes(
       offset: isInitial ? 0 : state.offset,
-      query: query,
+      query: state.searchQuery.isNotEmpty ? state.searchQuery : null,
+      category: state.selectedCategory, // Use exact category match like webapp
     );
 
     state = state.copyWith(
@@ -125,9 +135,15 @@ class RecipesNotifier extends StateNotifier<RecipesState> {
     });
   }
 
-  void setKeyword(String? keyword) {
-    final newKeyword = state.selectedKeyword == keyword ? null : keyword;
-    state = state.copyWith(selectedKeyword: newKeyword, offset: 0, recipes: []);
+  void setCategory(String? category) {
+    // Toggle category selection like the webapp
+    final newCategory = state.selectedCategory == category ? null : category;
+    state = state.copyWith(
+      selectedCategory: newCategory, 
+      offset: 0, 
+      recipes: [],
+      searchQuery: '', // Clear search when selecting category like webapp
+    );
     _loadRecipes(isInitial: true);
   }
 }
