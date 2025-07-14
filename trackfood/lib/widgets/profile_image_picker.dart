@@ -53,7 +53,7 @@ class _ProfileImagePickerState extends ConsumerState<ProfileImagePicker> {
               child: Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.label.withOpacity(0.5),
+                  color: AppColors.label.withValues(alpha: 0.5),
                 ),
                 child: const Center(
                   child: CupertinoActivityIndicator(color: CupertinoColors.white),

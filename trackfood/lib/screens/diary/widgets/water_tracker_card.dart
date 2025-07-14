@@ -64,10 +64,13 @@ class _WaterTrackerCardState extends State<WaterTrackerCard>
 
       if (widget.waterIntake != null) {
         // Update existing record
-        await supabaseService.client.from('water_intake').update({
-          'amount_ml': newAmount,
-          'updated_at': DateTime.now().toIso8601String(),
-        }).eq('id', widget.waterIntake!.id);
+        await supabaseService.client
+            .from('water_intake')
+            .update({
+              'amount_ml': newAmount,
+              'updated_at': DateTime.now().toIso8601String(),
+            })
+            .eq('id', widget.waterIntake!.id);
       } else {
         // Create new record
         await supabaseService.client.from('water_intake').insert({
@@ -80,11 +83,10 @@ class _WaterTrackerCardState extends State<WaterTrackerCard>
 
       widget.onWaterAdded();
     } catch (e) {
-      print('Error adding water: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Fehler beim Speichern: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Fehler beim Speichern: $e')));
       }
     } finally {
       setState(() => _isAdding = false);
@@ -214,25 +216,17 @@ class _WaterTrackerCardState extends State<WaterTrackerCard>
                       children: [
                         Row(
                           children: [
-                            Expanded(
-                              child: _buildQuickAddButton('250ml', 250),
-                            ),
+                            Expanded(child: _buildQuickAddButton('250ml', 250)),
                             const SizedBox(width: 8),
-                            Expanded(
-                              child: _buildQuickAddButton('500ml', 500),
-                            ),
+                            Expanded(child: _buildQuickAddButton('500ml', 500)),
                           ],
                         ),
                         const SizedBox(height: 8),
                         Row(
                           children: [
-                            Expanded(
-                              child: _buildQuickAddButton('750ml', 750),
-                            ),
+                            Expanded(child: _buildQuickAddButton('750ml', 750)),
                             const SizedBox(width: 8),
-                            Expanded(
-                              child: _buildQuickAddButton('1L', 1000),
-                            ),
+                            Expanded(child: _buildQuickAddButton('1L', 1000)),
                           ],
                         ),
                       ],
@@ -249,38 +243,38 @@ class _WaterTrackerCardState extends State<WaterTrackerCard>
 
   Widget _buildQuickAddButton(String label, int amountMl) {
     return GestureDetector(
-      onTap: _isAdding ? null : () => _addWater(amountMl),
-      child: Container(
-        height: 40,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: Colors.white.withValues(alpha: 0.2),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.3),
-            width: 1,
+          onTap: _isAdding ? null : () => _addWater(amountMl),
+          child: Container(
+            height: 40,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.white.withValues(alpha: 0.2),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.3),
+                width: 1,
+              ),
+            ),
+            child: Center(
+              child: _isAdding
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : Text(
+                      label,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+            ),
           ),
-        ),
-        child: Center(
-          child: _isAdding
-              ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 2,
-                  ),
-                )
-              : Text(
-                  label,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-        ),
-      ),
-    )
+        )
         .animate(delay: Duration(milliseconds: 100 * (amountMl ~/ 250)))
         .scale(begin: const Offset(0.8, 0.8))
         .fadeIn(duration: 300.ms);
@@ -291,10 +285,7 @@ class WavePainter extends CustomPainter {
   final double progress;
   final double wavePhase;
 
-  WavePainter({
-    required this.progress,
-    required this.wavePhase,
-  });
+  WavePainter({required this.progress, required this.wavePhase});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -318,7 +309,8 @@ class WavePainter extends CustomPainter {
 
     // Draw wave at water surface
     for (double x = 0; x <= size.width; x += 1) {
-      final waveY = size.height -
+      final waveY =
+          size.height -
           fillHeight +
           (waveHeight *
               (1 + progress * 0.5) *

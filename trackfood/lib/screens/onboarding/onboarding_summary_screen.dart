@@ -177,7 +177,7 @@ class _OnboardingSummaryScreenState
                           Text(
                             'Schritt 6 von 6',
                             style: AppTypography.body.copyWith(
-                              color: AppColors.label.withOpacity(0.7),
+                              color: AppColors.label.withValues(alpha: 0.7),
                             ),
                           ),
                           SizedBox(width: 40), // Balance the back button
@@ -231,7 +231,7 @@ class _OnboardingSummaryScreenState
                               .then() // Chain animations
                               .shimmer(
                                 duration: 1500.ms,
-                                color: AppColors.primary.withOpacity(0.3),
+                                color: AppColors.primary.withValues(alpha: 0.3),
                               ),
 
                           const SizedBox(height: 12),
@@ -239,7 +239,7 @@ class _OnboardingSummaryScreenState
                           Text(
                                 'Dein persönlicher Ernährungsplan ist bereit! Hier ist deine Zusammenfassung:',
                                 style: AppTypography.body.copyWith(
-                                  color: AppColors.label.withOpacity(0.8),
+                                  color: AppColors.label.withValues(alpha: 0.8),
                                 ),
                               )
                               .animate()
@@ -557,9 +557,9 @@ class _OnboardingSummaryScreenState
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                               colors: [
-                                AppColors.primary.withOpacity(0.4),
-                                AppColors.primary.withOpacity(0.1),
-                                AppColors.primary.withOpacity(0.02),
+                                AppColors.primary.withValues(alpha: 0.4),
+                                AppColors.primary.withValues(alpha: 0.1),
+                                AppColors.primary.withValues(alpha: 0.02),
                               ],
                               stops: [0.0, 0.6, 1.0],
                             ),
@@ -661,8 +661,8 @@ class _OnboardingSummaryScreenState
             height: 56,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: color.withOpacity(0.2),
-              border: Border.all(color: color.withOpacity(0.4), width: 2),
+              color: color.withValues(alpha: 0.2),
+              border: Border.all(color: color.withValues(alpha: 0.4), width: 2),
             ),
             child: Icon(icon, size: 26, color: AppColors.label),
           ),

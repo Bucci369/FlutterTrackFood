@@ -236,7 +236,6 @@ class EnhancedStepNotifier extends StateNotifier<EnhancedStepState> {
       }
     } catch (e) {
       // Silent fail for background save
-      print('Failed to save sensor steps: $e');
     }
   }
 

@@ -25,7 +25,7 @@ class _CustomAnimatedLogoState extends State<CustomAnimatedLogo>
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              const Color(0xFF99D98C).withOpacity(0.8),
+              const Color(0xFF99D98C).withValues(alpha: 0.8),
               const Color(0xFF76C893),
               const Color(0xFF52B69A),
               const Color(0xFF34A0A4),
@@ -47,13 +47,13 @@ class _CustomAnimatedLogoState extends State<CustomAnimatedLogo>
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      Colors.white.withOpacity(0.3),
-                      Colors.white.withOpacity(0.1),
+                      Colors.white.withValues(alpha: 0.3),
+                      Colors.white.withValues(alpha: 0.1),
                     ],
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.white.withOpacity(0.3),
+                      color: Colors.white.withValues(alpha: 0.3),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
@@ -98,7 +98,7 @@ class _CustomAnimatedLogoState extends State<CustomAnimatedLogo>
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withValues(alpha: 0.3),
                           width: 2,
                         ),
                       ),
@@ -109,7 +109,7 @@ class _CustomAnimatedLogoState extends State<CustomAnimatedLogo>
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          Colors.white.withOpacity(0.8),
+                          Colors.white.withValues(alpha: 0.8),
                         ),
                       ),
                     ),
@@ -135,20 +135,17 @@ class ParticlePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.1)
+      ..color = Colors.white.withValues(alpha: 0.1)
       ..style = PaintingStyle.fill;
 
     for (int i = 0; i < 50; i++) {
       final x = (i * 37) % screenSize.width;
-      final y = ((i * 23) % screenSize.height + animationValue * 100) %
+      final y =
+          ((i * 23) % screenSize.height + animationValue * 100) %
           screenSize.height;
       final radius = (i % 3) + 1.0;
 
-      canvas.drawCircle(
-        Offset(x, y),
-        radius * animationValue,
-        paint,
-      );
+      canvas.drawCircle(Offset(x, y), radius * animationValue, paint);
     }
   }
 

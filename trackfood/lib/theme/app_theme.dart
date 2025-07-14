@@ -33,7 +33,7 @@ class AppTheme {
     brightness: Brightness.dark,
     primaryColor: const Color.fromARGB(255, 69, 101, 204),
     scaffoldBackgroundColor: CupertinoColors.black,
-    barBackgroundColor: CupertinoColors.darkBackgroundGray.withOpacity(0.85),
+    barBackgroundColor: CupertinoColors.darkBackgroundGray.withValues(alpha: 0.85),
     textTheme: const CupertinoTextThemeData(
       textStyle: AppTypography.body,
       actionTextStyle: AppTypography.button,
@@ -50,7 +50,7 @@ class AppTheme {
     brightness: Brightness.light,
     primaryColor: AppColors.primary,
     scaffoldBackgroundColor: AppColors.background,
-    barBackgroundColor: AppColors.secondaryBackground.withOpacity(0.8),
+    barBackgroundColor: AppColors.secondaryBackground.withValues(alpha: 0.8),
     textTheme: const CupertinoTextThemeData(
       textStyle: AppTypography.body,
       actionTextStyle: AppTypography.button,
@@ -84,7 +84,7 @@ class AppTheme {
   /// Moderner, weicher Schatten für UI-Karten
   static List<BoxShadow> get cardShadow => [
     BoxShadow(
-      color: CupertinoColors.systemGrey4.withOpacity(0.3),
+      color: CupertinoColors.systemGrey4.withValues(alpha: 0.3),
       blurRadius: 16,
       offset: const Offset(0, 4),
     ),
@@ -105,7 +105,7 @@ class AppTheme {
     borderRadius: borderRadiusM,
     boxShadow: [
       BoxShadow(
-        color: AppColors.primary.withOpacity(0.4),
+        color: AppColors.primary.withValues(alpha: 0.4),
         blurRadius: 12,
         offset: const Offset(0, 5),
       ),

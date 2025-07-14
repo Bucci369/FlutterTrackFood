@@ -136,7 +136,7 @@ class EnhancedStepsCard extends ConsumerWidget {
       margin: const EdgeInsets.only(top: 12),
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: AppColors.systemRed.withOpacity(0.1),
+        color: AppColors.systemRed.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -174,7 +174,7 @@ class EnhancedStepsCard extends ConsumerWidget {
       margin: const EdgeInsets.only(top: 12),
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: AppColors.systemYellow.withOpacity(0.1),
+        color: AppColors.systemYellow.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(

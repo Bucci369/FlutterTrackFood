@@ -67,7 +67,6 @@ class WaterIntakeNotifier extends StateNotifier<AsyncValue<WaterIntake>> {
           state = currentState;
         }
         // Optionally, re-throw or handle the error
-        print('Failed to add water: $e');
       }
     }
   }

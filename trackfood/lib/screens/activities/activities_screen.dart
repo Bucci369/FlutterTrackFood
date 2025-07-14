@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/profile_provider.dart';
-import '../../providers/diary_provider.dart' hide profileProvider, supabaseServiceProvider; // Hide conflicting providers
+import '../../providers/diary_provider.dart'
+    hide profileProvider, supabaseServiceProvider; // Hide conflicting providers
 import '../../providers/dashboard_providers.dart'; // Import dashboard providers
 import '../../services/supabase_service.dart';
 import '../../theme/app_colors.dart';
@@ -149,7 +150,6 @@ class _ActivitiesScreenState extends ConsumerState<ActivitiesScreen> {
   List<Map<String, dynamic>> _activities = [];
   List<Map<String, dynamic>> _filteredActivities = [];
   bool _isLoading = true;
-  String _searchQuery = '';
 
   @override
   void initState() {
@@ -185,7 +185,6 @@ class _ActivitiesScreenState extends ConsumerState<ActivitiesScreen> {
         await _ensureActivitiesInSupabase();
       }
     } catch (e) {
-      print('Error loading activities: $e');
       // Fallback: Verwende lokale WebApp-Liste
       setState(() {
         _activities = _webAppActivities;
@@ -217,7 +216,6 @@ class _ActivitiesScreenState extends ConsumerState<ActivitiesScreen> {
         _isLoading = false;
       });
     } catch (e) {
-      print('Error importing activities: $e');
       setState(() {
         _activities = _webAppActivities;
         _filteredActivities = _activities;
@@ -228,7 +226,6 @@ class _ActivitiesScreenState extends ConsumerState<ActivitiesScreen> {
 
   void _filterActivities(String query) {
     setState(() {
-      _searchQuery = query;
       if (query.isEmpty) {
         _filteredActivities = _activities;
       } else {
@@ -511,7 +508,6 @@ class _ActivitiesScreenState extends ConsumerState<ActivitiesScreen> {
         );
       }
     } catch (e) {
-      print('Error saving activity: $e');
       if (mounted) {
         showCupertinoDialog(
           context: context,

@@ -14,19 +14,19 @@ class AuthService {
     try {
       // Extract access_token and refresh_token from the URI
       final Map<String, String> params = uri.queryParameters;
-      
-      if (params.containsKey('access_token') && params.containsKey('refresh_token')) {
+
+      if (params.containsKey('access_token') &&
+          params.containsKey('refresh_token')) {
         final String accessToken = params['access_token']!;
-        
+
         // Set the session with the tokens
         final AuthResponse response = await client.auth.setSession(accessToken);
-        
+
         return response;
       }
-      
+
       return null;
     } catch (e) {
-      print('Error handling deep link: $e');
       return null;
     }
   }
@@ -36,7 +36,7 @@ class AuthService {
     try {
       await client.auth.signOut();
     } catch (e) {
-      print('Error signing out: $e');
+      // Silently ignore sign out errors
     }
   }
 
@@ -46,11 +46,8 @@ class AuthService {
   /// Updates user password
   Future<void> updatePassword(String newPassword) async {
     try {
-      await client.auth.updateUser(
-        UserAttributes(password: newPassword),
-      );
+      await client.auth.updateUser(UserAttributes(password: newPassword));
     } catch (e) {
-      print('Error updating password: $e');
       rethrow;
     }
   }
@@ -63,7 +60,6 @@ class AuthService {
         redirectTo: 'io.supabase.flutterquickstart://reset-password/',
       );
     } catch (e) {
-      print('Error sending password reset email: $e');
       rethrow;
     }
   }
@@ -71,11 +67,8 @@ class AuthService {
   /// Updates user email
   Future<void> updateEmail(String newEmail) async {
     try {
-      await client.auth.updateUser(
-        UserAttributes(email: newEmail),
-      );
+      await client.auth.updateUser(UserAttributes(email: newEmail));
     } catch (e) {
-      print('Error updating email: $e');
       rethrow;
     }
   }
@@ -83,12 +76,8 @@ class AuthService {
   /// Resends email confirmation
   Future<void> resendEmailConfirmation(String email) async {
     try {
-      await client.auth.resend(
-        type: OtpType.signup,
-        email: email,
-      );
+      await client.auth.resend(type: OtpType.signup, email: email);
     } catch (e) {
-      print('Error resending email confirmation: $e');
       rethrow;
     }
   }
@@ -109,33 +98,31 @@ final currentUserProvider = StreamProvider<User?>((ref) {
 /// Authentication status provider
 final isAuthenticatedProvider = Provider<bool>((ref) {
   final userAsync = ref.watch(currentUserProvider);
-  return userAsync.maybeWhen(
-    data: (user) => user != null,
-    orElse: () => false,
-  );
+  return userAsync.maybeWhen(data: (user) => user != null, orElse: () => false);
 });
 
 /// Deep Link Handler for Password Reset
 class DeepLinkHandler {
-  static Future<bool> handlePasswordResetLink(BuildContext context, Uri uri) async {
+  static Future<bool> handlePasswordResetLink(
+    BuildContext context,
+    Uri uri,
+  ) async {
     try {
       final authService = AuthService();
       final AuthResponse? response = await authService.handleDeepLink(uri);
-      
+
       if (response != null && response.user != null) {
         // Navigate to password reset screen
         if (context.mounted) {
-          Navigator.of(context).pushNamedAndRemoveUntil(
-            '/reset-password',
-            (route) => false,
-          );
+          Navigator.of(
+            context,
+          ).pushNamedAndRemoveUntil('/reset-password', (route) => false);
         }
         return true;
       }
-      
+
       return false;
     } catch (e) {
-      print('Error handling password reset link: $e');
       return false;
     }
   }

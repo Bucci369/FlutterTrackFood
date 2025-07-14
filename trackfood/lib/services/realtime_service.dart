@@ -432,7 +432,7 @@ class RealtimeService {
       await channel.unsubscribe();
       _activeChannels.remove(channel);
     } catch (e) {
-      print('Error unsubscribing from channel: $e');
+      // Silently ignore unsubscribe errors
     }
   }
 
