@@ -11,7 +11,6 @@ import 'widgets/dashboard_header.dart';
 import 'widgets/progress_rings.dart';
 import 'widgets/macro_grid.dart';
 import 'widgets/recent_activities.dart';
-import 'widgets/recent_meals.dart';
 import 'widgets/fasting_card.dart';
 
 // Function to get a greeting based on the time of day
@@ -52,10 +51,12 @@ class DashboardContent extends ConsumerWidget {
     final burnedCaloriesAsync = ref.watch(dailyBurnedCaloriesProvider);
 
     final profile = profileState.profile;
+    
+    // Calculate nutritional goals if profile is available
+    final nutritionGoals = profile != null ? calculateNutritionalGoals(profile) : null;
+    final calorieGoal = nutritionGoals?.calories ?? 2000.0;
+
     final dailyCalories = diaryState.totalCalories;
-    final calorieGoal = profile != null
-        ? calculateDailyCalorieGoal(profile).toDouble()
-        : 2000.0;
     final macros = {
       'protein': diaryState.totalProtein,
       'carbs': diaryState.totalCarbs,
@@ -102,13 +103,8 @@ class DashboardContent extends ConsumerWidget {
                         greeting: getGreeting(),
                         userName: profile?.firstName ?? 'User',
                         date: selectedDate ?? DateTime.now(),
-                        calorieProgress: calorieGoal > 0
-                            ? (dailyCalories / calorieGoal)
-                            : 0.0,
-                        waterProgress: waterIntakeAsync.value!.dailyGoalMl > 0
-                            ? (waterIntakeAsync.value!.amountMl /
-                                  waterIntakeAsync.value!.dailyGoalMl)
-                            : 0.0,
+                        goalTitle: nutritionGoals?.goalTitle,
+                        goalDescription: nutritionGoals?.goalDescription,
                       ),
                       Padding(
                         padding: const EdgeInsets.all(16),
@@ -147,15 +143,6 @@ class DashboardContent extends ConsumerWidget {
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: RecentActivities(),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    child: RecentMeals(),
                   ),
                 ),
                 SliverToBoxAdapter(

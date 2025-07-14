@@ -6,16 +6,16 @@ class DashboardHeader extends StatelessWidget {
   final String greeting;
   final String userName;
   final DateTime date;
-  final double calorieProgress;
-  final double waterProgress;
+  final String? goalTitle;
+  final String? goalDescription;
 
   const DashboardHeader({
     super.key,
     required this.greeting,
     required this.userName,
     required this.date,
-    required this.calorieProgress,
-    required this.waterProgress,
+    this.goalTitle,
+    this.goalDescription,
   });
 
   String _formatDate(DateTime date) {
@@ -80,40 +80,7 @@ class DashboardHeader extends StatelessWidget {
                   ),
                 ],
               ),
-              // Achievement badges
-              Row(
-                children: [
-                  if (calorieProgress >= 1.0)
-                    Container(
-                      width: 32,
-                      height: 32,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: CupertinoColors.systemOrange,
-                      ),
-                      child: const Icon(
-                        CupertinoIcons.flame,
-                        color: CupertinoColors.white,
-                        size: 18,
-                      ),
-                    ),
-                  const SizedBox(width: 8),
-                  if (waterProgress >= 1.0)
-                    Container(
-                      width: 32,
-                      height: 32,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: CupertinoColors.systemBlue,
-                      ),
-                      child: const Icon(
-                        CupertinoIcons.drop,
-                        color: CupertinoColors.white,
-                        size: 18,
-                      ),
-                    ),
-                ],
-              ),
+              // Achievement badges can be added here later
             ],
           ),
 
@@ -163,14 +130,14 @@ class DashboardHeader extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Dein Tagesziel',
+                        goalTitle ?? 'Dein Tagesziel',
                         style: AppTypography.headline.copyWith(
                           color: AppColors.label,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Bleib dran! Du schaffst das 💪',
+                        goalDescription ?? 'Bleib dran! Du schaffst das 💪',
                         style: AppTypography.body.copyWith(
                           color: AppColors.secondaryLabel,
                         ),
