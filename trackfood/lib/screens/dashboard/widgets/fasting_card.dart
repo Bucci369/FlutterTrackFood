@@ -172,16 +172,38 @@ class _FastingCardState extends ConsumerState<FastingCard>
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: const Color(0xFFF6F1E7), // Apple White
-        border: Border.all(color: AppColors.separator, width: 1),
+        borderRadius: BorderRadius.circular(28),
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFF1A1A1A), // Dark card background start
+            const Color(0xFF2A2A2A), // Dark card background middle (lighter)
+            const Color(0xFF1A1A1A), // Dark card background end
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: const [0.0, 0.5, 1.0],
+        ),
+        border: Border.all(
+          color: CupertinoColors.white.withValues(alpha: 0.2), // Card border - subtle white border
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: CupertinoColors.systemGrey.withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: CupertinoColors.white.withValues(alpha: 0.1), // Card glow shadow
+            blurRadius: 40,
+            offset: const Offset(0, 0),
+          ),
+          BoxShadow(
+            color: CupertinoColors.black.withValues(alpha: 0.8), // Card drop shadow
+            blurRadius: 50,
+            offset: const Offset(0, 20),
+          ),
+          BoxShadow(
+            color: CupertinoColors.white.withValues(alpha: 0.05), // Card top light shadow
+            blurRadius: 80,
+            offset: const Offset(0, -10),
           ),
         ],
       ),
@@ -197,7 +219,15 @@ class _FastingCardState extends ConsumerState<FastingCard>
                 Text(
                   'Intervallfasten',
                   style: AppTypography.headline.copyWith(
-                    color: AppColors.label,
+                    color: CupertinoColors.white, // Fasting title text color
+                    fontWeight: FontWeight.w700,
+                    shadows: [
+                      Shadow(
+                        color: CupertinoColors.white.withValues(alpha: 0.3), // Fasting title text shadow
+                        blurRadius: 8,
+                        offset: const Offset(0, 0),
+                      ),
+                    ],
                   ),
                 ),
                 if (isFasting)
@@ -207,19 +237,33 @@ class _FastingCardState extends ConsumerState<FastingCard>
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: CupertinoColors.systemGreen.withOpacity(0.15),
+                      gradient: LinearGradient(
+                        colors: [
+                          CupertinoColors.systemGreen.withValues(alpha: 0.3), // Active badge background gradient start - green
+                          CupertinoColors.systemGreen.withValues(alpha: 0.1), // Active badge background gradient end - green
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                       borderRadius: BorderRadius.circular(
                         AppTheme.cornerRadiusS,
                       ),
                       border: Border.all(
-                        color: CupertinoColors.systemGreen.withOpacity(0.5),
-                        width: 1,
+                        color: CupertinoColors.systemGreen.withValues(alpha: 0.6), // Active badge border - green
+                        width: 1.5,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: CupertinoColors.systemGreen.withValues(alpha: 0.4), // Active badge glow shadow - green
+                          blurRadius: 15,
+                          offset: const Offset(0, 0),
+                        ),
+                      ],
                     ),
                     child: Text(
                       'AKTIV',
                       style: AppTypography.footnote.copyWith(
-                        color: CupertinoColors.systemGreen,
+                        color: CupertinoColors.white, // Active badge text color
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -268,7 +312,7 @@ class _FastingCardState extends ConsumerState<FastingCard>
                                 Text(
                                   '${(_progressController.value * 100).toInt()}%',
                                   style: AppTypography.footnote.copyWith(
-                                    color: AppColors.label,
+                                    color: CupertinoColors.white, // Progress percentage text color
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -287,7 +331,7 @@ class _FastingCardState extends ConsumerState<FastingCard>
                         Text(
                           session.plan, // Removed unnecessary null-check
                           style: AppTypography.title3.copyWith(
-                            color: AppColors.label,
+                            color: CupertinoColors.white, // Active fasting plan text color
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -295,14 +339,14 @@ class _FastingCardState extends ConsumerState<FastingCard>
                         Text(
                           'Läuft seit: ${_formatDuration(_currentFastingTime)}',
                           style: AppTypography.body.copyWith(
-                            color: AppColors.secondaryLabel,
+                            color: CupertinoColors.white.withValues(alpha: 0.8), // Active fasting duration text color
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           'Ziel: ${_formatDuration(_fastingDuration)}',
                           style: AppTypography.footnote.copyWith(
-                            color: AppColors.tertiaryLabel,
+                            color: CupertinoColors.white.withValues(alpha: 0.6), // Active fasting goal text color
                           ),
                         ),
                       ],
@@ -311,11 +355,28 @@ class _FastingCardState extends ConsumerState<FastingCard>
                 ],
               ).animate().fadeIn(duration: 300.ms),
               const SizedBox(height: AppTheme.paddingM),
-              SizedBox(
+              Container(
                 width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      CupertinoColors.systemRed, // Stop fasting button background gradient start - red
+                      CupertinoColors.systemRed.withValues(alpha: 0.8), // Stop fasting button background gradient end - red
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(AppTheme.cornerRadiusM),
+                  boxShadow: [
+                    BoxShadow(
+                      color: CupertinoColors.systemRed.withValues(alpha: 0.4), // Stop fasting button glow shadow - red
+                      blurRadius: 20,
+                      offset: const Offset(0, 0),
+                    ),
+                  ],
+                ),
                 child: CupertinoButton(
                   onPressed: _stopFasting,
-                  color: CupertinoColors.systemRed,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   borderRadius: BorderRadius.circular(AppTheme.cornerRadiusM),
                   child: const Text(
@@ -346,15 +407,34 @@ class _FastingCardState extends ConsumerState<FastingCard>
                         padding: const EdgeInsets.all(AppTheme.paddingS),
                         decoration: BoxDecoration(
                           borderRadius: AppTheme.borderRadiusM,
-                          color: isSelected
-                              ? AppColors.fill
-                              : AppColors.secondaryBackground,
+                          gradient: LinearGradient(
+                            colors: isSelected
+                                ? [
+                                    const Color(0xFF2A2A2A), // Selected fasting type background start
+                                    const Color(0xFF1A1A1A), // Selected fasting type background end
+                                  ]
+                                : [
+                                    const Color(0xFF1A1A1A), // Unselected fasting type background start
+                                    const Color(0xFF0F0F0F), // Unselected fasting type background end
+                                  ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
                           border: Border.all(
                             color: isSelected
-                                ? type.color
-                                : AppColors.separator,
+                                ? type.color.withValues(alpha: 0.6)
+                                : CupertinoColors.white.withValues(alpha: 0.1), // Unselected fasting type border
                             width: isSelected ? 2 : 1,
                           ),
+                          boxShadow: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color: type.color.withValues(alpha: 0.3),
+                                    blurRadius: 15,
+                                    offset: const Offset(0, 0),
+                                  ),
+                                ]
+                              : [],
                         ),
                         child: Row(
                           children: [
@@ -371,7 +451,7 @@ class _FastingCardState extends ConsumerState<FastingCard>
                                   Text(
                                     type.name,
                                     style: AppTypography.body.copyWith(
-                                      color: AppColors.label,
+                                      color: CupertinoColors.white, // Fasting type name text color
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -379,7 +459,7 @@ class _FastingCardState extends ConsumerState<FastingCard>
                                   Text(
                                     type.description,
                                     style: AppTypography.footnote.copyWith(
-                                      color: AppColors.secondaryLabel,
+                                      color: CupertinoColors.white.withValues(alpha: 0.7), // Fasting type description text color
                                     ),
                                     maxLines: 2,
                                   ),
@@ -394,11 +474,28 @@ class _FastingCardState extends ConsumerState<FastingCard>
                 ),
               ),
               const SizedBox(height: AppTheme.paddingM),
-              SizedBox(
+              Container(
                 width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      _fastingTypes[_selectedFastingType].color, // Start fasting button background gradient start - dynamic color
+                      _fastingTypes[_selectedFastingType].color.withValues(alpha: 0.8), // Start fasting button background gradient end - dynamic color
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(AppTheme.cornerRadiusM),
+                  boxShadow: [
+                    BoxShadow(
+                      color: _fastingTypes[_selectedFastingType].color.withValues(alpha: 0.4), // Start fasting button glow shadow - dynamic color
+                      blurRadius: 20,
+                      offset: const Offset(0, 0),
+                    ),
+                  ],
+                ),
                 child: CupertinoButton(
                   onPressed: _startFasting,
-                  color: _fastingTypes[_selectedFastingType].color,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   borderRadius: BorderRadius.circular(AppTheme.cornerRadiusM),
                   child: Text(
@@ -428,8 +525,8 @@ class FastingProgressPainter extends CustomPainter {
 
     // Background circle
     final backgroundPaint = Paint()
-      ..color = AppColors.separator
-      ..strokeWidth = 6
+      ..color = CupertinoColors.white.withValues(alpha: 0.1) // Progress ring background color
+      ..strokeWidth = 8
       ..style = PaintingStyle.stroke;
 
     canvas.drawCircle(center, radius, backgroundPaint);
@@ -437,12 +534,38 @@ class FastingProgressPainter extends CustomPainter {
     // Progress arc
     if (progress > 0) {
       final progressPaint = Paint()
-        ..color = color
-        ..strokeWidth = 6
+        ..shader = LinearGradient(
+          colors: [
+            color,
+            color.withValues(alpha: 0.7),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ).createShader(Rect.fromCircle(center: center, radius: radius))
+        ..strokeWidth = 8
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round;
+      
+      // Add glow effect
+      final glowPaint = Paint()
+        ..color = color.withValues(alpha: 0.3)
+        ..strokeWidth = 12
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
 
       final sweepAngle = 2 * math.pi * progress;
+      
+      // Draw glow effect first
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        -math.pi / 2,
+        sweepAngle,
+        false,
+        glowPaint,
+      );
+      
+      // Draw main progress arc
       canvas.drawArc(
         Rect.fromCircle(center: center, radius: radius),
         -math.pi / 2,

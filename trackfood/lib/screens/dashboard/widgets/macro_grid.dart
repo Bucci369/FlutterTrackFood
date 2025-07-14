@@ -16,49 +16,114 @@ class MacroGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: const Color(0xFFF6F1E7), // Apple White
+        borderRadius: BorderRadius.circular(28),
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFF1A1A1A), // 🎨 NÄHRSTOFFE KARTE OBEN: Dunkelgrau
+            const Color(0xFF2A2A2A), // 🎨 NÄHRSTOFFE KARTE MITTE: Helleres Grau
+            const Color(0xFF1A1A1A), // 🎨 NÄHRSTOFFE KARTE UNTEN: Dunkelgrau
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: const [0.0, 0.5, 1.0],
+        ),
         border: Border.all(
-          color: AppColors.separator,
+          color: CupertinoColors.white.withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: CupertinoColors.systemGrey.withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: CupertinoColors.white.withValues(alpha: 0.1),
+            blurRadius: 40,
+            offset: const Offset(0, 0),
+          ),
+          BoxShadow(
+            color: CupertinoColors.black.withValues(alpha: 0.8),
+            blurRadius: 50,
+            offset: const Offset(0, 20),
+          ),
+          BoxShadow(
+            color: CupertinoColors.white.withValues(alpha: 0.05),
+            blurRadius: 80,
+            offset: const Offset(0, -10),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Nährstoffe',
-            style: AppTypography.headline.copyWith(
-              color: AppColors.label,
-            ),
+          // Enhanced header with icon
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.systemGreen.withValues(alpha: 0.3),
+                      AppColors.systemGreen.withValues(alpha: 0.1),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.systemGreen.withValues(alpha: 0.4),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.systemGreen.withValues(alpha: 0.5),
+                      blurRadius: 15,
+                      offset: const Offset(0, 0),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  CupertinoIcons.bars,
+                  color: CupertinoColors.white,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Nährstoffe',
+                style: AppTypography.headline.copyWith(
+                  color: CupertinoColors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 20,
+                  shadows: [
+                    Shadow(
+                      color: CupertinoColors.white.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 0),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 20),
-          // Grid of 6 macro circles (2 rows x 3 columns)
+          const SizedBox(height: 28),
+          
+          // Enhanced grid with better spacing
           Row(
             children: [
               Expanded(child: _buildMacroRing('Eiweiß', macros['protein'] ?? 0, 50, CupertinoColors.systemRed, 0)),
-              const SizedBox(width: 16),
+              const SizedBox(width: 20),
               Expanded(child: _buildMacroRing('Kohlenhydrate', macros['carbs'] ?? 0, 150, CupertinoColors.systemBlue, 1)),
-              const SizedBox(width: 16),
+              const SizedBox(width: 20),
               Expanded(child: _buildMacroRing('Fett', macros['fat'] ?? 0, 70, CupertinoColors.systemGreen, 2)),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           Row(
             children: [
               Expanded(child: _buildMacroRing('Ballaststoffe', macros['fiber'] ?? 0, 25, CupertinoColors.systemOrange, 3)),
-              const SizedBox(width: 16),
+              const SizedBox(width: 20),
               Expanded(child: _buildMacroRing('Zucker', macros['sugar'] ?? 0, 50, CupertinoColors.systemPurple, 4)),
-              const SizedBox(width: 16),
+              const SizedBox(width: 20),
               Expanded(child: _buildMacroRing('Natrium', macros['sodium'] ?? 0, 2300, CupertinoColors.systemYellow, 5)),
             ],
           ),
@@ -70,69 +135,164 @@ class MacroGrid extends StatelessWidget {
   Widget _buildMacroRing(String label, double current, double goal, Color color, int index) {
     final progress = goal > 0 ? (current / goal).clamp(0.0, 1.0) : 0.0;
     
-    return Column(
-      children: [
-        SizedBox(
-          width: 80,
-          height: 80,
-          child: CustomPaint(
-            painter: MacroRingPainter(
-              progress: progress,
-              color: color,
-              strokeWidth: 6,
-            ),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    '${current.toInt()}',
-                    style: AppTypography.body.copyWith(
-                      color: AppColors.label,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFF2A2A2A), // 🎨 EINZELNE MAKRO RING OBEN: Helleres Grau
+            const Color(0xFF1A1A1A), // 🎨 EINZELNE MAKRO RING MITTE: Dunkelgrau  
+            const Color(0xFF2A2A2A), // 🎨 EINZELNE MAKRO RING UNTEN: Helleres Grau
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: const [0.0, 0.5, 1.0],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: color.withValues(alpha: 0.4), // 🎨 MAKRO RING RAHMEN: Dynamische Farbe je Nährstoff 40%
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.3),
+            blurRadius: 25,
+            offset: const Offset(0, 0),
+          ),
+          BoxShadow(
+            color: CupertinoColors.white.withValues(alpha: 0.05),
+            blurRadius: 15,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          SizedBox(
+            width: 90,
+            height: 90,
+            child: CustomPaint(
+              painter: MacroRingPainter(
+                progress: progress,
+                color: color,
+                strokeWidth: 8,
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '${current.toInt()}',
+                      style: AppTypography.body.copyWith(
+                        color: CupertinoColors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        shadows: [
+                          Shadow(
+                            color: CupertinoColors.white.withValues(alpha: 0.3),
+                            blurRadius: 6,
+                            offset: const Offset(0, 0),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  Text(
-                    '${goal.toInt()}',
-                    style: AppTypography.body.copyWith(
-                      color: AppColors.secondaryLabel,
-                      fontSize: 10,
+                    Container(
+                      width: 20,
+                      height: 1,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            CupertinoColors.white.withValues(alpha: 0.1),
+                            CupertinoColors.white.withValues(alpha: 0.4),
+                            CupertinoColors.white.withValues(alpha: 0.1),
+                          ],
+                        ),
+                      ),
+                      margin: const EdgeInsets.symmetric(vertical: 2),
                     ),
-                  ),
-                ],
+                    Text(
+                      '${goal.toInt()}',
+                      style: AppTypography.body.copyWith(
+                        color: CupertinoColors.white.withValues(alpha: 0.7),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 6,
-              height: 6,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: color,
-              ),
-            ),
-            const SizedBox(width: 4),
-            Flexible(
-              child: Text(
-                label,
-                style: AppTypography.body.copyWith(
-                  color: AppColors.label,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
+          const SizedBox(height: 12),
+          
+          // Enhanced label with icon
+          Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      color.withValues(alpha: 0.3),
+                      color.withValues(alpha: 0.1),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: color.withValues(alpha: 0.3),
+                    width: 0.5,
+                  ),
                 ),
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: color,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text(
+                        label,
+                        style: AppTypography.body.copyWith(
+                          color: CupertinoColors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
+              const SizedBox(height: 4),
+              // Progress percentage
+              Text(
+                '${(progress * 100).toInt()}%',
+                style: AppTypography.caption1.copyWith(
+                  color: CupertinoColors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  shadows: [
+                    Shadow(
+                      color: color.withValues(alpha: 0.8),
+                      blurRadius: 4,
+                      offset: const Offset(0, 0),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     )
     .animate(delay: Duration(milliseconds: 100 * index))
     .fadeIn(duration: 400.ms)

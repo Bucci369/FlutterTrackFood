@@ -93,35 +93,116 @@ class _ConcentricProgressRingsState extends State<ConcentricProgressRings>
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: const Color(0xFFF6F1E7), // Apple White
-        border: Border.all(color: AppColors.separator, width: 1),
+        borderRadius: BorderRadius.circular(28),
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFF1A1A1A),
+            const Color(0xFF2A2A2A),
+            const Color(0xFF1A1A1A),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: const [0.0, 0.5, 1.0],
+        ),
+        border: Border.all(
+          color: CupertinoColors.white.withValues(alpha: 0.2), 
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: CupertinoColors.systemGrey.withValues(alpha: 0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: CupertinoColors.white.withValues(alpha: 0.1),
+            blurRadius: 40,
+            offset: const Offset(0, 0),
+          ),
+          BoxShadow(
+            color: CupertinoColors.black.withValues(alpha: 0.8),
+            blurRadius: 50,
+            offset: const Offset(0, 20),
+          ),
+          BoxShadow(
+            color: CupertinoColors.white.withValues(alpha: 0.05),
+            blurRadius: 80,
+            offset: const Offset(0, -10),
           ),
         ],
       ),
       child: Column(
         children: [
-          // Title
-          Text(
-            'Heute\'s Ziele',
-            style: AppTypography.title2.copyWith(
-              color: AppColors.label,
-              fontWeight: FontWeight.bold,
-            ),
+          // Enhanced Title with icon
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.systemBlue.withValues(alpha: 0.3),
+                      AppColors.systemBlue.withValues(alpha: 0.1),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.systemBlue.withValues(alpha: 0.4),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.systemBlue.withValues(alpha: 0.5),
+                      blurRadius: 15,
+                      offset: const Offset(0, 0),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  CupertinoIcons.chart_pie_fill,
+                  color: CupertinoColors.white,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Heutige Ziele',
+                style: AppTypography.title2.copyWith(
+                  color: CupertinoColors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 20,
+                  shadows: [
+                    Shadow(
+                      color: CupertinoColors.white.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 0),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 28),
           
-          // Concentric Rings
-          SizedBox(
-            width: 280,
-            height: 280,
+          // Enhanced Concentric Rings with glow effect
+          Container(
+            width: 300,
+            height: 300,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: CupertinoColors.white.withValues(alpha: 0.15),
+                  blurRadius: 60,
+                  offset: const Offset(0, 0),
+                ),
+                BoxShadow(
+                  color: AppColors.systemBlue.withValues(alpha: 0.3),
+                  blurRadius: 80,
+                  offset: const Offset(0, 0),
+                ),
+              ],
+            ),
             child: AnimatedBuilder(
               animation: _controller,
               builder: (context, child) {
@@ -134,25 +215,66 @@ class _ConcentricProgressRingsState extends State<ConcentricProgressRings>
                         : 0.0) * _burnedAnimation.value,
                   ),
                   child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '${((widget.calorieProgress * 100).clamp(0, 100)).toInt()}%',
-                          style: AppTypography.title1.copyWith(
-                            color: AppColors.label,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 36,
-                          ),
+                    child: Container(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [
+                            const Color(0xFF2A2A2A),
+                            const Color(0xFF1A1A1A),
+                            const Color(0xFF2A2A2A),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          stops: const [0.0, 0.5, 1.0],
                         ),
-                        Text(
-                          'Erreicht',
-                          style: AppTypography.body.copyWith(
-                            color: AppColors.secondaryLabel,
-                            fontSize: 16,
-                          ),
+                        border: Border.all(
+                          color: CupertinoColors.white.withValues(alpha: 0.3),
+                          width: 2,
                         ),
-                      ],
+                        boxShadow: [
+                          BoxShadow(
+                            color: CupertinoColors.white.withValues(alpha: 0.2),
+                            blurRadius: 20,
+                            offset: const Offset(0, 0),
+                          ),
+                          BoxShadow(
+                            color: CupertinoColors.black.withValues(alpha: 0.8),
+                            blurRadius: 30,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '${((widget.calorieProgress * 100).clamp(0, 100)).toInt()}%',
+                            style: AppTypography.title1.copyWith(
+                              color: CupertinoColors.white,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 32,
+                              shadows: [
+                                Shadow(
+                                  color: CupertinoColors.white.withValues(alpha: 0.5),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 0),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            'Erreicht',
+                            style: AppTypography.body.copyWith(
+                              color: CupertinoColors.white.withValues(alpha: 0.8),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -160,31 +282,88 @@ class _ConcentricProgressRingsState extends State<ConcentricProgressRings>
             ),
           ),
           
-          const SizedBox(height: 20),
+          const SizedBox(height: 32),
           
-          // Legend
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildLegendItem(
-                color: CupertinoColors.systemRed.darkColor,
-                label: 'Kalorien',
-                value: '${widget.caloriesCurrent.toInt()}',
-                icon: CupertinoIcons.flame_fill,
+          // Enhanced Legend with better spacing
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  const Color(0xFF2A2A2A),
+                  const Color(0xFF1A1A1A),
+                  const Color(0xFF2A2A2A),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                stops: const [0.0, 0.5, 1.0],
               ),
-              _buildLegendItem(
-                color: CupertinoColors.systemBlue,
-                label: 'Wasser',
-                value: '${(widget.waterCurrent / 1000).toStringAsFixed(1)}L',
-                icon: CupertinoIcons.drop_fill,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: CupertinoColors.white.withValues(alpha: 0.2),
+                width: 1,
               ),
-              _buildLegendItem(
-                color: CupertinoColors.systemOrange,
-                label: 'Verbrannt',
-                value: '${widget.burnedCalories.toInt()}',
-                icon: CupertinoIcons.bolt_fill,
-              ),
-            ],
+              boxShadow: [
+                BoxShadow(
+                  color: CupertinoColors.white.withValues(alpha: 0.1),
+                  blurRadius: 20,
+                  offset: const Offset(0, 0),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildLegendItem(
+                  color: CupertinoColors.systemRed.darkColor,
+                  label: 'Kalorien',
+                  value: '${widget.caloriesCurrent.toInt()}',
+                  icon: CupertinoIcons.flame_fill,
+                ),
+                Container(
+                  width: 1,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        CupertinoColors.white.withValues(alpha: 0.1),
+                        CupertinoColors.white.withValues(alpha: 0.3),
+                        CupertinoColors.white.withValues(alpha: 0.1),
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                ),
+                _buildLegendItem(
+                  color: CupertinoColors.systemBlue,
+                  label: 'Wasser',
+                  value: '${(widget.waterCurrent / 1000).toStringAsFixed(1)}L',
+                  icon: CupertinoIcons.drop_fill,
+                ),
+                Container(
+                  width: 1,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        CupertinoColors.white.withValues(alpha: 0.1),
+                        CupertinoColors.white.withValues(alpha: 0.3),
+                        CupertinoColors.white.withValues(alpha: 0.1),
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                ),
+                _buildLegendItem(
+                  color: CupertinoColors.systemOrange,
+                  label: 'Verbrannt',
+                  value: '${widget.burnedCalories.toInt()}',
+                  icon: CupertinoIcons.bolt_fill,
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -197,24 +376,63 @@ class _ConcentricProgressRingsState extends State<ConcentricProgressRings>
     required String value,
     required IconData icon,
   }) {
-    return Column(
-      children: [
-        Icon(icon, color: color, size: 20),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: AppTypography.body.copyWith(
-            color: AppColors.label,
-            fontWeight: FontWeight.w600,
+    return Expanded(
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  color.withValues(alpha: 0.3),
+                  color.withValues(alpha: 0.1),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: color.withValues(alpha: 0.4),
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.5),
+                  blurRadius: 20,
+                  offset: const Offset(0, 0),
+                ),
+              ],
+            ),
+            child: Icon(icon, color: CupertinoColors.white, size: 24), // 🎨 LEGENDE ICONS: Weiß
           ),
-        ),
-        Text(
-          label,
-          style: AppTypography.caption1.copyWith(
-            color: AppColors.secondaryLabel,
+          const SizedBox(height: 12),
+          Text(
+            value,
+            style: AppTypography.body.copyWith(
+              color: CupertinoColors.white,
+              fontWeight: FontWeight.w700,
+              fontSize: 16,
+              shadows: [
+                Shadow(
+                  color: CupertinoColors.white.withValues(alpha: 0.3),
+                  blurRadius: 6,
+                  offset: const Offset(0, 0),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: AppTypography.caption1.copyWith(
+              color: CupertinoColors.white.withValues(alpha: 0.8),
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }

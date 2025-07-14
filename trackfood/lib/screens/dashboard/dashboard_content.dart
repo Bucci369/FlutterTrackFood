@@ -76,7 +76,16 @@ class DashboardContent extends ConsumerWidget {
     };
 
     return Container(
-      color: const Color(0xFFF6F1E7),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFF000000), // 🎨 DASHBOARD HINTERGRUND OBEN: Reines Schwarz
+            Color(0xFF0A0A0A), // 🎨 DASHBOARD HINTERGRUND UNTEN: Dunkelgrau
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
       child: Stack(
         children: [
           SafeArea(
@@ -116,13 +125,17 @@ class DashboardContent extends ConsumerWidget {
                             userName: profile.firstName ?? 'User',
                             date: selectedDate ?? DateTime.now(),
                             goalTitle: nutritionGoals.goalTitle,
-                            goalDescription: nutritionGoals.goalDescription,
                             caloriesCurrent: dailyCalories,
                             caloriesGoal: calorieGoal,
                             burnedCalories: burnedCalories,
+                            currentWeight: profile.weightKg,
+                            targetWeight: profile.targetWeightKg,
                           ),
                           Padding(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 8,
+                            ),
                             child: ConcentricProgressRings(
                               calorieProgress: calorieGoal > 0
                                   ? (dailyCalories / calorieGoal).clamp(
@@ -149,27 +162,30 @@ class DashboardContent extends ConsumerWidget {
                 ),
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
                     child: MacroGrid(macros: macros),
                   ),
                 ),
                 const SliverToBoxAdapter(
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+                    padding: EdgeInsets.fromLTRB(20, 20, 20, 8),
                     child: StepsCard(),
                   ),
                 ),
                 const SliverToBoxAdapter(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     child: RecentActivities(),
                   ),
                 ),
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
+                      horizontal: 20,
+                      vertical: 12,
                     ),
                     child: FastingCard(),
                   ),
@@ -177,13 +193,13 @@ class DashboardContent extends ConsumerWidget {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
+                      horizontal: 20,
+                      vertical: 12,
                     ),
                     child: const ReportSectionWrapper(),
                   ),
                 ),
-                const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                const SliverToBoxAdapter(child: SizedBox(height: 40)),
               ],
             ),
           ),

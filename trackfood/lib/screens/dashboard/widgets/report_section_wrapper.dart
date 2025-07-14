@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../theme/app_colors.dart';
 import '../../../theme/app_typography.dart';
 import '../../../providers/report_provider.dart';
 import 'dart:math' as math;
@@ -29,16 +28,38 @@ class _ReportSectionStatefulState extends State<ReportSectionStateful> {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: const Color(0xFFF6F1E7), // Apple White
-        border: Border.all(color: AppColors.separator, width: 1),
+        borderRadius: BorderRadius.circular(28),
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFF1A1A1A), // Dark card background start
+            const Color(0xFF2A2A2A), // Dark card background middle (lighter)
+            const Color(0xFF1A1A1A), // Dark card background end
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: const [0.0, 0.5, 1.0],
+        ),
+        border: Border.all(
+          color: CupertinoColors.white.withValues(alpha: 0.2), // Card border - subtle white border
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: CupertinoColors.systemGrey.withValues(alpha: 0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: CupertinoColors.white.withValues(alpha: 0.1), // Card glow shadow
+            blurRadius: 40,
+            offset: const Offset(0, 0),
+          ),
+          BoxShadow(
+            color: CupertinoColors.black.withValues(alpha: 0.8), // Card drop shadow
+            blurRadius: 50,
+            offset: const Offset(0, 20),
+          ),
+          BoxShadow(
+            color: CupertinoColors.white.withValues(alpha: 0.05), // Card top light shadow
+            blurRadius: 80,
+            offset: const Offset(0, -10),
           ),
         ],
       ),
@@ -52,12 +73,21 @@ class _ReportSectionStatefulState extends State<ReportSectionStateful> {
               Text(
                 'Report',
                 style: AppTypography.title2.copyWith(
-                  color: AppColors.label,
-                  fontWeight: FontWeight.bold,
+                  color: CupertinoColors.white, // Report title text color
+                  fontWeight: FontWeight.w700,
+                  shadows: [
+                    Shadow(
+                      color: CupertinoColors.white.withValues(alpha: 0.3), // Report title text shadow
+                      blurRadius: 8,
+                      offset: const Offset(0, 0),
+                    ),
+                  ],
                 ),
               ),
               CupertinoSlidingSegmentedControl<bool>(
                 groupValue: showWeekly,
+                backgroundColor: CupertinoColors.white.withValues(alpha: 0.1), // Segmented control background
+                thumbColor: CupertinoColors.white.withValues(alpha: 0.2), // Segmented control thumb color
                 onValueChanged: (value) {
                   setState(() {
                     showWeekly = value ?? true;
@@ -74,6 +104,7 @@ class _ReportSectionStatefulState extends State<ReportSectionStateful> {
                       style: AppTypography.body.copyWith(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
+                        color: showWeekly ? CupertinoColors.black : CupertinoColors.white, // Segmented control text color when selected/unselected
                       ),
                     ),
                   ),
@@ -87,6 +118,7 @@ class _ReportSectionStatefulState extends State<ReportSectionStateful> {
                       style: AppTypography.body.copyWith(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
+                        color: !showWeekly ? CupertinoColors.black : CupertinoColors.white, // Segmented control text color when selected/unselected
                       ),
                     ),
                   ),
@@ -114,7 +146,7 @@ class _ReportSectionStatefulState extends State<ReportSectionStateful> {
                   child: Text(
                     'Fehler beim Laden der Daten',
                     style: AppTypography.body.copyWith(
-                      color: AppColors.secondaryLabel,
+                      color: CupertinoColors.white.withValues(alpha: 0.7), // Error text color
                     ),
                   ),
                 ),
@@ -135,7 +167,7 @@ class _ReportSectionStatefulState extends State<ReportSectionStateful> {
         Text(
           'Quick Actions',
           style: AppTypography.body.copyWith(
-            color: AppColors.secondaryLabel,
+            color: CupertinoColors.white.withValues(alpha: 0.8), // Quick Actions text color
             fontSize: 14,
           ),
         ),
@@ -155,14 +187,32 @@ class _ReportSectionStatefulState extends State<ReportSectionStateful> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: CupertinoColors.systemYellow.withValues(alpha: 0.1),
+                gradient: LinearGradient(
+                  colors: [
+                    CupertinoColors.systemYellow.withValues(alpha: 0.3),
+                    CupertinoColors.systemYellow.withValues(alpha: 0.1),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
                 borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: CupertinoColors.systemYellow.withValues(alpha: 0.4),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: CupertinoColors.systemYellow.withValues(alpha: 0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 0),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
                   Icon(
                     CupertinoIcons.info_circle,
-                    color: CupertinoColors.systemYellow,
+                    color: CupertinoColors.white,
                     size: 16,
                   ),
                   const SizedBox(width: 8),
@@ -170,7 +220,7 @@ class _ReportSectionStatefulState extends State<ReportSectionStateful> {
                     child: Text(
                       'Daten für ${reportData.totalDays} von ${showWeekly ? 7 : 30} Tagen verfügbar',
                       style: AppTypography.caption1.copyWith(
-                        color: AppColors.secondaryLabel,
+                        color: CupertinoColors.white.withValues(alpha: 0.7),
                       ),
                     ),
                   ),
@@ -184,11 +234,30 @@ class _ReportSectionStatefulState extends State<ReportSectionStateful> {
 
   Widget _buildCalorieChart(ReportData reportData) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: CupertinoColors.systemBackground,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.separator.withValues(alpha: 0.3)),
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFF2A2A2A), // Calorie chart container background start
+            const Color(0xFF1A1A1A), // Calorie chart container background middle (darker)
+            const Color(0xFF2A2A2A), // Calorie chart container background end
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: const [0.0, 0.5, 1.0],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: CupertinoColors.white.withValues(alpha: 0.15), // Calorie chart container border - subtle white
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: CupertinoColors.white.withValues(alpha: 0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 0),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -199,18 +268,18 @@ class _ReportSectionStatefulState extends State<ReportSectionStateful> {
               Text(
                 'Calorie',
                 style: AppTypography.body.copyWith(
-                  color: AppColors.label,
-                  fontWeight: FontWeight.w600,
+                  color: CupertinoColors.white, // Chart title text color
+                  fontWeight: FontWeight.w700,
                 ),
               ),
               Row(
                 children: [
                   _buildLegendDot(
-                    CupertinoColors.systemRed.darkColor,
+                    CupertinoColors.systemRed.darkColor, // Calorie intake legend color - red
                     'Intake',
                   ),
                   const SizedBox(width: 12),
-                  _buildLegendDot(CupertinoColors.systemOrange, 'Burned'),
+                  _buildLegendDot(CupertinoColors.systemOrange, 'Burned'), // Calorie burned legend color - orange
                 ],
               ),
             ],
@@ -263,7 +332,7 @@ class _ReportSectionStatefulState extends State<ReportSectionStateful> {
                     child: Text(
                       day,
                       style: AppTypography.caption1.copyWith(
-                        color: AppColors.secondaryLabel,
+                        color: CupertinoColors.white.withValues(alpha: 0.7),
                         fontSize: 9,
                       ),
                       overflow: TextOverflow.ellipsis,
@@ -281,11 +350,30 @@ class _ReportSectionStatefulState extends State<ReportSectionStateful> {
     final hasWeightData = reportData.weightData.any((w) => w > 0);
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFF3E5F5), // Light purple background
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.separator.withValues(alpha: 0.3)),
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFF2A2A2A),
+            const Color(0xFF1A1A1A),
+            const Color(0xFF2A2A2A),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: const [0.0, 0.5, 1.0],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: CupertinoColors.white.withValues(alpha: 0.15),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: CupertinoColors.white.withValues(alpha: 0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 0),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -298,8 +386,8 @@ class _ReportSectionStatefulState extends State<ReportSectionStateful> {
                   Text(
                     'Weight',
                     style: AppTypography.body.copyWith(
-                      color: AppColors.label,
-                      fontWeight: FontWeight.w600,
+                      color: CupertinoColors.white,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -309,7 +397,7 @@ class _ReportSectionStatefulState extends State<ReportSectionStateful> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: CupertinoColors.systemBlue.withValues(alpha: 0.1),
+                      color: CupertinoColors.systemBlue.withValues(alpha: 0.1), // Weight add button background - blue
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: CupertinoButton(
@@ -331,14 +419,14 @@ class _ReportSectionStatefulState extends State<ReportSectionStateful> {
                         children: [
                           Icon(
                             CupertinoIcons.add,
-                            color: CupertinoColors.systemBlue,
+                            color: CupertinoColors.systemBlue, // Weight add button icon color - blue
                             size: 16,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             'Gewicht',
                             style: AppTypography.caption1.copyWith(
-                              color: CupertinoColors.systemBlue,
+                              color: CupertinoColors.systemBlue, // Weight add button text color - blue
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -357,14 +445,14 @@ class _ReportSectionStatefulState extends State<ReportSectionStateful> {
                           .abs()
                           .toStringAsFixed(1),
                       style: AppTypography.title3.copyWith(
-                        color: AppColors.label,
+                        color: CupertinoColors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
                       'Kg ${reportData.weightData.first > reportData.weightData.last ? 'Lost' : 'Gained'}',
                       style: AppTypography.caption1.copyWith(
-                        color: AppColors.secondaryLabel,
+                        color: CupertinoColors.white.withValues(alpha: 0.7),
                       ),
                     ),
                   ],
@@ -418,7 +506,7 @@ class _ReportSectionStatefulState extends State<ReportSectionStateful> {
                     child: Text(
                       'Keine Gewichtsdaten verfügbar',
                       style: AppTypography.body.copyWith(
-                        color: AppColors.secondaryLabel,
+                        color: CupertinoColors.white.withValues(alpha: 0.7),
                       ),
                     ),
                   ),
@@ -435,7 +523,7 @@ class _ReportSectionStatefulState extends State<ReportSectionStateful> {
                     child: Text(
                       day,
                       style: AppTypography.caption1.copyWith(
-                        color: AppColors.secondaryLabel,
+                        color: CupertinoColors.white.withValues(alpha: 0.7),
                         fontSize: 9,
                       ),
                       overflow: TextOverflow.ellipsis,
@@ -462,7 +550,7 @@ class _ReportSectionStatefulState extends State<ReportSectionStateful> {
         Text(
           label,
           style: AppTypography.caption1.copyWith(
-            color: AppColors.secondaryLabel,
+            color: CupertinoColors.white.withValues(alpha: 0.7),
             fontSize: 12,
           ),
         ),
@@ -474,7 +562,7 @@ class _ReportSectionStatefulState extends State<ReportSectionStateful> {
     return Text(
       label,
       style: AppTypography.caption1.copyWith(
-        color: AppColors.secondaryLabel,
+        color: CupertinoColors.white.withValues(alpha: 0.6),
         fontSize: 10,
       ),
     );
@@ -507,7 +595,7 @@ class CalorieChartPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     // Grid lines
     final gridPaint = Paint()
-      ..color = AppColors.separator.withValues(alpha: 0.3)
+      ..color = CupertinoColors.white.withValues(alpha: 0.3)
       ..strokeWidth = 0.5;
 
     // Draw horizontal grid lines
@@ -545,8 +633,15 @@ class CalorieChartPainter extends CustomPainter {
     if (data.isEmpty) return;
 
     final paint = Paint()
-      ..color = color
-      ..strokeWidth = 2
+      ..shader = LinearGradient(
+        colors: [
+          color,
+          color.withValues(alpha: 0.8),
+        ],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
+      ..strokeWidth = 3
       ..style = PaintingStyle.stroke;
 
     final path = Path();
@@ -568,11 +663,19 @@ class CalorieChartPainter extends CustomPainter {
     final pointPaint = Paint()
       ..color = color
       ..style = PaintingStyle.fill;
+    
+    final pointGlowPaint = Paint()
+      ..color = color.withValues(alpha: 0.3)
+      ..style = PaintingStyle.fill
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
 
     for (int i = 0; i < data.length; i++) {
       final x = (i / (data.length - 1)) * size.width;
       final y = size.height - (data[i] / maxValue) * size.height;
-      canvas.drawCircle(Offset(x, y), 3, pointPaint);
+      // Draw glow effect
+      canvas.drawCircle(Offset(x, y), 6, pointGlowPaint);
+      // Draw main point
+      canvas.drawCircle(Offset(x, y), 4, pointPaint);
     }
   }
 
@@ -594,7 +697,7 @@ class WeightChartPainter extends CustomPainter {
 
     // Grid lines
     final gridPaint = Paint()
-      ..color = AppColors.separator.withValues(alpha: 0.3)
+      ..color = CupertinoColors.white.withValues(alpha: 0.3)
       ..strokeWidth = 0.5;
 
     // Draw horizontal grid lines
@@ -609,8 +712,15 @@ class WeightChartPainter extends CustomPainter {
 
     // Draw line
     final paint = Paint()
-      ..color = CupertinoColors.systemGreen
-      ..strokeWidth = 2
+      ..shader = LinearGradient(
+        colors: [
+          CupertinoColors.systemGreen,
+          CupertinoColors.systemGreen.withValues(alpha: 0.8),
+        ],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
+      ..strokeWidth = 3
       ..style = PaintingStyle.stroke;
 
     final path = Path();
@@ -634,13 +744,21 @@ class WeightChartPainter extends CustomPainter {
     final pointPaint = Paint()
       ..color = CupertinoColors.systemGreen
       ..style = PaintingStyle.fill;
+    
+    final pointGlowPaint = Paint()
+      ..color = CupertinoColors.systemGreen.withValues(alpha: 0.3)
+      ..style = PaintingStyle.fill
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
 
     for (int i = 0; i < data.length; i++) {
       final x = (i / (data.length - 1)) * size.width;
       final y = range > 0
           ? size.height - ((data[i] - minValue) / range) * size.height
           : size.height / 2;
-      canvas.drawCircle(Offset(x, y), 3, pointPaint);
+      // Draw glow effect
+      canvas.drawCircle(Offset(x, y), 6, pointGlowPaint);
+      // Draw main point
+      canvas.drawCircle(Offset(x, y), 4, pointPaint);
     }
   }
 
