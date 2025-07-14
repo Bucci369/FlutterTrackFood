@@ -201,7 +201,6 @@ class ProfileService {
 
   // Calculate daily calorie needs
   double? calculateDailyCalorieNeeds(Profile profile) {
-    final bmr = profile.bmr;
     final tdee = profile.tdee;
     
     if (tdee != null) {

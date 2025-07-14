@@ -331,11 +331,6 @@ class SupabaseService {
       }
 
       final response = await request;
-      
-      print('DEBUG: Supabase search response: ${response.length} products found');
-      if (response.isNotEmpty) {
-        print('DEBUG: First product data: ${response[0]}');
-      }
 
       return (response as List).map((json) => FoodItem.fromJson(json)).toList();
     } catch (e) {
@@ -459,14 +454,12 @@ class SupabaseService {
       const int batchSize = 1000;
       
       while (true) {
-        print('DEBUG: Fetching batch $from to ${from + batchSize - 1}');
         final response = await client
             .from('recipes')
             .select('category')
             .not('category', 'is', null)
             .range(from, from + batchSize - 1);
             
-        print('DEBUG: Batch response length: ${response.length}');
         if (response.isEmpty) break;
         
         allCategories.addAll(response);
@@ -474,8 +467,6 @@ class SupabaseService {
         if (response.length < batchSize) break;
         from += batchSize;
       }
-
-      print('DEBUG: Total categories fetched: ${allCategories.length}');
 
       // Count categories on client side like the webapp does
       final Map<String, int> categoryCounts = {};
@@ -485,8 +476,6 @@ class SupabaseService {
           categoryCounts[category] = (categoryCounts[category] ?? 0) + 1;
         }
       }
-      
-      print('DEBUG: Unique categories found: ${categoryCounts.keys.toList()}');
 
       // Convert to list and sort by count (descending)
       final categories = categoryCounts.entries

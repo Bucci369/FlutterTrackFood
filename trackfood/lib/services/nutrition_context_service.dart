@@ -376,98 +376,9 @@ class NutritionContextService {
     return patterns;
   }
 
-  Map<String, int> _getTopFoods(List<DiaryEntry> entries, int limit) {
-    final foodCounts = <String, int>{};
 
-    for (final entry in entries) {
-      foodCounts[entry.foodName] = (foodCounts[entry.foodName] ?? 0) + 1;
-    }
 
-    final sortedFoods = foodCounts.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
 
-    return Map.fromEntries(sortedFoods.take(limit));
-  }
-
-  Map<String, double> _calculateActivitySummary(List<UserActivity> activities) {
-    double totalCaloriesBurned = 0;
-    double totalDuration = 0;
-
-    for (final activity in activities) {
-      totalCaloriesBurned += activity.calories;
-      totalDuration += activity.durationMin;
-    }
-
-    return {
-      'totalCaloriesBurned': totalCaloriesBurned,
-      'avgDuration':
-          activities.isNotEmpty ? totalDuration / activities.length : 0,
-    };
-  }
-
-  Map<String, int> _calculateWaterSummary(List<WaterIntake> waterIntakes) {
-    int totalWater = 0;
-    final uniqueDays = <String>{};
-
-    for (final intake in waterIntakes) {
-      totalWater += intake.amountMl;
-      uniqueDays.add(intake.date.toIso8601String().split('T')[0]);
-    }
-
-    return {
-      'totalWater': totalWater,
-      'avgWaterPerDay':
-          uniqueDays.isNotEmpty ? (totalWater / uniqueDays.length).round() : 0,
-    };
-  }
-
-  List<String> _generateHealthInsights(
-      Map<String, double> nutritionSummary, int days) {
-    final insights = <String>[];
-
-    // Protein analysis
-    final proteinPercent = nutritionSummary['proteinPercent']!;
-    if (proteinPercent < 15) {
-      insights.add(
-          'Proteinanteil ist niedrig (${proteinPercent.toStringAsFixed(1)}%). Empfohlen: 15-25%');
-    } else if (proteinPercent > 30) {
-      insights.add(
-          'Sehr hoher Proteinanteil (${proteinPercent.toStringAsFixed(1)}%)');
-    }
-
-    // Carb analysis
-    final carbPercent = nutritionSummary['carbPercent']!;
-    if (carbPercent > 60) {
-      insights.add(
-          'Hoher Kohlenhydratanteil (${carbPercent.toStringAsFixed(1)}%). Mehr Protein und gesunde Fette?');
-    }
-
-    // Fiber analysis
-    final avgFiber = nutritionSummary['avgFiberPerDay']!;
-    if (avgFiber < 25) {
-      insights.add(
-          'Ballaststoffaufnahme niedrig (${avgFiber.toStringAsFixed(1)}g/Tag). Ziel: 25-35g');
-    }
-
-    // Sugar analysis
-    final avgSugar = nutritionSummary['avgSugarPerDay']!;
-    if (avgSugar > 50) {
-      insights.add(
-          'Hohe Zuckeraufnahme (${avgSugar.toStringAsFixed(1)}g/Tag). Weniger Süßes?');
-    }
-
-    // Calorie consistency
-    final avgCalories = nutritionSummary['avgCaloriesPerDay']!;
-    if (avgCalories < 1200) {
-      insights.add(
-          'Sehr niedrige Kalorienaufnahme (${avgCalories.toInt()} kcal/Tag). Ausreichend essen!');
-    } else if (avgCalories > 3000) {
-      insights.add(
-          'Hohe Kalorienaufnahme (${avgCalories.toInt()} kcal/Tag). Aktivitätslevel berücksichtigen');
-    }
-
-    return insights;
-  }
 
   // Advanced Analysis Helper Methods
   String _getBMICategory(double bmi) {

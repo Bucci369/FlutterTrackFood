@@ -75,10 +75,6 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    final profileState = ref.watch(profileProvider);
-    
-    print('User: ${_supabaseService.currentUser}');
-    print('OnboardingCompleted: $_isOnboardingCompleted');
     
     if (_supabaseService.currentUser == null) {
       return const AuthScreen();

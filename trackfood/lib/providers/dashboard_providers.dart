@@ -100,7 +100,6 @@ final dailyBurnedCaloriesProvider = FutureProvider<double>((ref) async {
     }
     return totalCalories;
   } catch (e) {
-    print('Error fetching daily burned calories: $e');
     return 0.0;
   }
 });

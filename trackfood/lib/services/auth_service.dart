@@ -17,7 +17,6 @@ class AuthService {
       
       if (params.containsKey('access_token') && params.containsKey('refresh_token')) {
         final String accessToken = params['access_token']!;
-        final String refreshToken = params['refresh_token']!;
         
         // Set the session with the tokens
         final AuthResponse response = await client.auth.setSession(accessToken);

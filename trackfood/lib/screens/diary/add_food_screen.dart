@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trackfood/models/food_item.dart';
 import 'package:trackfood/models/meal_type.dart';
 import 'package:trackfood/providers/diary_provider.dart'
-    hide supabaseServiceProvider; // Hide the conflicting provider
+    hide supabaseServiceProvider;
 import 'package:trackfood/services/supabase_service.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -251,7 +251,6 @@ class _AddFoodScreenState extends ConsumerState<AddFoodScreen> {
           CupertinoDialogAction(
             child: const Text('Abbrechen'),
             onPressed: () {
-              print('DEBUG: Abbrechen pressed');
               quantityController.dispose();
               Navigator.pop(context);
             },
@@ -260,15 +259,12 @@ class _AddFoodScreenState extends ConsumerState<AddFoodScreen> {
             isDefaultAction: true,
             child: const Text('Hinzufügen'),
             onPressed: () {
-              print('DEBUG: Hinzufügen pressed');
               // Get final quantity from controller
               final finalQuantity =
                   double.tryParse(quantityController.text) ?? 100;
-              print('DEBUG: Final quantity: $finalQuantity');
 
               final nutriments = food.nutriments;
               if (nutriments.energyKcal100g == null) {
-                print('DEBUG: No nutrition data');
                 quantityController.dispose();
                 Navigator.pop(context);
                 return;
@@ -291,14 +287,6 @@ class _AddFoodScreenState extends ConsumerState<AddFoodScreen> {
                   ? nutriments.salt100g! * (finalQuantity / 100) * 1000
                   : (nutriments.sodium100g ?? 0) * (finalQuantity / 100) * 1000;
 
-              print(
-                'DEBUG: Nutrition values - Calories: $calories, Protein: $protein, Carbs: $carbs, Fat: $fat',
-              );
-              print(
-                'DEBUG: Additional nutrients - Fiber: $fiber, Sugar: $sugar, Sodium: $sodium',
-              );
-
-              print('DEBUG: Adding diary entry...');
               diaryNotifier.addDiaryEntry(
                 mealType: widget.mealType.name,
                 foodName: food.productName,
@@ -317,14 +305,11 @@ class _AddFoodScreenState extends ConsumerState<AddFoodScreen> {
 
               // Use Navigator.popUntil to ensure we get back to the right screen
               Navigator.of(context).popUntil((route) {
-                print('DEBUG: Route name: ${route.settings.name}');
                 return route.isFirst || route.settings.name == '/diary';
               });
 
               // Show success animation/feedback
               _showSuccessAnimation(food.productName);
-
-              print('DEBUG: Navigation completed successfully');
             },
           ),
         ],
