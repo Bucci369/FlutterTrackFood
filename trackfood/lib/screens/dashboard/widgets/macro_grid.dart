@@ -48,42 +48,11 @@ class MacroGrid extends StatelessWidget {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Enhanced header with icon
-          Row(
+          // Title with underline
+          Column(
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.systemGreen.withValues(alpha: 0.3),
-                      AppColors.systemGreen.withValues(alpha: 0.1),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.systemGreen.withValues(alpha: 0.4),
-                    width: 1,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.systemGreen.withValues(alpha: 0.5),
-                      blurRadius: 15,
-                      offset: const Offset(0, 0),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  CupertinoIcons.bars,
-                  color: CupertinoColors.white,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
               Text(
                 'Nährstoffe',
                 style: AppTypography.headline.copyWith(
@@ -99,12 +68,28 @@ class MacroGrid extends StatelessWidget {
                   ],
                 ),
               ),
+              const SizedBox(height: 8),
+              Container(
+                width: 180, // A bit wider than the text
+                height: 1,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      CupertinoColors.white.withOpacity(0.0),
+                      CupertinoColors.white.withOpacity(0.4),
+                      CupertinoColors.white.withOpacity(0.0),
+                    ],
+                    stops: const [0.1, 0.5, 0.9],
+                  ),
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 28),
+          const SizedBox(height: 24),
 
-          // Enhanced grid with better spacing
+          // Grid of macro rings
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Expanded(
                 child: _buildMacroRing(

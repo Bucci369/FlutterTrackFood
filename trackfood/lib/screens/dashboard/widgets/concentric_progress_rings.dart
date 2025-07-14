@@ -131,43 +131,11 @@ class _ConcentricProgressRingsState extends State<ConcentricProgressRings>
       ),
       child: Column(
         children: [
-          // Enhanced Title with icon
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          // Title with underline
+          Column(
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.systemBlue.withValues(alpha: 0.3),
-                      AppColors.systemBlue.withValues(alpha: 0.1),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.systemBlue.withValues(alpha: 0.4),
-                    width: 1,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.systemBlue.withValues(alpha: 0.5),
-                      blurRadius: 15,
-                      offset: const Offset(0, 0),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  CupertinoIcons.chart_pie_fill,
-                  color: CupertinoColors.white,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
               Text(
-                'Heutige Ziele',
+                'Tagesübersicht',
                 style: AppTypography.title2.copyWith(
                   color: CupertinoColors.white,
                   fontWeight: FontWeight.w700,
@@ -179,6 +147,21 @@ class _ConcentricProgressRingsState extends State<ConcentricProgressRings>
                       offset: const Offset(0, 0),
                     ),
                   ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                width: 180, // A bit wider than the text
+                height: 1,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      CupertinoColors.white.withOpacity(0.0),
+                      CupertinoColors.white.withOpacity(0.4),
+                      CupertinoColors.white.withOpacity(0.0),
+                    ],
+                    stops: const [0.1, 0.5, 0.9],
+                  ),
                 ),
               ),
             ],
@@ -506,8 +489,11 @@ class ConcentricRingsPainter extends CustomPainter {
       // Background circle
       final backgroundPaint = Paint()
         ..color =
-            const Color(
-              0xFFE5E5EA,
+            const Color.fromARGB(
+              255,
+              151,
+              151,
+              155,
             ) // 3 Ringe Hintergrund A much lighter gray for visibility
         ..strokeWidth = strokeWidth
         ..style = PaintingStyle.stroke
