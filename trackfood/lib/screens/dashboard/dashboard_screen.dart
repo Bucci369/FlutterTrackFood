@@ -40,7 +40,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           tabBar: CupertinoTabBar(
             activeColor: AppColors.vibrantBlue, // Vibrant active color
             inactiveColor: AppColors.sharpGray, // Sharp inactive color
-            backgroundColor: AppColors.deepBlack.withValues(alpha: 0.9), // Dark glass background
+            backgroundColor: AppColors.deepBlack.withValues(
+              alpha: 0.9,
+            ), // Dark glass background
             border: Border(
               top: BorderSide(
                 color: AppColors.glassWhite, // Glass border effect
@@ -48,7 +50,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ),
             ),
             onTap: (index) {
-              if (index != 2) { // Skip chat (center) button - handled by floating button
+              if (index != 2) {
+                // Skip chat (center) button - handled by floating button
                 ref.read(tabControllerProvider.notifier).state = index;
               }
             },
@@ -111,7 +114,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         // Floating Chat Button
         Positioned(
           bottom: 30, // Lowered to sit on the tab bar, creating a notch effect
-          left: MediaQuery.of(context).size.width / 2 - 34, // Centered for the new larger size
+          left:
+              MediaQuery.of(context).size.width / 2 -
+              34, // Centered for the new larger size
           child: Container(
             width: 68, // Made the button larger
             height: 68, // Made the button larger
@@ -123,17 +128,23 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 end: Alignment.bottomRight,
               ),
               border: Border.all(
-                color: AppColors.pureWhite.withValues(alpha: 0.3), // Crisp white border
+                color: AppColors.pureWhite.withValues(
+                  alpha: 0.3,
+                ), // Crisp white border
                 width: 2,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.vibrantBlue.withValues(alpha: 0.4), // Vibrant glow
+                  color: AppColors.vibrantBlue.withValues(
+                    alpha: 0.4,
+                  ), // Vibrant glow
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                 ),
                 BoxShadow(
-                  color: AppColors.deepBlack.withValues(alpha: 0.3), // Drop shadow
+                  color: AppColors.deepBlack.withValues(
+                    alpha: 0.3,
+                  ), // Drop shadow
                   blurRadius: 15,
                   offset: const Offset(0, 4),
                 ),
