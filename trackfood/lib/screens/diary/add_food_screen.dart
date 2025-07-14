@@ -199,11 +199,14 @@ class _AddFoodScreenState extends ConsumerState<AddFoodScreen> {
                   itemCount: foods.length,
                   itemBuilder: (context, index) {
                     final food = foods[index];
+                    final calories = food.nutriments.energyKcal100g;
+                    final subtitle = calories != null
+                        ? '${calories.toStringAsFixed(0)} kcal / 100g'
+                        : 'N/A kcal / 100g';
+
                     return CupertinoListTile(
                       title: Text(food.productName),
-                      subtitle: Text(
-                        '${food.nutriments.energyKcal100g?.toStringAsFixed(0) ?? "N/A"} kcal / 100g',
-                      ),
+                      subtitle: Text(subtitle),
                       onTap: () => _showAddFoodDialog(food),
                     );
                   },
@@ -282,9 +285,11 @@ class _AddFoodScreenState extends ConsumerState<AddFoodScreen> {
               final fiber = (nutriments.fiber100g ?? 0) * (finalQuantity / 100);
               final sugar =
                   (nutriments.sugars100g ?? 0) * (finalQuantity / 100);
-              // Correct sodium calculation: use sodium_100g and convert to mg
+              // Correct sodium calculation: use salt if available, otherwise sodium
               final sodium =
-                  (nutriments.salt100g ?? 0) * (finalQuantity / 100) * 1000;
+                  nutriments.salt100g != null && nutriments.salt100g! > 0
+                  ? nutriments.salt100g! * (finalQuantity / 100) * 1000
+                  : (nutriments.sodium100g ?? 0) * (finalQuantity / 100) * 1000;
 
               print(
                 'DEBUG: Nutrition values - Calories: $calories, Protein: $protein, Carbs: $carbs, Fat: $fat',

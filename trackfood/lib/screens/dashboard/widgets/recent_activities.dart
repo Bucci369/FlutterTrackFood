@@ -88,70 +88,73 @@ class RecentActivities extends ConsumerWidget {
     int index,
     BuildContext context,
   ) {
-    return Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: AppColors.background,
-            border: Border.all(color: AppColors.separator, width: 1),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.primary.withValues(alpha: 0.2),
-                  border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.4),
-                    width: 1,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0), // Add padding to the bottom
+      child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: AppColors.background,
+              border: Border.all(color: AppColors.separator, width: 1),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.primary.withValues(alpha: 0.2),
+                    border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.4),
+                      width: 1,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      activity['emoji'],
+                      style: const TextStyle(fontSize: 20),
+                    ),
                   ),
                 ),
-                child: Center(
-                  child: Text(
-                    activity['emoji'],
-                    style: const TextStyle(fontSize: 20),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        activity['name'],
+                        style: AppTypography.body.copyWith(
+                          color: AppColors.label,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${activity['duration']} • ${activity['calories']} kcal',
+                        style: AppTypography.body.copyWith(
+                          color: AppColors.secondaryLabel,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      activity['name'],
-                      style: AppTypography.body.copyWith(
-                        color: AppColors.label,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${activity['duration']} • ${activity['calories']} kcal',
-                      style: AppTypography.body.copyWith(
-                        color: AppColors.secondaryLabel,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
+                Text(
+                  activity['time'],
+                  style: AppTypography.body.copyWith(
+                    color: AppColors.secondaryLabel,
+                    fontSize: 12,
+                  ),
                 ),
-              ),
-              Text(
-                activity['time'],
-                style: AppTypography.body.copyWith(
-                  color: AppColors.secondaryLabel,
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ),
-        )
-        .animate(delay: Duration(milliseconds: 100 * index))
-        .fadeIn(duration: 400.ms)
-        .slideX(begin: 0.3, end: 0);
+              ],
+            ),
+          )
+          .animate(delay: Duration(milliseconds: 100 * index))
+          .fadeIn(duration: 400.ms)
+          .slideX(begin: 0.3, end: 0),
+    );
   }
 
   Widget _buildEmptyState(BuildContext context) {

@@ -210,6 +210,28 @@ class SupabaseService {
     }
   }
 
+  // === Activities ===
+
+  /// Fetches all activities for the current user for a specific date.
+  Future<List<Map<String, dynamic>>> getActivitiesForDate(DateTime date) async {
+    if (currentUserId == null) return [];
+    try {
+      final dateStr = date.toIso8601String().split('T')[0];
+      final response = await client
+          .from('user_activities')
+          .select('*') // Select all columns for now
+          .eq('user_id', currentUserId!)
+          .gte('activity_date', '${dateStr}T00:00:00Z')
+          .lt('activity_date', '${dateStr}T23:59:59Z')
+          .order('created_at', ascending: false);
+
+      return (response as List).cast<Map<String, dynamic>>();
+    } catch (e) {
+      print('Error fetching activities for date: $e');
+      return [];
+    }
+  }
+
   // === Water Intake ===
 
   /// Fetches or creates water intake for a specific date.

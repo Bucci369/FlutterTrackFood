@@ -10,6 +10,8 @@ class ProgressRings extends StatefulWidget {
   final double waterProgress;
   final double waterCurrent;
   final double waterGoal;
+  final double burnedCalories;
+  final double burnedCaloriesGoal; // Add burned calories goal
 
   const ProgressRings({
     super.key,
@@ -19,6 +21,8 @@ class ProgressRings extends StatefulWidget {
     required this.waterProgress,
     required this.waterCurrent,
     required this.waterGoal,
+    required this.burnedCalories,
+    this.burnedCaloriesGoal = 500.0, // Default burned calories goal
   });
 
   @override
@@ -27,8 +31,9 @@ class ProgressRings extends StatefulWidget {
 
 class _ProgressRingsState extends State<ProgressRings>
     with TickerProviderStateMixin {
-  late AnimationController _calorieController;
-  late AnimationController _waterController;
+  AnimationController? _calorieController; // Make nullable
+  AnimationController? _waterController; // Make nullable
+  AnimationController? _burnedCaloriesController; // Make nullable
 
   @override
   void initState() {
@@ -41,39 +46,63 @@ class _ProgressRingsState extends State<ProgressRings>
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
+    _burnedCaloriesController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
 
-    // Start animations with delay
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) {
-        _calorieController.animateTo(widget.calorieProgress.clamp(0.0, 1.0));
-      }
-    });
-    Future.delayed(const Duration(milliseconds: 700), () {
-      if (mounted) {
-        _waterController.animateTo(widget.waterProgress.clamp(0.0, 1.0));
-      }
-    });
+    // Start animations immediately
+    _calorieController?.animateTo(widget.calorieProgress.clamp(0.0, 1.0));
+    _waterController?.animateTo(widget.waterProgress.clamp(0.0, 1.0));
+    final burnedProgress = widget.burnedCaloriesGoal > 0
+        ? (widget.burnedCalories / widget.burnedCaloriesGoal).clamp(0.0, 1.0)
+        : 0.0;
+    _burnedCaloriesController?.animateTo(burnedProgress);
+  }
+
+  @override
+  void didUpdateWidget(covariant ProgressRings oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Update animations if the progress values have changed
+    if (widget.calorieProgress != oldWidget.calorieProgress) {
+      _calorieController?.animateTo(widget.calorieProgress.clamp(0.0, 1.0));
+    }
+    if (widget.waterProgress != oldWidget.waterProgress) {
+      _waterController?.animateTo(widget.waterProgress.clamp(0.0, 1.0));
+    }
+    if (widget.burnedCalories != oldWidget.burnedCalories ||
+        widget.burnedCaloriesGoal != oldWidget.burnedCaloriesGoal) {
+      final burnedProgress = widget.burnedCaloriesGoal > 0
+          ? (widget.burnedCalories / widget.burnedCaloriesGoal).clamp(0.0, 1.0)
+          : 0.0;
+      _burnedCaloriesController?.animateTo(burnedProgress);
+    }
   }
 
   @override
   void dispose() {
-    _calorieController.dispose();
-    _waterController.dispose();
+    _calorieController?.dispose();
+    _waterController?.dispose();
+    _burnedCaloriesController?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Add null checks before using controllers
+    if (_calorieController == null ||
+        _waterController == null ||
+        _burnedCaloriesController == null) {
+      return const CupertinoActivityIndicator(); // Show loading indicator while controllers are not ready
+    }
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         color: const Color(0xFFF6F1E7), // Apple White
-        border: Border.all(
-          color: AppColors.separator,
-          width: 1,
-        ),
+        border: Border.all(color: AppColors.separator, width: 1),
         boxShadow: [
           BoxShadow(
             color: CupertinoColors.systemGrey.withOpacity(0.1),
@@ -85,6 +114,8 @@ class _ProgressRingsState extends State<ProgressRings>
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Row(
+          mainAxisAlignment:
+              MainAxisAlignment.spaceEvenly, // Distribute space evenly
           children: [
             // Calorie Ring
             Expanded(
@@ -94,11 +125,12 @@ class _ProgressRingsState extends State<ProgressRings>
                     width: 100,
                     height: 100,
                     child: AnimatedBuilder(
-                      animation: _calorieController,
+                      animation: _calorieController!,
                       builder: (context, child) {
                         return CustomPaint(
                           painter: ProgressRingPainter(
-                            progress: _calorieController.value,
+                            progress: _calorieController!
+                                .value, // Use non-null assertion
                             colors: const [
                               Color(0xFF99D98C),
                               Color(0xFF34A0A4),
@@ -114,15 +146,17 @@ class _ProgressRingsState extends State<ProgressRings>
                                   style: AppTypography.title2.copyWith(
                                     color: AppColors.label,
                                     fontWeight: FontWeight.bold,
+                                    fontSize: 28,
                                   ),
                                 ),
                                 Text(
-                                  '${widget.caloriesGoal.toInt()}',
+                                  '/ ${widget.caloriesGoal.toInt()}',
                                   style: AppTypography.body.copyWith(
                                     color: AppColors.secondaryLabel,
-                                    fontSize: 12,
+                                    fontSize: 14,
                                   ),
                                 ),
+                                // Removed burned calories text from here
                               ],
                             ),
                           ),
@@ -133,6 +167,8 @@ class _ProgressRingsState extends State<ProgressRings>
                   const SizedBox(height: 12),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize:
+                        MainAxisSize.min, // Ensure mainAxisSize is min
                     children: [
                       Icon(
                         CupertinoIcons.flame_fill,
@@ -153,9 +189,81 @@ class _ProgressRingsState extends State<ProgressRings>
                 ],
               ),
             ),
-            
-            const SizedBox(width: 32),
-            
+
+            const SizedBox(width: 12), // Reduce spacing between rings again
+            // Burned Calories Ring
+            Expanded(
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: 100,
+                    height: 100,
+                    child: AnimatedBuilder(
+                      animation: _burnedCaloriesController!,
+                      builder: (context, child) {
+                        return CustomPaint(
+                          painter: ProgressRingPainter(
+                            progress: _burnedCaloriesController!
+                                .value, // Use non-null assertion
+                            colors: const [
+                              CupertinoColors.systemRed,
+                              CupertinoColors.systemOrange,
+                            ], // Use different colors for burned calories
+                            strokeWidth: 8,
+                          ),
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '${widget.burnedCalories.toInt()}',
+                                  style: AppTypography.title2.copyWith(
+                                    color: AppColors.label,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 28,
+                                  ),
+                                ),
+                                Text(
+                                  '/ ${widget.burnedCaloriesGoal.toInt()}',
+                                  style: AppTypography.body.copyWith(
+                                    color: AppColors.secondaryLabel,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize:
+                        MainAxisSize.min, // Ensure mainAxisSize is min
+                    children: [
+                      Icon(
+                        CupertinoIcons.bolt_fill,
+                        color: CupertinoColors.systemRed,
+                        size: 18,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Verbrannt',
+                        style: AppTypography.body.copyWith(
+                          color: AppColors.label,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(width: 12), // Reduce spacing between rings again
             // Water Ring
             Expanded(
               child: Column(
@@ -164,11 +272,12 @@ class _ProgressRingsState extends State<ProgressRings>
                     width: 100,
                     height: 100,
                     child: AnimatedBuilder(
-                      animation: _waterController,
+                      animation: _waterController!,
                       builder: (context, child) {
                         return CustomPaint(
                           painter: ProgressRingPainter(
-                            progress: _waterController.value,
+                            progress: _waterController!
+                                .value, // Use non-null assertion
                             colors: const [
                               Color(0xFF00BCD4),
                               Color(0xFF0097A7),
@@ -184,13 +293,14 @@ class _ProgressRingsState extends State<ProgressRings>
                                   style: AppTypography.title2.copyWith(
                                     color: AppColors.label,
                                     fontWeight: FontWeight.bold,
+                                    fontSize: 28,
                                   ),
                                 ),
                                 Text(
-                                  '${widget.waterGoal.toInt()}',
+                                  '/ ${widget.waterGoal.toInt()}',
                                   style: AppTypography.body.copyWith(
                                     color: AppColors.secondaryLabel,
-                                    fontSize: 12,
+                                    fontSize: 14,
                                   ),
                                 ),
                               ],
@@ -203,6 +313,8 @@ class _ProgressRingsState extends State<ProgressRings>
                   const SizedBox(height: 12),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize:
+                        MainAxisSize.min, // Ensure mainAxisSize is min
                     children: [
                       Icon(
                         CupertinoIcons.drop_fill,

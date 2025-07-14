@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/profile_provider.dart';
+import '../../providers/diary_provider.dart' hide profileProvider, supabaseServiceProvider; // Hide conflicting providers
+import '../../providers/dashboard_providers.dart'; // Import dashboard providers
 import '../../services/supabase_service.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_typography.dart';
@@ -480,6 +482,11 @@ class _ActivitiesScreenState extends ConsumerState<ActivitiesScreen> {
         'activity_date': dateString,
         'created_at': DateTime.now().toIso8601String(),
       });
+
+      // Invalidate providers to force a refresh
+      ref.invalidate(recentActivitiesProvider);
+      ref.invalidate(dailyBurnedCaloriesProvider);
+      ref.read(diaryProvider.notifier).loadEntries();
 
       if (mounted) {
         // Show success message

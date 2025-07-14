@@ -64,6 +64,47 @@ final recentActivitiesProvider = FutureProvider<List<Map<String, dynamic>>>((
   }).toList();
 });
 
+// Provider for daily burned calories
+final dailyBurnedCaloriesProvider = FutureProvider<double>((ref) async {
+  final supabase = ref.watch(supabaseServiceProvider);
+  final profile = ref.watch(profileProvider).profile;
+
+  if (profile?.id == null) return 0.0;
+
+  final today = DateTime.now();
+  final startOfDay = DateTime(
+    today.year,
+    today.month,
+    today.day,
+  ).toIso8601String();
+  final endOfDay = DateTime(
+    today.year,
+    today.month,
+    today.day,
+    23,
+    59,
+    59,
+  ).toIso8601String();
+
+  try {
+    final response = await supabase.client
+        .from('user_activities')
+        .select('calories')
+        .eq('user_id', profile!.id)
+        .gte('activity_date', startOfDay)
+        .lte('activity_date', endOfDay);
+
+    double totalCalories = 0.0;
+    for (final activity in response) {
+      totalCalories += (activity['calories'] as num?)?.toDouble() ?? 0.0;
+    }
+    return totalCalories;
+  } catch (e) {
+    print('Error fetching daily burned calories: $e');
+    return 0.0;
+  }
+});
+
 // State Notifier for Fasting
 class FastingState {
   final FastingSession? session;

@@ -71,10 +71,16 @@ class DiaryNotifier extends StateNotifier<DiaryState> {
     final entries = await _supabaseService.getEntriesForDate(
       state.selectedDate,
     );
+
+    // Fetch activities for the selected date
+    final activities = await _supabaseService.getActivitiesForDate(
+      state.selectedDate,
+    );
+
     final grouped = groupBy(entries, (DiaryEntry entry) => entry.mealType.name);
 
-    // Calculate totals
-    final totalCalories = entries.fold<double>(
+    // Calculate totals from diary entries
+    final consumedCalories = entries.fold<double>(
       0,
       (sum, item) => sum + item.calories,
     );
@@ -88,10 +94,19 @@ class DiaryNotifier extends StateNotifier<DiaryState> {
     final totalSugar = entries.fold<double>(0, (sum, item) => sum + item.sugarG);
     final totalSodium = entries.fold<double>(0, (sum, item) => sum + item.sodiumMg);
 
+    // Calculate total burned calories from activities
+    final burnedCalories = activities.fold<double>(
+      0.0, // Initial value should be a double
+      (sum, activity) => sum + ((activity['calories'] ?? 0.0) as num).toDouble(),
+    );
+
+    // Calculate net calories (consumed - burned)
+    final netCalories = consumedCalories - burnedCalories;
+
     state = state.copyWith(
       groupedEntries: grouped,
       isLoading: false,
-      totalCalories: totalCalories,
+      totalCalories: netCalories, // Store net calories here
       totalProtein: totalProtein,
       totalCarbs: totalCarbs,
       totalFat: totalFat,
