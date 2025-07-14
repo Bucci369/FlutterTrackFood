@@ -36,7 +36,6 @@ class StorageService {
       }
       return null;
     } catch (e) {
-      print('Error picking profile image: $e');
       return null;
     }
   }
@@ -70,7 +69,6 @@ class StorageService {
 
       return publicUrl;
     } catch (e) {
-      print('Error uploading profile image: $e');
       return null;
     }
   }
@@ -88,7 +86,6 @@ class StorageService {
 
       return true;
     } catch (e) {
-      print('Error deleting profile image: $e');
       return false;
     }
   }
@@ -112,7 +109,6 @@ class StorageService {
       }
       return null;
     } catch (e) {
-      print('Error picking product image: $e');
       return null;
     }
   }
@@ -146,7 +142,6 @@ class StorageService {
 
       return publicUrl;
     } catch (e) {
-      print('Error uploading product image: $e');
       return null;
     }
   }
@@ -170,7 +165,6 @@ class StorageService {
       }
       return null;
     } catch (e) {
-      print('Error picking recipe image: $e');
       return null;
     }
   }
@@ -204,7 +198,6 @@ class StorageService {
 
       return publicUrl;
     } catch (e) {
-      print('Error uploading recipe image: $e');
       return null;
     }
   }
@@ -229,7 +222,6 @@ class StorageService {
 
       return files;
     } catch (e) {
-      print('Error listing files: $e');
       return [];
     }
   }
@@ -246,7 +238,6 @@ class StorageService {
       }
       return null;
     } catch (e) {
-      print('Error getting file size: $e');
       return null;
     }
   }
@@ -266,16 +257,12 @@ class StorageService {
 
       for (String bucketName in requiredBuckets) {
         if (!bucketNames.contains(bucketName)) {
-          print(
-            'Bucket $bucketName does not exist. Please create it in Supabase dashboard.',
-          );
           return false;
         }
       }
 
       return true;
     } catch (e) {
-      print('Error checking buckets: $e');
       return false;
     }
   }

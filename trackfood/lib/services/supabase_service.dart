@@ -24,7 +24,6 @@ class SupabaseService {
           .single();
       return Profile.fromJson(response);
     } catch (e) {
-      print('Error fetching profile: $e');
       return null;
     }
   }
@@ -47,7 +46,6 @@ class SupabaseService {
       if (response == null) return null;
       return FastingSession.fromJson(response);
     } catch (e) {
-      print('Error fetching latest fasting session: $e');
       return null;
     }
   }
@@ -78,7 +76,6 @@ class SupabaseService {
 
       return FastingSession.fromJson(response);
     } catch (e) {
-      print('Error starting fasting session: $e');
       return null;
     }
   }
@@ -95,7 +92,7 @@ class SupabaseService {
           })
           .eq('id', sessionId);
     } catch (e) {
-      print('Error stopping fasting session: $e');
+      // Handle error silently
     }
   }
 
@@ -124,7 +121,6 @@ class SupabaseService {
           .map((json) => DiaryEntry.fromJson(json))
           .toList();
     } catch (e) {
-      print('Error fetching recent meals: $e');
       return [];
     }
   }
@@ -146,7 +142,6 @@ class SupabaseService {
           .map((json) => DiaryEntry.fromJson(json))
           .toList();
     } catch (e) {
-      print('Error fetching entries for date: $e');
       return [];
     }
   }
@@ -187,11 +182,9 @@ class SupabaseService {
       await client.from('diary_entries').insert(newEntry);
     } on PostgrestException catch (e) {
       // Handle potential database errors gracefully
-      print('Supabase error in addDiaryEntry: ${e.message}');
       throw Exception('Failed to add diary entry: ${e.message}');
     } catch (e) {
       // Handle other generic errors
-      print('Generic error in addDiaryEntry: $e');
       throw Exception(
         'An unexpected error occurred while adding a diary entry.',
       );
@@ -227,7 +220,6 @@ class SupabaseService {
 
       return (response as List).cast<Map<String, dynamic>>();
     } catch (e) {
-      print('Error fetching activities for date: $e');
       return [];
     }
   }
@@ -269,11 +261,9 @@ class SupabaseService {
       }
     } on PostgrestException catch (e) {
       // Handle specific Postgrest errors if needed
-      print('Supabase error in getWaterIntakeForDate: ${e.message}');
       throw Exception('Failed to get or create water intake: ${e.message}');
     } catch (e) {
       // Handle other generic errors
-      print('Generic error in getWaterIntakeForDate: $e');
       throw Exception('An unexpected error occurred.');
     }
   }
@@ -302,10 +292,8 @@ class SupabaseService {
       // 3. Return the updated water intake object
       return WaterIntake.fromJson(updatedData);
     } on PostgrestException catch (e) {
-      print('Supabase error in addWater: ${e.message}');
       throw Exception('Failed to add water: ${e.message}');
     } catch (e) {
-      print('Generic error in addWater: $e');
       throw Exception('An unexpected error occurred while adding water.');
     }
   }
@@ -334,7 +322,6 @@ class SupabaseService {
 
       return (response as List).map((json) => FoodItem.fromJson(json)).toList();
     } catch (e) {
-      print('Error searching products in Supabase: $e');
       return [];
     }
   }
@@ -349,7 +336,6 @@ class SupabaseService {
           .update({'image_url': imageUrl})
           .eq('id', userId);
     } catch (e) {
-      print('Error updating profile image: $e');
       throw Exception('Failed to update profile image');
     }
   }
@@ -364,7 +350,6 @@ class SupabaseService {
           .single();
       return response['image_url'] as String?;
     } catch (e) {
-      print('Error fetching profile image: $e');
       return null;
     }
   }
@@ -392,7 +377,6 @@ class SupabaseService {
       }
       return totalSteps;
     } catch (e) {
-      print('Error fetching steps: $e');
       return 0;
     }
   }
@@ -413,7 +397,6 @@ class SupabaseService {
         'source': source,
       });
     } catch (e) {
-      print('Error adding steps: $e');
       throw Exception('Failed to add steps: $e');
     }
   }
@@ -441,7 +424,6 @@ class SupabaseService {
           .range(offset, offset + limit - 1);
       return (response as List).map((json) => Recipe.fromJson(json)).toList();
     } catch (e) {
-      print('Error fetching recipes: $e');
       return [];
     }
   }
@@ -490,7 +472,6 @@ class SupabaseService {
 
       return categories;
     } catch (e) {
-      print('Error fetching recipe categories: $e');
       return [];
     }
   }
