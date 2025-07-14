@@ -6,6 +6,7 @@ import 'package:trackfood/models/food_item.dart'; // Import FoodItem model
 import 'package:trackfood/models/profile.dart';
 import 'package:trackfood/models/water_intake.dart';
 import 'package:trackfood/models/recipe.dart';
+import 'package:trackfood/models/weight_history.dart';
 
 class SupabaseService {
   final SupabaseClient client = Supabase.instance.client;
@@ -398,6 +399,72 @@ class SupabaseService {
       });
     } catch (e) {
       throw Exception('Failed to add steps: $e');
+    }
+  }
+
+  // === Historical Data ===
+  
+  Future<List<DiaryEntry>> getDiaryEntriesForDateRange(
+    String userId, 
+    DateTime startDate, 
+    DateTime endDate
+  ) async {
+    try {
+      final response = await client
+          .from('diary_entries')
+          .select()
+          .eq('user_id', userId)
+          .gte('entry_date', startDate.toIso8601String())
+          .lte('entry_date', endDate.toIso8601String())
+          .order('entry_date', ascending: true);
+      
+      return (response as List)
+          .map((json) => DiaryEntry.fromJson(json))
+          .toList();
+    } catch (e) {
+      return [];
+    }
+  }
+  
+  Future<List<WeightHistory>> getWeightHistoryForDateRange(
+    String userId, 
+    DateTime startDate, 
+    DateTime endDate
+  ) async {
+    try {
+      final response = await client
+          .from('weight_history')
+          .select()
+          .eq('user_id', userId)
+          .gte('recorded_date', startDate.toIso8601String())
+          .lte('recorded_date', endDate.toIso8601String())
+          .order('recorded_date', ascending: true);
+      
+      return (response as List)
+          .map((json) => WeightHistory.fromJson(json))
+          .toList();
+    } catch (e) {
+      return [];
+    }
+  }
+  
+  Future<List<Map<String, dynamic>>> getUserActivitiesForDateRange(
+    String userId,
+    DateTime startDate,
+    DateTime endDate
+  ) async {
+    try {
+      final response = await client
+          .from('user_activities')
+          .select('activity_date, calories')
+          .eq('user_id', userId)
+          .gte('activity_date', startDate.toIso8601String())
+          .lte('activity_date', endDate.toIso8601String())
+          .order('activity_date', ascending: true);
+      
+      return (response as List<dynamic>).cast<Map<String, dynamic>>();
+    } catch (e) {
+      return [];
     }
   }
 

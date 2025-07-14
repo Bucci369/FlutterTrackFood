@@ -9,6 +9,8 @@ import 'package:trackfood/widgets/steps_card.dart';
 import '../../theme/app_colors.dart';
 import 'widgets/dashboard_header.dart';
 import 'widgets/progress_rings.dart';
+import 'widgets/concentric_progress_rings.dart';
+import 'widgets/report_section_wrapper.dart';
 import 'widgets/macro_grid.dart';
 import 'widgets/recent_activities.dart';
 import 'widgets/fasting_card.dart';
@@ -122,15 +124,14 @@ class DashboardContent extends ConsumerWidget {
                           ),
                           Padding(
                             padding: const EdgeInsets.all(16),
-                            child: ProgressRings(
+                            child: ConcentricProgressRings(
                               calorieProgress: calorieGoal > 0
-                                  ? (dailyCalories / calorieGoal)
+                                  ? (dailyCalories / calorieGoal).clamp(0.0, 1.0)
                                   : 0.0,
                               caloriesCurrent: dailyCalories,
                               caloriesGoal: calorieGoal,
                               waterProgress: waterIntake.dailyGoalMl > 0
-                                  ? (waterIntake.amountMl /
-                                        waterIntake.dailyGoalMl)
+                                  ? (waterIntake.amountMl / waterIntake.dailyGoalMl).clamp(0.0, 1.0)
                                   : 0.0,
                               waterCurrent: waterIntake.amountMl.toDouble(),
                               waterGoal: waterIntake.dailyGoalMl.toDouble(),
@@ -167,6 +168,15 @@ class DashboardContent extends ConsumerWidget {
                       vertical: 8,
                     ),
                     child: FastingCard(),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: const ReportSectionWrapper(),
                   ),
                 ),
                 const SliverToBoxAdapter(child: SizedBox(height: 32)),

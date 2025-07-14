@@ -17,12 +17,12 @@ class WeightHistory {
 
   factory WeightHistory.fromJson(Map<String, dynamic> json) {
     return WeightHistory(
-      id: json['id'] ?? '',
-      userId: json['user_id'] ?? '',
+      id: json['id'] as String,
+      userId: json['user_id'] as String,
       weightKg: (json['weight_kg'] as num).toDouble(),
-      recordedDate: DateTime.parse(json['recorded_date']),
-      notes: json['notes'],
-      createdAt: DateTime.parse(json['created_at']),
+      recordedDate: DateTime.parse(json['recorded_date'] as String),
+      notes: json['notes'] as String?,
+      createdAt: DateTime.parse(json['created_at'] as String),
     );
   }
 
@@ -31,27 +31,9 @@ class WeightHistory {
       'id': id,
       'user_id': userId,
       'weight_kg': weightKg,
-      'recorded_date': recordedDate.toIso8601String().split('T')[0],
+      'recorded_date': recordedDate.toIso8601String(),
       'notes': notes,
       'created_at': createdAt.toIso8601String(),
     };
-  }
-
-  WeightHistory copyWith({
-    String? id,
-    String? userId,
-    double? weightKg,
-    DateTime? recordedDate,
-    String? notes,
-    DateTime? createdAt,
-  }) {
-    return WeightHistory(
-      id: id ?? this.id,
-      userId: userId ?? this.userId,
-      weightKg: weightKg ?? this.weightKg,
-      recordedDate: recordedDate ?? this.recordedDate,
-      notes: notes ?? this.notes,
-      createdAt: createdAt ?? this.createdAt,
-    );
   }
 }
