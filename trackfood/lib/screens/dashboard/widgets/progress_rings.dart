@@ -146,7 +146,7 @@ class _ProgressRingsState extends State<ProgressRings>
                                   style: AppTypography.title2.copyWith(
                                     color: AppColors.label,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 28,
+                                    fontSize: 24, // Reduced from 28
                                   ),
                                 ),
                                 Text(
@@ -220,7 +220,7 @@ class _ProgressRingsState extends State<ProgressRings>
                                   style: AppTypography.title2.copyWith(
                                     color: AppColors.label,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 28,
+                                    fontSize: 24, // Reduced from 28
                                   ),
                                 ),
                                 Text(
@@ -289,13 +289,11 @@ class _ProgressRingsState extends State<ProgressRings>
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  (widget.waterCurrent / 1000).toStringAsFixed(
-                                    1,
-                                  ), // Convert to L
+                                  '${(widget.waterCurrent / 1000).toStringAsFixed(1)}', // Convert to L
                                   style: AppTypography.title2.copyWith(
                                     color: AppColors.label,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 28,
+                                    fontSize: 24, // Reduced from 28
                                   ),
                                 ),
                                 Text(

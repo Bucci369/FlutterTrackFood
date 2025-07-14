@@ -68,6 +68,8 @@ class _MessageInputState extends State<MessageInput> {
                   textCapitalization: TextCapitalization.sentences,
                   smartDashesType: SmartDashesType.enabled,
                   smartQuotesType: SmartQuotesType.enabled,
+                  keyboardType:
+                      TextInputType.text, // Explicitly set keyboard type
                   // ------------------------------------
                   textInputAction: TextInputAction.send,
                   onSubmitted: (_) => _sendMessage(),
@@ -76,9 +78,7 @@ class _MessageInputState extends State<MessageInput> {
                   placeholderStyle: AppTypography.body.copyWith(
                     color: AppColors.placeholder,
                   ),
-                  style: AppTypography.body.copyWith(
-                    color: AppColors.label,
-                  ),
+                  style: AppTypography.body.copyWith(color: AppColors.label),
                   decoration: const BoxDecoration(),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -91,7 +91,10 @@ class _MessageInputState extends State<MessageInput> {
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [AppColors.primary, AppColors.primary.withValues(alpha: 0.8)],
+                  colors: [
+                    AppColors.primary,
+                    AppColors.primary.withValues(alpha: 0.8),
+                  ],
                 ),
                 borderRadius: BorderRadius.circular(24),
               ),

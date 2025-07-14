@@ -40,20 +40,6 @@ class DiaryScreen extends ConsumerWidget {
                 child: const Icon(CupertinoIcons.back),
               )
             : null,
-        trailing: CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: () {
-            Navigator.of(context).push(
-              CupertinoPageRoute(
-                builder: (context) => AddFoodScreen(
-                  // Pass the default meal type based on time of day
-                  mealType: _getMealTypeForCurrentTime(),
-                ),
-              ),
-            );
-          },
-          child: const Icon(CupertinoIcons.add),
-        ),
       ),
       child: FutureBuilder(
         // This FutureBuilder ensures that the locale is initialized before building the UI
@@ -117,19 +103,6 @@ class DiaryScreen extends ConsumerWidget {
         },
       ),
     );
-  }
-
-  MealType _getMealTypeForCurrentTime() {
-    final hour = DateTime.now().hour;
-    if (hour >= 5 && hour < 11) {
-      return MealType.breakfast;
-    } else if (hour >= 11 && hour < 15) {
-      return MealType.lunch;
-    } else if (hour >= 15 && hour < 22) {
-      return MealType.dinner;
-    } else {
-      return MealType.snack;
-    }
   }
 
   Widget _buildDateNavigator(
