@@ -58,7 +58,10 @@ class _ReportSectionState extends ConsumerState<ReportSection> {
                 },
                 children: {
                   true: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     child: Text(
                       '7 Tage',
                       style: AppTypography.body.copyWith(
@@ -68,7 +71,10 @@ class _ReportSectionState extends ConsumerState<ReportSection> {
                     ),
                   ),
                   false: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     child: Text(
                       '30 Tage',
                       style: AppTypography.body.copyWith(
@@ -81,9 +87,9 @@ class _ReportSectionState extends ConsumerState<ReportSection> {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 20),
-          
+
           // Data-dependent content
           reportDataAsync.when(
             loading: () => const Center(
@@ -120,15 +126,15 @@ class _ReportSectionState extends ConsumerState<ReportSection> {
           ),
         ),
         const SizedBox(height: 12),
-        
+
         // Calorie Chart Section
         _buildCalorieChart(reportData),
-        
+
         const SizedBox(height: 20),
-        
+
         // Weight Chart Section
         _buildWeightChart(reportData),
-        
+
         if (reportData.totalDays < (showWeekly ? 7 : 30))
           Padding(
             padding: const EdgeInsets.only(top: 16),
@@ -185,7 +191,10 @@ class _ReportSectionState extends ConsumerState<ReportSection> {
               ),
               Row(
                 children: [
-                  _buildLegendDot(CupertinoColors.systemRed.darkColor, 'Intake'),
+                  _buildLegendDot(
+                    CupertinoColors.systemRed.darkColor,
+                    'Intake',
+                  ),
                   const SizedBox(width: 12),
                   _buildLegendDot(CupertinoColors.systemOrange, 'Burned'),
                 ],
@@ -193,7 +202,7 @@ class _ReportSectionState extends ConsumerState<ReportSection> {
             ],
           ),
           const SizedBox(height: 20),
-          
+
           // Y-axis labels and chart
           SizedBox(
             height: 200,
@@ -214,7 +223,7 @@ class _ReportSectionState extends ConsumerState<ReportSection> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                
+
                 // Chart area
                 Expanded(
                   child: CustomPaint(
@@ -228,19 +237,21 @@ class _ReportSectionState extends ConsumerState<ReportSection> {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           // X-axis labels
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: reportData.dateLabels
-                .map((day) => Text(
-                      day,
-                      style: AppTypography.caption1.copyWith(
-                        color: AppColors.secondaryLabel,
-                      ),
-                    ))
+                .map(
+                  (day) => Text(
+                    day,
+                    style: AppTypography.caption1.copyWith(
+                      color: AppColors.secondaryLabel,
+                    ),
+                  ),
+                )
                 .toList(),
           ),
         ],
@@ -250,7 +261,7 @@ class _ReportSectionState extends ConsumerState<ReportSection> {
 
   Widget _buildWeightChart(ReportData reportData) {
     final hasWeightData = reportData.weightData.any((w) => w > 0);
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -276,7 +287,9 @@ class _ReportSectionState extends ConsumerState<ReportSection> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '${(reportData.weightData.first - reportData.weightData.last).abs().toStringAsFixed(1)}',
+                      (reportData.weightData.first - reportData.weightData.last)
+                          .abs()
+                          .toStringAsFixed(1),
                       style: AppTypography.title3.copyWith(
                         color: AppColors.label,
                         fontWeight: FontWeight.bold,
@@ -293,7 +306,7 @@ class _ReportSectionState extends ConsumerState<ReportSection> {
             ],
           ),
           const SizedBox(height: 20),
-          
+
           // Weight chart
           SizedBox(
             height: 120,
@@ -307,19 +320,29 @@ class _ReportSectionState extends ConsumerState<ReportSection> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            _buildYAxisLabel('${(reportData.weightData.reduce(math.max) + 2).toInt()}'),
-                            _buildYAxisLabel('${reportData.weightData.reduce(math.max).toInt()}'),
-                            _buildYAxisLabel('${reportData.weightData.reduce(math.min).toInt()}'),
-                            _buildYAxisLabel('${(reportData.weightData.reduce(math.min) - 2).toInt()}'),
+                            _buildYAxisLabel(
+                              '${(reportData.weightData.reduce(math.max) + 2).toInt()}',
+                            ),
+                            _buildYAxisLabel(
+                              '${reportData.weightData.reduce(math.max).toInt()}',
+                            ),
+                            _buildYAxisLabel(
+                              '${reportData.weightData.reduce(math.min).toInt()}',
+                            ),
+                            _buildYAxisLabel(
+                              '${(reportData.weightData.reduce(math.min) - 2).toInt()}',
+                            ),
                           ],
                         ),
                       ),
                       const SizedBox(width: 8),
-                      
+
                       // Chart area
                       Expanded(
                         child: CustomPaint(
-                          painter: WeightChartPainter(data: reportData.weightData),
+                          painter: WeightChartPainter(
+                            data: reportData.weightData,
+                          ),
                           child: Container(),
                         ),
                       ),
@@ -334,19 +357,21 @@ class _ReportSectionState extends ConsumerState<ReportSection> {
                     ),
                   ),
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           // X-axis labels
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: reportData.dateLabels
-                .map((day) => Text(
-                      day,
-                      style: AppTypography.caption1.copyWith(
-                        color: AppColors.secondaryLabel,
-                      ),
-                    ))
+                .map(
+                  (day) => Text(
+                    day,
+                    style: AppTypography.caption1.copyWith(
+                      color: AppColors.secondaryLabel,
+                    ),
+                  ),
+                )
                 .toList(),
           ),
         ],
@@ -361,10 +386,7 @@ class _ReportSectionState extends ConsumerState<ReportSection> {
         Container(
           width: 8,
           height: 8,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 4),
         Text(
@@ -393,10 +415,7 @@ class CalorieChartPainter extends CustomPainter {
   final List<double> intakeData;
   final List<double> burnedData;
 
-  CalorieChartPainter({
-    required this.intakeData,
-    required this.burnedData,
-  });
+  CalorieChartPainter({required this.intakeData, required this.burnedData});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -408,31 +427,35 @@ class CalorieChartPainter extends CustomPainter {
     // Draw horizontal grid lines
     for (int i = 0; i <= 3; i++) {
       final y = (i / 3) * size.height;
-      canvas.drawLine(
-        Offset(0, y),
-        Offset(size.width, y),
-        gridPaint,
-      );
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
     }
 
     // Draw vertical grid lines
     for (int i = 0; i < intakeData.length; i++) {
       final x = (i / (intakeData.length - 1)) * size.width;
-      canvas.drawLine(
-        Offset(x, 0),
-        Offset(x, size.height),
-        gridPaint,
-      );
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), gridPaint);
     }
 
     // Draw intake line
-    _drawLine(canvas, size, intakeData, CupertinoColors.systemRed.darkColor, 3000);
-    
+    _drawLine(
+      canvas,
+      size,
+      intakeData,
+      CupertinoColors.systemRed.darkColor,
+      3000,
+    );
+
     // Draw burned line
     _drawLine(canvas, size, burnedData, CupertinoColors.systemOrange, 3000);
   }
 
-  void _drawLine(Canvas canvas, Size size, List<double> data, Color color, double maxValue) {
+  void _drawLine(
+    Canvas canvas,
+    Size size,
+    List<double> data,
+    Color color,
+    double maxValue,
+  ) {
     if (data.isEmpty) return;
 
     final paint = Paint()
@@ -469,7 +492,8 @@ class CalorieChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(CalorieChartPainter oldDelegate) {
-    return oldDelegate.intakeData != intakeData || oldDelegate.burnedData != burnedData;
+    return oldDelegate.intakeData != intakeData ||
+        oldDelegate.burnedData != burnedData;
   }
 }
 
@@ -490,11 +514,7 @@ class WeightChartPainter extends CustomPainter {
     // Draw horizontal grid lines
     for (int i = 0; i <= 3; i++) {
       final y = (i / 3) * size.height;
-      canvas.drawLine(
-        Offset(0, y),
-        Offset(size.width, y),
-        gridPaint,
-      );
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
     }
 
     final minValue = data.reduce(math.min) - 1;
@@ -511,7 +531,7 @@ class WeightChartPainter extends CustomPainter {
 
     for (int i = 0; i < data.length; i++) {
       final x = (i / (data.length - 1)) * size.width;
-      final y = range > 0 
+      final y = range > 0
           ? size.height - ((data[i] - minValue) / range) * size.height
           : size.height / 2;
 
@@ -531,7 +551,7 @@ class WeightChartPainter extends CustomPainter {
 
     for (int i = 0; i < data.length; i++) {
       final x = (i / (data.length - 1)) * size.width;
-      final y = range > 0 
+      final y = range > 0
           ? size.height - ((data[i] - minValue) / range) * size.height
           : size.height / 2;
       canvas.drawCircle(Offset(x, y), 3, pointPaint);

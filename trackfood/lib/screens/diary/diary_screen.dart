@@ -41,7 +41,8 @@ class DiaryScreen extends ConsumerWidget {
               )
             : null,
       ),
-      child: FutureBuilder(
+      child: FutureBuilder<void>(
+        // Added <void>
         // This FutureBuilder ensures that the locale is initialized before building the UI
         future: initializeDateFormatting('de_DE', null),
         builder: (context, snapshot) {
