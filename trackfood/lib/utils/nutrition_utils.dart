@@ -91,17 +91,17 @@ NutritionGoals calculateNutritionalGoals(Profile profile) {
   String goalDescription;
 
   switch (profile.goal) {
-    case 'weight_loss':
+    case 'lose_weight': // Corrected from 'weight_loss'
       targetCalories = tdee - 500;
       goalTitle = 'Abnehmen';
       goalDescription = 'Du isst im Kaloriendefizit, um Gewicht zu verlieren.';
       break;
-    case 'weight_gain':
+    case 'gain_weight': // Corrected from 'weight_gain'
       targetCalories = tdee + 500;
       goalTitle = 'Zunehmen';
       goalDescription = 'Du isst im Kalorienüberschuss, um Gewicht aufzubauen.';
       break;
-    case 'muscle_gain':
+    case 'build_muscle': // Corrected from 'muscle_gain'
       targetCalories = tdee + 300;
       goalTitle = 'Muskelaufbau';
       goalDescription = 'Mehr Kalorien und Protein für den Muskelaufbau.';
@@ -119,7 +119,7 @@ NutritionGoals calculateNutritionalGoals(Profile profile) {
   double fatGrams;
   double carbGrams;
 
-  if (profile.goal == 'muscle_gain') {
+  if (profile.goal == 'build_muscle') { // Corrected from 'muscle_gain'
     proteinGrams = (profile.weightKg ?? 70) * 1.8;
     double remainingCalories = targetCalories - (proteinGrams * 4);
     fatGrams = (remainingCalories * 0.35) / 9;

@@ -105,6 +105,9 @@ class DashboardContent extends ConsumerWidget {
                         date: selectedDate ?? DateTime.now(),
                         goalTitle: nutritionGoals?.goalTitle,
                         goalDescription: nutritionGoals?.goalDescription,
+                        caloriesCurrent: dailyCalories,
+                        caloriesGoal: calorieGoal,
+                        burnedCalories: burnedCaloriesAsync.value!,
                       ),
                       Padding(
                         padding: const EdgeInsets.all(16),
