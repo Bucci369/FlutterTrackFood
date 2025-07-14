@@ -48,6 +48,57 @@ class AppColors {
   static const Color systemTeal = CupertinoColors.systemTeal;
   static const Color systemIndigo = CupertinoColors.systemIndigo;
 
+  // === APPLE-STYLE VIBRANT COLORS ===
+  /// Ultra-saturated colors matching Apple's design sharpness
+  static const Color vibrantBlue = Color(0xFF007AFF); // Pure iOS blue
+  static const Color vibrantGreen = Color(0xFF32D74B); // Intense green
+  static const Color vibrantOrange = Color(0xFFFF9500); // Saturated orange
+  static const Color vibrantRed = Color(0xFFFF3B30); // Sharp red
+  static const Color vibrantPurple = Color(0xFFAF52DE); // Vivid purple
+  static const Color vibrantTeal = Color(0xFF64D2FF); // Electric teal
+  static const Color vibrantYellow = Color(0xFFFFD60A); // Bright yellow
+  static const Color vibrantPink = Color(0xFFFF2D92); // Hot pink
+
+  // === PREMIUM GRADIENTS ===
+  /// Apple-inspired ultra-sharp gradients
+  static const List<Color> vibrantBlueGradient = [
+    Color(0xFF007AFF),
+    Color(0xFF0051D5),
+  ];
+  static const List<Color> vibrantGreenGradient = [
+    Color(0xFF32D74B),
+    Color(0xFF248A3D),
+  ];
+  static const List<Color> vibrantOrangeGradient = [
+    Color(0xFFFF9500),
+    Color(0xFFFF6D00),
+  ];
+
+  // === SHARP CONTRAST COLORS ===
+  /// High-contrast colors for crisp UI elements
+  static const Color pureWhite = Color(0xFFFFFFFF);
+  static const Color deepBlack = Color(0xFF000000);
+  static const Color sharpGray = Color(0xFF8E8E93);
+  static const Color lightGray = Color(0xFFF2F2F7);
+
+  // === GLASSMORPHISM COLORS ===
+  /// Apple-style glass and blur effects
+  static const Color glassWhite = Color(0x26FFFFFF); // 15% white for glass effect
+  static const Color glassBlack = Color(0x40000000); // 25% black for glass shadows
+  static const Color frostWhite = Color(0x33FFFFFF); // 20% white for frosted glass
+  static const Color shimmerWhite = Color(0x0DFFFFFF); // 5% white for subtle shimmer
+  
+  // === PREMIUM GLASS GRADIENTS ===
+  /// Ultra-premium glass effect gradients
+  static const List<Color> glassGradient = [
+    Color(0x33FFFFFF), // 20% white top
+    Color(0x0DFFFFFF), // 5% white bottom
+  ];
+  static const List<Color> darkGlassGradient = [
+    Color(0x1A000000), // 10% black top
+    Color(0x33000000), // 20% black bottom
+  ];
+
   static const Color systemBackground = CupertinoColors.systemBackground;
   static const Color secondarySystemBackground =
       CupertinoColors.secondarySystemBackground;

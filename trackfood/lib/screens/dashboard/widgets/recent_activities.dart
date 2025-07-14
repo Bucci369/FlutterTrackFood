@@ -97,8 +97,8 @@ class RecentActivities extends ConsumerWidget {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.3), // "Show all" button glow shadow - blue
-                        blurRadius: 10,
+                        color: AppColors.primary.withValues(alpha: 0.2), // "Show all" button glow shadow - blue (reduced)
+                        blurRadius: 8,
                         offset: const Offset(0, 0),
                       ),
                     ],
@@ -199,8 +199,8 @@ class RecentActivities extends ConsumerWidget {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.3), // Activity icon glow shadow - blue
-                        blurRadius: 15,
+                        color: AppColors.primary.withValues(alpha: 0.2), // Activity icon glow shadow - blue (reduced)
+                        blurRadius: 10,
                         offset: const Offset(0, 0),
                       ),
                     ],
@@ -277,8 +277,8 @@ class RecentActivities extends ConsumerWidget {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.3), // Empty state icon glow shadow - blue
-                  blurRadius: 20,
+                  color: AppColors.primary.withValues(alpha: 0.2), // Empty state icon glow shadow - blue (reduced)
+                  blurRadius: 15,
                   offset: const Offset(0, 0),
                 ),
               ],
@@ -320,8 +320,8 @@ class RecentActivities extends ConsumerWidget {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.4), // Empty state button glow shadow - blue
-                  blurRadius: 20,
+                  color: AppColors.primary.withValues(alpha: 0.25), // Empty state button glow shadow - blue (reduced)
+                  blurRadius: 15,
                   offset: const Offset(0, 0),
                 ),
               ],

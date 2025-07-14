@@ -16,13 +16,12 @@ class StepsCard extends ConsumerWidget {
         : 0.0;
 
     return Container(
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            const Color(0xFF1A1A1A), // Dark card background start
-            const Color(0xFF2A2A2A), // Dark card background middle (lighter)
-            const Color(0xFF1A1A1A), // Dark card background end
+            const Color(0xFF000000), // Pure black background start - Apple sharp
+            const Color(0xFF1C1C1E), // Dark gray background middle - iOS system
+            const Color(0xFF000000), // Pure black background end - Apple sharp
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -30,37 +29,60 @@ class StepsCard extends ConsumerWidget {
         ),
         borderRadius: BorderRadius.circular(28),
         border: Border.all(
-          color: CupertinoColors.white.withValues(alpha: 0.2), // Card border - subtle white border
-          width: 1,
+          color: AppColors.glassWhite, // Card border - glass effect
+          width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: CupertinoColors.white.withValues(alpha: 0.1), // Card glow shadow
+            color: AppColors.vibrantOrange.withValues(alpha: 0.08), // Card accent glow - vibrant orange (reduced)
             blurRadius: 40,
             offset: const Offset(0, 0),
           ),
           BoxShadow(
-            color: CupertinoColors.black.withValues(alpha: 0.8), // Card drop shadow
-            blurRadius: 50,
-            offset: const Offset(0, 20),
+            color: AppColors.deepBlack.withValues(alpha: 0.9), // Card deep drop shadow - pure black
+            blurRadius: 40,
+            offset: const Offset(0, 25),
           ),
           BoxShadow(
-            color: CupertinoColors.white.withValues(alpha: 0.05), // Card top light shadow
-            blurRadius: 80,
-            offset: const Offset(0, -10),
+            color: AppColors.pureWhite.withValues(alpha: 0.08), // Card top rim light - crisp white
+            blurRadius: 20,
+            offset: const Offset(0, -5),
           ),
         ],
       ),
-      child: Row(
+      child: Stack(
         children: [
-          Container(
+          // Glassmorphism overlay
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(28),
+                gradient: LinearGradient(
+                  colors: AppColors.glassGradient, // Glass overlay gradient
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+            ),
+          ),
+          // Main content
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.systemOrange.withValues(alpha: 0.4), // Steps circle glow - orange
-                  blurRadius: 25,
+                  color: AppColors.vibrantOrange.withValues(alpha: 0.3), // Steps circle glow - vibrant orange (reduced)
+                  blurRadius: 20,
+                  offset: const Offset(0, 4),
+                ),
+                BoxShadow(
+                  color: AppColors.vibrantOrange.withValues(alpha: 0.15), // Steps circle inner glow - vibrant orange (reduced)
+                  blurRadius: 10,
                   offset: const Offset(0, 0),
                 ),
               ],
@@ -74,22 +96,19 @@ class StepsCard extends ConsumerWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
-                    colors: [
-                      AppColors.systemOrange.withValues(alpha: 0.3), // Steps center icon background gradient start - orange
-                      AppColors.systemOrange.withValues(alpha: 0.1), // Steps center icon background gradient end - orange
-                    ],
+                    colors: AppColors.vibrantOrangeGradient, // Steps center icon background - vibrant gradient
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   border: Border.all(
-                    color: AppColors.systemOrange.withValues(alpha: 0.4), // Steps center icon border - orange
-                    width: 1,
+                    color: AppColors.vibrantOrange.withValues(alpha: 0.8), // Steps center icon border - vibrant orange
+                    width: 2,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.systemOrange.withValues(alpha: 0.5), // Steps center icon glow shadow - orange
-                      blurRadius: 15,
-                      offset: const Offset(0, 0),
+                      color: AppColors.vibrantOrange.withValues(alpha: 0.4), // Steps center icon glow shadow - vibrant orange (reduced)
+                      blurRadius: 12,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
@@ -99,7 +118,7 @@ class StepsCard extends ConsumerWidget {
                   size: 24,
                 ),
               ),
-              progressColor: AppColors.systemOrange, // Steps progress ring - orange
+              progressColor: AppColors.vibrantOrange, // Steps progress ring - vibrant orange
               backgroundColor: CupertinoColors.white.withValues(alpha: 0.1), // Steps progress background ring - subtle white
               circularStrokeCap: CircularStrokeCap.round,
             ),
@@ -136,34 +155,39 @@ class StepsCard extends ConsumerWidget {
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  AppColors.systemOrange.withValues(alpha: 0.3), // Add button background gradient start - orange
-                  AppColors.systemOrange.withValues(alpha: 0.1), // Add button background gradient end - orange
-                ],
+                colors: AppColors.vibrantOrangeGradient, // Add button background - vibrant gradient
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: AppColors.systemOrange.withValues(alpha: 0.4), // Add button border - orange
-                width: 1,
+                color: AppColors.pureWhite.withValues(alpha: 0.3), // Add button border - crisp white
+                width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.systemOrange.withValues(alpha: 0.3), // Add button glow shadow - orange
+                  color: AppColors.vibrantOrange.withValues(alpha: 0.25), // Add button glow shadow - vibrant orange (reduced)
                   blurRadius: 15,
-                  offset: const Offset(0, 0),
+                  offset: const Offset(0, 4),
+                ),
+                BoxShadow(
+                  color: AppColors.vibrantOrange.withValues(alpha: 0.1), // Add button inner glow - vibrant orange (reduced)
+                  blurRadius: 6,
+                  offset: const Offset(0, 1),
                 ),
               ],
             ),
             child: CupertinoButton(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(8),
               onPressed: () => _showAddStepsDialog(context, ref),
               child: Icon(
                 CupertinoIcons.add,
                 color: CupertinoColors.white, // Add button plus icon color
-                size: 20,
+                size: 18,
               ),
+            ),
+          ),
+              ],
             ),
           ),
         ],

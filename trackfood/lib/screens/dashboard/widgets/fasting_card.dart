@@ -254,8 +254,8 @@ class _FastingCardState extends ConsumerState<FastingCard>
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: CupertinoColors.systemGreen.withValues(alpha: 0.4), // Active badge glow shadow - green
-                          blurRadius: 15,
+                          color: CupertinoColors.systemGreen.withValues(alpha: 0.25), // Active badge glow shadow - green (reduced)
+                          blurRadius: 10,
                           offset: const Offset(0, 0),
                         ),
                       ],
@@ -369,8 +369,8 @@ class _FastingCardState extends ConsumerState<FastingCard>
                   borderRadius: BorderRadius.circular(AppTheme.cornerRadiusM),
                   boxShadow: [
                     BoxShadow(
-                      color: CupertinoColors.systemRed.withValues(alpha: 0.4), // Stop fasting button glow shadow - red
-                      blurRadius: 20,
+                      color: CupertinoColors.systemRed.withValues(alpha: 0.25), // Stop fasting button glow shadow - red (reduced)
+                      blurRadius: 15,
                       offset: const Offset(0, 0),
                     ),
                   ],
@@ -488,8 +488,8 @@ class _FastingCardState extends ConsumerState<FastingCard>
                   borderRadius: BorderRadius.circular(AppTheme.cornerRadiusM),
                   boxShadow: [
                     BoxShadow(
-                      color: _fastingTypes[_selectedFastingType].color.withValues(alpha: 0.4), // Start fasting button glow shadow - dynamic color
-                      blurRadius: 20,
+                      color: _fastingTypes[_selectedFastingType].color.withValues(alpha: 0.25), // Start fasting button glow shadow - dynamic color (reduced)
+                      blurRadius: 15,
                       offset: const Offset(0, 0),
                     ),
                   ],
