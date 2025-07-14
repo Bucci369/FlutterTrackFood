@@ -285,7 +285,7 @@ class _AddFoodScreenState extends ConsumerState<AddFoodScreen> {
                   (nutriments.sugars100g ?? 0) * (finalQuantity / 100);
               // Correct sodium calculation: use sodium_100g and convert to mg
               final sodium =
-                  (nutriments.sodium100g ?? 0) * (finalQuantity / 100) * 1000;
+                  (nutriments.salt100g ?? 0) * (finalQuantity / 100) * 1000;
 
               print(
                 'DEBUG: Nutrition values - Calories: $calories, Protein: $protein, Carbs: $carbs, Fat: $fat',

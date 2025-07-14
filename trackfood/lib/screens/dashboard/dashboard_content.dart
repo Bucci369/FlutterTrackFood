@@ -58,6 +58,8 @@ class DashboardContent extends ConsumerWidget {
       'protein': diaryState.totalProtein,
       'carbs': diaryState.totalCarbs,
       'fat': diaryState.totalFat,
+      'fiber': diaryState.totalFiber,
+      'sugar': diaryState.totalSugar,
       'sodium': diaryState.totalSodium,
     };
 
