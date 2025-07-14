@@ -30,24 +30,25 @@ class RecentActivities extends ConsumerWidget {
           stops: const [0.0, 0.5, 1.0],
         ),
         border: Border.all(
-          color: CupertinoColors.white.withValues(alpha: 0.2), // Card border - subtle white border
+          color: CupertinoColors.white.withValues(
+            alpha: 0.2,
+          ), // Card border - subtle white border
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: CupertinoColors.white.withValues(alpha: 0.1), // Card glow shadow
-            blurRadius: 40,
+            color: CupertinoColors.white.withValues(
+              alpha: 0.05,
+            ), // Reduced glow
+            blurRadius: 20, // Softened blur
             offset: const Offset(0, 0),
           ),
           BoxShadow(
-            color: CupertinoColors.black.withValues(alpha: 0.8), // Card drop shadow
-            blurRadius: 50,
-            offset: const Offset(0, 20),
-          ),
-          BoxShadow(
-            color: CupertinoColors.white.withValues(alpha: 0.05), // Card top light shadow
-            blurRadius: 80,
-            offset: const Offset(0, -10),
+            color: CupertinoColors.black.withValues(
+              alpha: 0.5,
+            ), // Softened shadow
+            blurRadius: 30,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -64,7 +65,9 @@ class RecentActivities extends ConsumerWidget {
                   fontWeight: FontWeight.w700,
                   shadows: [
                     Shadow(
-                      color: CupertinoColors.white.withValues(alpha: 0.3), // Activity title text shadow
+                      color: CupertinoColors.white.withValues(
+                        alpha: 0.3,
+                      ), // Activity title text shadow
                       blurRadius: 8,
                       offset: const Offset(0, 0),
                     ),
@@ -80,24 +83,35 @@ class RecentActivities extends ConsumerWidget {
                   );
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        AppColors.primary.withValues(alpha: 0.3), // "Show all" button background gradient start - blue
-                        AppColors.primary.withValues(alpha: 0.1), // "Show all" button background gradient end - blue
+                        AppColors.primary.withValues(
+                          alpha: 0.3,
+                        ), // "Show all" button background gradient start - blue
+                        AppColors.primary.withValues(
+                          alpha: 0.1,
+                        ), // "Show all" button background gradient end - blue
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: AppColors.primary.withValues(alpha: 0.4), // "Show all" button border - blue
+                      color: AppColors.primary.withValues(
+                        alpha: 0.4,
+                      ), // "Show all" button border - blue
                       width: 1,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.2), // "Show all" button glow shadow - blue (reduced)
+                        color: AppColors.primary.withValues(
+                          alpha: 0.2,
+                        ), // "Show all" button glow shadow - blue (reduced)
                         blurRadius: 8,
                         offset: const Offset(0, 0),
                       ),
@@ -106,7 +120,8 @@ class RecentActivities extends ConsumerWidget {
                   child: Text(
                     'Alle anzeigen',
                     style: AppTypography.body.copyWith(
-                      color: CupertinoColors.white, // "Show all" button text color
+                      color:
+                          CupertinoColors.white, // "Show all" button text color
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
@@ -122,7 +137,9 @@ class RecentActivities extends ConsumerWidget {
               error: (err, stack) => Center(
                 child: Text(
                   'Fehler: $err',
-                  style: TextStyle(color: CupertinoColors.white.withValues(alpha: 0.8)), // Error text color
+                  style: TextStyle(
+                    color: CupertinoColors.white.withValues(alpha: 0.8),
+                  ), // Error text color
                 ),
               ),
               data: (activities) {
@@ -152,104 +169,124 @@ class RecentActivities extends ConsumerWidget {
   ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0), // Add padding to the bottom
-      child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              gradient: LinearGradient(
-                colors: [
-                  const Color(0xFF2A2A2A), // Activity item background start
-                  const Color(0xFF1A1A1A), // Activity item background middle (darker)
-                  const Color(0xFF2A2A2A), // Activity item background end
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                stops: const [0.0, 0.5, 1.0],
-              ),
-              border: Border.all(
-                color: CupertinoColors.white.withValues(alpha: 0.15), // Activity item border - subtle white
-                width: 1,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: CupertinoColors.white.withValues(alpha: 0.05), // Activity item glow shadow
-                  blurRadius: 15,
-                  offset: const Offset(0, 0),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [
-                        AppColors.primary.withValues(alpha: 0.3), // Activity icon background gradient start - blue
-                        AppColors.primary.withValues(alpha: 0.1), // Activity icon background gradient end - blue
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    border: Border.all(
-                      color: AppColors.primary.withValues(alpha: 0.4), // Activity icon border - blue
-                      width: 1.5,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.2), // Activity icon glow shadow - blue (reduced)
-                        blurRadius: 10,
-                        offset: const Offset(0, 0),
-                      ),
+      child:
+          Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFF2A2A2A), // Activity item background start
+                      const Color(
+                        0xFF1A1A1A,
+                      ), // Activity item background middle (darker)
+                      const Color(0xFF2A2A2A), // Activity item background end
                     ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    stops: const [0.0, 0.5, 1.0],
                   ),
-                  child: Center(
-                    child: Text(
-                      activity['emoji'],
-                      style: const TextStyle(fontSize: 20),
+                  border: Border.all(
+                    color: CupertinoColors.white.withValues(
+                      alpha: 0.15,
+                    ), // Activity item border - subtle white
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: CupertinoColors.white.withValues(
+                        alpha: 0.05,
+                      ), // Activity item glow shadow
+                      blurRadius: 15,
+                      offset: const Offset(0, 0),
                     ),
-                  ),
+                  ],
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        activity['name'],
-                        style: AppTypography.body.copyWith(
-                          color: CupertinoColors.white, // Activity name text color
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
+                child: Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColors.primary.withValues(
+                              alpha: 0.3,
+                            ), // Activity icon background gradient start - blue
+                            AppColors.primary.withValues(
+                              alpha: 0.1,
+                            ), // Activity icon background gradient end - blue
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        border: Border.all(
+                          color: AppColors.primary.withValues(
+                            alpha: 0.4,
+                          ), // Activity icon border - blue
+                          width: 1.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withValues(
+                              alpha: 0.2,
+                            ), // Activity icon glow shadow - blue (reduced)
+                            blurRadius: 10,
+                            offset: const Offset(0, 0),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(
+                          activity['emoji'],
+                          style: const TextStyle(fontSize: 20),
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${activity['duration']} • ${activity['calories']} kcal',
-                        style: AppTypography.body.copyWith(
-                          color: CupertinoColors.white.withValues(alpha: 0.7), // Activity duration/calories text color
-                          fontSize: 12,
-                        ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            activity['name'],
+                            style: AppTypography.body.copyWith(
+                              color: CupertinoColors
+                                  .white, // Activity name text color
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${activity['duration']} • ${activity['calories']} kcal',
+                            style: AppTypography.body.copyWith(
+                              color: CupertinoColors.white.withValues(
+                                alpha: 0.7,
+                              ), // Activity duration/calories text color
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    Text(
+                      activity['time'],
+                      style: AppTypography.body.copyWith(
+                        color: CupertinoColors.white.withValues(
+                          alpha: 0.6,
+                        ), // Activity time text color
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
-                Text(
-                  activity['time'],
-                  style: AppTypography.body.copyWith(
-                    color: CupertinoColors.white.withValues(alpha: 0.6), // Activity time text color
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          )
-          .animate(delay: Duration(milliseconds: 100 * index))
-          .fadeIn(duration: 400.ms)
-          .slideX(begin: 0.3, end: 0),
+              )
+              .animate(delay: Duration(milliseconds: 100 * index))
+              .fadeIn(duration: 400.ms)
+              .slideX(begin: 0.3, end: 0),
     );
   }
 
@@ -265,19 +302,27 @@ class RecentActivities extends ConsumerWidget {
               shape: BoxShape.circle,
               gradient: LinearGradient(
                 colors: [
-                  AppColors.primary.withValues(alpha: 0.3), // Empty state icon background gradient start - blue
-                  AppColors.primary.withValues(alpha: 0.1), // Empty state icon background gradient end - blue
+                  AppColors.primary.withValues(
+                    alpha: 0.3,
+                  ), // Empty state icon background gradient start - blue
+                  AppColors.primary.withValues(
+                    alpha: 0.1,
+                  ), // Empty state icon background gradient end - blue
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.4), // Empty state icon border - blue
+                color: AppColors.primary.withValues(
+                  alpha: 0.4,
+                ), // Empty state icon border - blue
                 width: 2,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.2), // Empty state icon glow shadow - blue (reduced)
+                  color: AppColors.primary.withValues(
+                    alpha: 0.2,
+                  ), // Empty state icon glow shadow - blue (reduced)
                   blurRadius: 15,
                   offset: const Offset(0, 0),
                 ),
@@ -302,7 +347,9 @@ class RecentActivities extends ConsumerWidget {
           Text(
             'Starte dein erstes Workout!',
             style: AppTypography.body.copyWith(
-              color: CupertinoColors.white.withValues(alpha: 0.7), // Empty state subtitle text color
+              color: CupertinoColors.white.withValues(
+                alpha: 0.7,
+              ), // Empty state subtitle text color
               fontSize: 14,
             ),
           ),
@@ -311,8 +358,11 @@ class RecentActivities extends ConsumerWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppColors.primary, // Empty state button background gradient start - blue
-                  AppColors.primary.withValues(alpha: 0.8), // Empty state button background gradient end - blue
+                  AppColors
+                      .primary, // Empty state button background gradient start - blue
+                  AppColors.primary.withValues(
+                    alpha: 0.8,
+                  ), // Empty state button background gradient end - blue
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -320,7 +370,9 @@ class RecentActivities extends ConsumerWidget {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.25), // Empty state button glow shadow - blue (reduced)
+                  color: AppColors.primary.withValues(
+                    alpha: 0.25,
+                  ), // Empty state button glow shadow - blue (reduced)
                   blurRadius: 15,
                   offset: const Offset(0, 0),
                 ),

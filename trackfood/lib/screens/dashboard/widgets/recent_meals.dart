@@ -26,9 +26,9 @@ class RecentMeals extends ConsumerWidget {
         border: Border.all(color: AppColors.separator, width: 1),
         boxShadow: [
           BoxShadow(
-            color: CupertinoColors.systemGrey.withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: CupertinoColors.systemGrey.withOpacity(0.08), // Reduced glow
+            blurRadius: 15, // Softened blur
+            offset: const Offset(0, 4),
           ),
         ],
       ),

@@ -26,7 +26,8 @@ class ConcentricProgressRings extends StatefulWidget {
   });
 
   @override
-  State<ConcentricProgressRings> createState() => _ConcentricProgressRingsState();
+  State<ConcentricProgressRings> createState() =>
+      _ConcentricProgressRingsState();
 }
 
 class _ConcentricProgressRingsState extends State<ConcentricProgressRings>
@@ -39,7 +40,7 @@ class _ConcentricProgressRingsState extends State<ConcentricProgressRings>
   @override
   void initState() {
     super.initState();
-    
+
     _controller = AnimationController(
       duration: const Duration(milliseconds: 2000),
       vsync: this,
@@ -107,7 +108,7 @@ class _ConcentricProgressRingsState extends State<ConcentricProgressRings>
           stops: const [0.0, 0.5, 1.0],
         ),
         border: Border.all(
-          color: CupertinoColors.white.withValues(alpha: 0.2), 
+          color: CupertinoColors.white.withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
@@ -182,8 +183,7 @@ class _ConcentricProgressRingsState extends State<ConcentricProgressRings>
               ),
             ],
           ),
-          const SizedBox(height: 28),
-          
+          const SizedBox(height: 20), // Reduced vertical space
           // Enhanced Concentric Rings with glow effect
           Container(
             width: 300,
@@ -208,11 +208,14 @@ class _ConcentricProgressRingsState extends State<ConcentricProgressRings>
               builder: (context, child) {
                 return CustomPaint(
                   painter: ConcentricRingsPainter(
-                    calorieProgress: widget.calorieProgress * _calorieAnimation.value,
+                    calorieProgress:
+                        widget.calorieProgress * _calorieAnimation.value,
                     waterProgress: widget.waterProgress * _waterAnimation.value,
-                    burnedProgress: (widget.burnedCaloriesGoal > 0 
-                        ? widget.burnedCalories / widget.burnedCaloriesGoal 
-                        : 0.0) * _burnedAnimation.value,
+                    burnedProgress:
+                        (widget.burnedCaloriesGoal > 0
+                            ? widget.burnedCalories / widget.burnedCaloriesGoal
+                            : 0.0) *
+                        _burnedAnimation.value,
                   ),
                   child: Center(
                     child: Container(
@@ -258,7 +261,9 @@ class _ConcentricProgressRingsState extends State<ConcentricProgressRings>
                               fontSize: 32,
                               shadows: [
                                 Shadow(
-                                  color: CupertinoColors.white.withValues(alpha: 0.5),
+                                  color: CupertinoColors.white.withValues(
+                                    alpha: 0.5,
+                                  ),
                                   blurRadius: 10,
                                   offset: const Offset(0, 0),
                                 ),
@@ -268,7 +273,9 @@ class _ConcentricProgressRingsState extends State<ConcentricProgressRings>
                           Text(
                             'Erreicht',
                             style: AppTypography.body.copyWith(
-                              color: CupertinoColors.white.withValues(alpha: 0.8),
+                              color: CupertinoColors.white.withValues(
+                                alpha: 0.8,
+                              ),
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
@@ -281,9 +288,10 @@ class _ConcentricProgressRingsState extends State<ConcentricProgressRings>
               },
             ),
           ),
-          
-          const SizedBox(height: 32),
-          
+
+          const SizedBox(
+            height: 20,
+          ), // Reduced space to make the card more compact
           // Enhanced Legend with better spacing
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
@@ -403,7 +411,11 @@ class _ConcentricProgressRingsState extends State<ConcentricProgressRings>
                 ),
               ],
             ),
-            child: Icon(icon, color: CupertinoColors.white, size: 24), // 🎨 LEGENDE ICONS: Weiß
+            child: Icon(
+              icon,
+              color: CupertinoColors.white,
+              size: 24,
+            ), // 🎨 LEGENDE ICONS: Weiß
           ),
           const SizedBox(height: 12),
           Text(
@@ -458,7 +470,10 @@ class ConcentricRingsPainter extends CustomPainter {
       // Outer ring - Calories (rötlich)
       {
         'progress': calorieProgress.clamp(0.0, 1.0),
-        'colors': [CupertinoColors.systemRed.darkColor, CupertinoColors.systemPink],
+        'colors': [
+          CupertinoColors.systemRed.darkColor,
+          CupertinoColors.systemPink,
+        ],
         'radius': baseRadius,
         'strokeWidth': 10.0,
       },
@@ -490,7 +505,10 @@ class ConcentricRingsPainter extends CustomPainter {
 
       // Background circle
       final backgroundPaint = Paint()
-        ..color = AppColors.separator.withValues(alpha: 0.3)
+        ..color =
+            const Color(
+              0xFFE5E5EA,
+            ) // 3 Ringe Hintergrund A much lighter gray for visibility
         ..strokeWidth = strokeWidth
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round;

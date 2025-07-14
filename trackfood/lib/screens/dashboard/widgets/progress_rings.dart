@@ -105,9 +105,9 @@ class _ProgressRingsState extends State<ProgressRings>
         border: Border.all(color: AppColors.separator, width: 1),
         boxShadow: [
           BoxShadow(
-            color: CupertinoColors.systemGrey.withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: CupertinoColors.systemGrey.withOpacity(0.08), // Reduced glow
+            blurRadius: 15, // Softened blur
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -362,7 +362,10 @@ class ProgressRingPainter extends CustomPainter {
 
     // Background circle
     final backgroundPaint = Paint()
-      ..color = AppColors.separator
+      ..color =
+          const Color(
+            0xFFE5E5EA,
+          ) // Using a specific, light gray color for high visibility.
       ..strokeWidth = strokeWidth
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;

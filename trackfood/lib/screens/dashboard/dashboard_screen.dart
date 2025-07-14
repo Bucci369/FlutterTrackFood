@@ -129,24 +129,24 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ),
               border: Border.all(
                 color: AppColors.pureWhite.withValues(
-                  alpha: 0.3,
-                ), // Crisp white border
-                width: 2,
+                  alpha: 0.2,
+                ), // Softer white border
+                width: 1, // Thinner border
               ),
               boxShadow: [
                 BoxShadow(
                   color: AppColors.vibrantBlue.withValues(
-                    alpha: 0.4,
-                  ), // Vibrant glow
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
+                    alpha: 0.2,
+                  ), // Reduced glow
+                  blurRadius: 15, // Softened blur
+                  offset: const Offset(0, 5),
                 ),
                 BoxShadow(
                   color: AppColors.deepBlack.withValues(
-                    alpha: 0.3,
-                  ), // Drop shadow
-                  blurRadius: 15,
-                  offset: const Offset(0, 4),
+                    alpha: 0.2,
+                  ), // Softer drop shadow
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
