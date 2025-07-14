@@ -61,7 +61,7 @@ class DashboardContent extends ConsumerWidget {
     final todayDateOnly = DateTime(today.year, today.month, today.day);
     final waterIntakeAsync = ref.watch(waterIntakeProvider(todayDateOnly));
     final burnedCaloriesAsync = ref.watch(dailyBurnedCaloriesProvider);
-    
+
     final nutritionGoals = calculateNutritionalGoals(profile);
     final calorieGoal = nutritionGoals.calories;
     final dailyCalories = diaryState.totalCalories;
@@ -88,11 +88,25 @@ class DashboardContent extends ConsumerWidget {
                 ),
                 // Combined loading/error state for dependent providers
                 waterIntakeAsync.when(
-                  loading: () => SliverToBoxAdapter(child: Container(height: 250, child: Center(child: CupertinoActivityIndicator()))),
-                  error: (err, stack) => SliverToBoxAdapter(child: Center(child: Text('Fehler: $err'))),
+                  loading: () => SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: 250,
+                      child: Center(child: CupertinoActivityIndicator()),
+                    ),
+                  ),
+                  error: (err, stack) => SliverToBoxAdapter(
+                    child: Center(child: Text('Fehler: $err')),
+                  ),
                   data: (waterIntake) => burnedCaloriesAsync.when(
-                    loading: () => SliverToBoxAdapter(child: Container(height: 250, child: Center(child: CupertinoActivityIndicator()))),
-                    error: (err, stack) => SliverToBoxAdapter(child: Center(child: Text('Fehler: $err'))),
+                    loading: () => SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: 250,
+                        child: Center(child: CupertinoActivityIndicator()),
+                      ),
+                    ),
+                    error: (err, stack) => SliverToBoxAdapter(
+                      child: Center(child: Text('Fehler: $err')),
+                    ),
                     data: (burnedCalories) {
                       return SliverList(
                         delegate: SliverChildListDelegate([
@@ -115,7 +129,8 @@ class DashboardContent extends ConsumerWidget {
                               caloriesCurrent: dailyCalories,
                               caloriesGoal: calorieGoal,
                               waterProgress: waterIntake.dailyGoalMl > 0
-                                  ? (waterIntake.amountMl / waterIntake.dailyGoalMl)
+                                  ? (waterIntake.amountMl /
+                                        waterIntake.dailyGoalMl)
                                   : 0.0,
                               waterCurrent: waterIntake.amountMl.toDouble(),
                               waterGoal: waterIntake.dailyGoalMl.toDouble(),
