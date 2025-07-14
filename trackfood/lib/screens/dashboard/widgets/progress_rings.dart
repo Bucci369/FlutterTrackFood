@@ -289,7 +289,9 @@ class _ProgressRingsState extends State<ProgressRings>
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  '${widget.waterCurrent.toInt()}',
+                                  (widget.waterCurrent / 1000).toStringAsFixed(
+                                    1,
+                                  ), // Convert to L
                                   style: AppTypography.title2.copyWith(
                                     color: AppColors.label,
                                     fontWeight: FontWeight.bold,
@@ -297,7 +299,7 @@ class _ProgressRingsState extends State<ProgressRings>
                                   ),
                                 ),
                                 Text(
-                                  '/ ${widget.waterGoal.toInt()}',
+                                  '/ ${(widget.waterGoal / 1000).toStringAsFixed(1)} L', // Convert to L and add unit
                                   style: AppTypography.body.copyWith(
                                     color: AppColors.secondaryLabel,
                                     fontSize: 14,
@@ -323,7 +325,7 @@ class _ProgressRingsState extends State<ProgressRings>
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        'Gläser',
+                        'Wasser', // Change label from "Gläser" to "Wasser"
                         style: AppTypography.body.copyWith(
                           color: AppColors.label,
                           fontSize: 14,

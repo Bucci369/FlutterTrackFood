@@ -27,6 +27,7 @@ class ChatProvider with ChangeNotifier {
   final List<ChatMessage> _messages = [];
   bool _isLoading = false;
   String? _error;
+  ChatMessage? _lastUserMessage; // Store the last user message for retry
 
   List<ChatMessage> get messages => List.unmodifiable(_messages);
   bool get isLoading => _isLoading;
@@ -103,21 +104,38 @@ Was kann ich heute für dich tun? Du kannst mir eine Frage stellen oder eine der
 
       _messages.add(aiMessage);
     } catch (e) {
-      _error = e.toString();
+      _lastUserMessage = userMessage; // Save the failed message
+      final errorMessageText = e.toString().toLowerCase();
+      if (errorMessageText.contains('503') || errorMessageText.contains('overloaded')) {
+        _error = 'Der KI-Assistent ist gerade sehr gefragt. Bitte versuche es in ein paar Momenten erneut.';
+      } else {
+        _error = 'Ein unerwarteter Fehler ist aufgetreten. Bitte überprüfe deine Verbindung.';
+      }
 
-      // Add error message
+      // Add error message to chat
       final errorMessage = ChatMessage(
         id: const Uuid().v4(),
         role: 'assistant',
-        content:
-            'Entschuldigung, es gab ein Problem bei der Kommunikation. Bitte versuche es erneut. 🤖',
+        content: 'Entschuldigung, es gab ein Problem bei der Kommunikation. Bitte versuche es erneut. 🤖',
+        isError: true, // Mark this message as an error
         timestamp: DateTime.now(),
       );
-
       _messages.add(errorMessage);
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> retryLastMessage() async {
+    if (_lastUserMessage != null) {
+      // Remove the last two messages (the user's failed message and the AI's error response)
+      if (_messages.length >= 2) {
+        _messages.removeRange(_messages.length - 2, _messages.length);
+      }
+      final messageToSend = _lastUserMessage!;
+      _lastUserMessage = null; // Clear after retrying
+      await sendMessage(messageToSend.content);
     }
   }
 

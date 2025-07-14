@@ -2,34 +2,46 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trackfood/models/water_intake.dart';
 import 'package:trackfood/services/supabase_service.dart';
 
+// Using .family to create a provider that accepts a date parameter.
+// This allows us to fetch water intake for any given day.
 final waterIntakeProvider =
-    StateNotifierProvider<WaterIntakeNotifier, AsyncValue<WaterIntake>>((ref) {
+    StateNotifierProvider.family<
+      WaterIntakeNotifier,
+      AsyncValue<WaterIntake>,
+      DateTime
+    >((ref, date) {
       final supabaseService = ref.watch(supabaseServiceProvider);
-      return WaterIntakeNotifier(supabaseService);
+      return WaterIntakeNotifier(supabaseService, date);
     });
 
 class WaterIntakeNotifier extends StateNotifier<AsyncValue<WaterIntake>> {
   final SupabaseService _supabaseService;
+  final DateTime _date; // The specific date for this notifier instance
 
-  WaterIntakeNotifier(this._supabaseService)
+  WaterIntakeNotifier(this._supabaseService, this._date)
     : super(const AsyncValue.loading()) {
-    _init();
+    _loadWaterIntakeForDate();
   }
 
-  Future<void> _init() async {
+  Future<void> _loadWaterIntakeForDate() async {
     final userId = _supabaseService.currentUserId;
     if (userId == null) {
       state = AsyncValue.error('User not logged in', StackTrace.current);
       return;
     }
     try {
+      // Fetch water intake for the specific date passed to the provider
       final intake = await _supabaseService.getWaterIntakeForDate(
         userId,
-        DateTime.now(),
+        _date,
       );
-      state = AsyncValue.data(intake);
+      if (mounted) {
+        state = AsyncValue.data(intake);
+      }
     } catch (e, stack) {
-      state = AsyncValue.error(e, stack);
+      if (mounted) {
+        state = AsyncValue.error(e, stack);
+      }
     }
   }
 
@@ -46,10 +58,14 @@ class WaterIntakeNotifier extends StateNotifier<AsyncValue<WaterIntake>> {
       try {
         // Actualize the data from the backend
         final result = await _supabaseService.addWater(intakeId, amount);
-        state = AsyncValue.data(result);
+        if (mounted) {
+          state = AsyncValue.data(result);
+        }
       } catch (e) {
         // If error, revert to the old state
-        state = currentState;
+        if (mounted) {
+          state = currentState;
+        }
         // Optionally, re-throw or handle the error
         print('Failed to add water: $e');
       }

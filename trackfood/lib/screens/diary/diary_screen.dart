@@ -7,6 +7,7 @@ import 'package:trackfood/models/diary_entry.dart';
 import 'package:trackfood/models/meal_type.dart';
 import 'package:trackfood/providers/diary_provider.dart';
 import 'package:trackfood/providers/profile_provider.dart' as profile_provider;
+import 'package:trackfood/providers/water_provider.dart'; // Import water provider
 import 'package:trackfood/theme/app_colors.dart';
 import 'package:trackfood/theme/app_typography.dart';
 import 'package:trackfood/screens/diary/add_food_screen.dart';
@@ -21,7 +22,11 @@ class DiaryScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final diaryState = ref.watch(diaryProvider);
     final diaryNotifier = ref.read(diaryProvider.notifier);
-    final profileState = ref.watch(profile_provider.profileProvider); // Watch the new provider
+    final profileState = ref.watch(profile_provider.profileProvider);
+    // Watch the water intake provider for the SELECTED date
+    final waterIntakeAsync = ref.watch(
+      waterIntakeProvider(diaryState.selectedDate),
+    );
 
     return CupertinoPageScaffold(
       backgroundColor: const Color(0xFFF6F1E7), // Apple White
@@ -93,7 +98,8 @@ class DiaryScreen extends ConsumerWidget {
                   diaryState.selectedDate,
                   diaryNotifier,
                 ),
-                const WaterTrackerCard(),
+                // Pass the AsyncValue to the WaterTrackerCard
+                WaterTrackerCard(waterIntakeAsync: waterIntakeAsync),
                 const SizedBox(height: 8),
                 Expanded(
                   child: diaryState.isLoading

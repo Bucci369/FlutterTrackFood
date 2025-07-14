@@ -63,6 +63,12 @@ class _MessageInputState extends State<MessageInput> {
                   controller: _controller,
                   focusNode: _focusNode,
                   maxLines: null,
+                  // --- German Keyboard Optimizations ---
+                  autocorrect: true,
+                  textCapitalization: TextCapitalization.sentences,
+                  smartDashesType: SmartDashesType.enabled,
+                  smartQuotesType: SmartQuotesType.enabled,
+                  // ------------------------------------
                   textInputAction: TextInputAction.send,
                   onSubmitted: (_) => _sendMessage(),
                   enabled: !widget.isLoading,

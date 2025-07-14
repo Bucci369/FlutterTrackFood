@@ -2,7 +2,10 @@ import 'package:trackfood/models/profile.dart';
 
 // Mifflin-St Jeor Equation for BMR calculation
 double calculateBMR(Profile profile) {
-  if (profile.age == null || profile.weightKg == null || profile.heightCm == null || profile.gender == null) {
+  if (profile.age == null ||
+      profile.weightKg == null ||
+      profile.heightCm == null ||
+      profile.gender == null) {
     return 0;
   }
 
@@ -34,7 +37,8 @@ double calculateTDEE(Profile profile) {
     'extra_active': 1.9,
   };
 
-  final multiplier = activityMultipliers[profile.activityLevel ?? 'sedentary'] ?? 1.2;
+  final multiplier =
+      activityMultipliers[profile.activityLevel ?? 'sedentary'] ?? 1.2;
   return bmr * multiplier;
 }
 
@@ -119,7 +123,8 @@ NutritionGoals calculateNutritionalGoals(Profile profile) {
   double fatGrams;
   double carbGrams;
 
-  if (profile.goal == 'build_muscle') { // Corrected from 'muscle_gain'
+  if (profile.goal == 'build_muscle') {
+    // Corrected from 'muscle_gain'
     proteinGrams = (profile.weightKg ?? 70) * 1.8;
     double remainingCalories = targetCalories - (proteinGrams * 4);
     fatGrams = (remainingCalories * 0.35) / 9;

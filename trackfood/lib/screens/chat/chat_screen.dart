@@ -146,31 +146,54 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       color: AppColors.systemRed.withValues(alpha: 0.3),
                     ),
                   ),
-                  child: Row(
+                  child: Column( // Use a column for more complex layout
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        CupertinoIcons.exclamationmark_circle,
-                        color: AppColors.systemRed,
+                      Row(
+                        children: [
+                          Icon(
+                            CupertinoIcons.exclamationmark_circle,
+                            color: AppColors.systemRed,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Fehler', // Generic title
+                              style: AppTypography.headline.copyWith(
+                                color: AppColors.systemRed,
+                              ),
+                            ),
+                          ),
+                          CupertinoButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: chat.clearError,
+                            child: Text(
+                              'Schließen',
+                              style: AppTypography.body.copyWith(
+                                color: AppColors.systemRed,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
+                      Padding(
+                        padding: const EdgeInsets.only(left: 34, top: 4), // Align with title
                         child: Text(
-                          'Fehler: ${chat.error}',
+                          chat.error!, // Display the user-friendly error message
                           style: AppTypography.body.copyWith(
                             color: AppColors.systemRed,
                           ),
                         ),
                       ),
-                      CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: chat.clearError,
-                        child: Text(
-                          'Schließen',
-                          style: AppTypography.body.copyWith(
-                            color: AppColors.systemRed,
+                      // Add retry button if the last message failed
+                      if (chat.messages.isNotEmpty && chat.messages.last.isError)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 34, top: 8),
+                          child: CupertinoButton.filled(
+                            onPressed: chat.retryLastMessage,
+                            child: const Text('Erneut versuchen'),
                           ),
                         ),
-                      ),
                     ],
                   ),
                 ),

@@ -33,7 +33,7 @@ class DashboardHeader extends StatelessWidget {
       'Donnerstag',
       'Freitag',
       'Samstag',
-      'Sonntag'
+      'Sonntag',
     ];
     final months = [
       'Januar',
@@ -47,7 +47,7 @@ class DashboardHeader extends StatelessWidget {
       'September',
       'Oktober',
       'November',
-      'Dezember'
+      'Dezember',
     ];
 
     final weekday = weekdays[date.weekday - 1];
@@ -100,10 +100,7 @@ class DashboardHeader extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
               color: const Color(0xFFF6F1E7), // Apple White
-              border: Border.all(
-                color: AppColors.separator,
-                width: 1,
-              ),
+              border: Border.all(color: AppColors.separator, width: 1),
               boxShadow: [
                 BoxShadow(
                   color: CupertinoColors.systemGrey.withOpacity(0.1),
@@ -134,7 +131,9 @@ class DashboardHeader extends StatelessWidget {
                   child: LinearProgressIndicator(
                     value: _getProgressBarValue(),
                     backgroundColor: AppColors.separator,
-                    valueColor: AlwaysStoppedAnimation<Color>(_getProgressBarColor()),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      _getProgressBarColor(),
+                    ),
                     minHeight: 10,
                   ),
                 ),

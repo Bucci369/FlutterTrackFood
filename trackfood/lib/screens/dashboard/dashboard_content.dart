@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trackfood/providers/diary_provider.dart';
 import 'package:trackfood/providers/profile_provider.dart' as profile_provider;
 import 'package:trackfood/providers/water_provider.dart';
-import 'package:trackfood/providers/dashboard_providers.dart'; // Import dashboard providers
+import 'package:trackfood/providers/dashboard_providers.dart';
 import 'package:trackfood/utils/nutrition_utils.dart';
 import 'package:trackfood/widgets/steps_card.dart';
 import '../../theme/app_colors.dart';
@@ -46,16 +46,24 @@ class DashboardContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profileState = ref.watch(profile_provider.profileProvider);
-    final waterIntakeAsync = ref.watch(waterIntakeProvider);
     final diaryState = ref.watch(diaryProvider);
+
+    if (profileState.isLoading || profileState.profile == null) {
+      return const Center(child: CupertinoActivityIndicator());
+    }
+    if (profileState.error != null) {
+      return Center(child: Text('Fehler: ${profileState.error}'));
+    }
+
+    final profile = profileState.profile!;
+    // Watch other providers only when profile is available
+    final today = DateTime.now();
+    final todayDateOnly = DateTime(today.year, today.month, today.day);
+    final waterIntakeAsync = ref.watch(waterIntakeProvider(todayDateOnly));
     final burnedCaloriesAsync = ref.watch(dailyBurnedCaloriesProvider);
-
-    final profile = profileState.profile;
     
-    // Calculate nutritional goals if profile is available
-    final nutritionGoals = profile != null ? calculateNutritionalGoals(profile) : null;
-    final calorieGoal = nutritionGoals?.calories ?? 2000.0;
-
+    final nutritionGoals = calculateNutritionalGoals(profile);
+    final calorieGoal = nutritionGoals.calories;
     final dailyCalories = diaryState.totalCalories;
     final macros = {
       'protein': diaryState.totalProtein,
@@ -65,10 +73,6 @@ class DashboardContent extends ConsumerWidget {
       'sugar': diaryState.totalSugar,
       'sodium': diaryState.totalSodium,
     };
-
-    if (profileState.isLoading && profile == null) {
-      return const Center(child: CupertinoActivityIndicator());
-    }
 
     return Container(
       color: const Color(0xFFF6F1E7),
@@ -82,54 +86,47 @@ class DashboardContent extends ConsumerWidget {
                 CupertinoSliverRefreshControl(
                   onRefresh: handleRefresh ?? () async {},
                 ),
-                // Handle loading and error states for header and progress rings section
-                if (waterIntakeAsync.isLoading ||
-                    burnedCaloriesAsync.isLoading) // Check loading for both
-                  SliverToBoxAdapter(
-                    child: Container(
-                      height: 250,
-                      child: Center(child: CupertinoActivityIndicator()),
-                    ),
-                  )
-                else if (waterIntakeAsync.hasError ||
-                    burnedCaloriesAsync.hasError) // Check errors for both
-                  SliverToBoxAdapter(
-                    child: Center(child: Text('Fehler beim Laden der Daten')),
-                  )
-                else // Both have data
-                  SliverList(
-                    delegate: SliverChildListDelegate([
-                      DashboardHeader(
-                        greeting: getGreeting(),
-                        userName: profile?.firstName ?? 'User',
-                        date: selectedDate ?? DateTime.now(),
-                        goalTitle: nutritionGoals?.goalTitle,
-                        goalDescription: nutritionGoals?.goalDescription,
-                        caloriesCurrent: dailyCalories,
-                        caloriesGoal: calorieGoal,
-                        burnedCalories: burnedCaloriesAsync.value!,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: ProgressRings(
-                          calorieProgress: calorieGoal > 0
-                              ? (dailyCalories / calorieGoal)
-                              : 0.0,
-                          caloriesCurrent: dailyCalories,
-                          caloriesGoal: calorieGoal,
-                          waterProgress: waterIntakeAsync.value!.dailyGoalMl > 0
-                              ? (waterIntakeAsync.value!.amountMl /
-                                    waterIntakeAsync.value!.dailyGoalMl)
-                              : 0.0,
-                          waterCurrent: waterIntakeAsync.value!.amountMl
-                              .toDouble(),
-                          waterGoal: waterIntakeAsync.value!.dailyGoalMl
-                              .toDouble(),
-                          burnedCalories: burnedCaloriesAsync.value!,
-                        ),
-                      ),
-                    ]),
+                // Combined loading/error state for dependent providers
+                waterIntakeAsync.when(
+                  loading: () => SliverToBoxAdapter(child: Container(height: 250, child: Center(child: CupertinoActivityIndicator()))),
+                  error: (err, stack) => SliverToBoxAdapter(child: Center(child: Text('Fehler: $err'))),
+                  data: (waterIntake) => burnedCaloriesAsync.when(
+                    loading: () => SliverToBoxAdapter(child: Container(height: 250, child: Center(child: CupertinoActivityIndicator()))),
+                    error: (err, stack) => SliverToBoxAdapter(child: Center(child: Text('Fehler: $err'))),
+                    data: (burnedCalories) {
+                      return SliverList(
+                        delegate: SliverChildListDelegate([
+                          DashboardHeader(
+                            greeting: getGreeting(),
+                            userName: profile.firstName ?? 'User',
+                            date: selectedDate ?? DateTime.now(),
+                            goalTitle: nutritionGoals.goalTitle,
+                            goalDescription: nutritionGoals.goalDescription,
+                            caloriesCurrent: dailyCalories,
+                            caloriesGoal: calorieGoal,
+                            burnedCalories: burnedCalories,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: ProgressRings(
+                              calorieProgress: calorieGoal > 0
+                                  ? (dailyCalories / calorieGoal)
+                                  : 0.0,
+                              caloriesCurrent: dailyCalories,
+                              caloriesGoal: calorieGoal,
+                              waterProgress: waterIntake.dailyGoalMl > 0
+                                  ? (waterIntake.amountMl / waterIntake.dailyGoalMl)
+                                  : 0.0,
+                              waterCurrent: waterIntake.amountMl.toDouble(),
+                              waterGoal: waterIntake.dailyGoalMl.toDouble(),
+                              burnedCalories: burnedCalories,
+                            ),
+                          ),
+                        ]),
+                      );
+                    },
                   ),
+                ),
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),

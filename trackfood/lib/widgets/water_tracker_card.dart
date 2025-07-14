@@ -1,18 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart'; // Import Material library for Card
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:trackfood/models/water_intake.dart';
 import 'package:trackfood/providers/water_provider.dart';
 import 'package:trackfood/theme/app_colors.dart';
 import 'package:trackfood/theme/app_typography.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class WaterTrackerCard extends ConsumerWidget {
-  const WaterTrackerCard({super.key});
+  final AsyncValue<WaterIntake> waterIntakeAsync;
+
+  const WaterTrackerCard({super.key, required this.waterIntakeAsync});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final waterIntakeAsync = ref.watch(waterIntakeProvider);
-
     return Card(
       elevation: 0, // Flatter design to match dashboard
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -70,9 +71,9 @@ class WaterTrackerCard extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildAddButton(ref, '+150 ml', 150),
-                    _buildAddButton(ref, '+250 ml', 250),
-                    _buildAddButton(ref, '+500 ml', 500),
+                    _buildAddButton(ref, '+150 ml', 150, intake.date),
+                    _buildAddButton(ref, '+250 ml', 250, intake.date),
+                    _buildAddButton(ref, '+500 ml', 500, intake.date),
                   ],
                 ),
               ],
@@ -85,12 +86,17 @@ class WaterTrackerCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildAddButton(WidgetRef ref, String text, int amount) {
+  Widget _buildAddButton(
+    WidgetRef ref,
+    String text,
+    int amount,
+    DateTime date,
+  ) {
     return CupertinoButton(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       color: AppColors.tertiarySystemFill,
       onPressed: () {
-        ref.read(waterIntakeProvider.notifier).addWater(amount);
+        ref.read(waterIntakeProvider(date).notifier).addWater(amount);
       },
       child: Text(
         text,
