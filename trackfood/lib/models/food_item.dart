@@ -43,6 +43,7 @@ class Nutriments {
   final double? fiber100g;
   final double? sugars100g;
   final double? salt100g;
+  final double? sodium100g;
 
   Nutriments({
     this.energyKcal100g,
@@ -52,6 +53,7 @@ class Nutriments {
     this.fiber100g,
     this.sugars100g,
     this.salt100g,
+    this.sodium100g,
   });
 
   factory Nutriments.fromJson(
@@ -72,6 +74,7 @@ class Nutriments {
       fiber100g: _parseDouble(json['fiber_100g'] ?? json['fiber_per_100g']),
       sugars100g: _parseDouble(json['sugars_100g'] ?? json['sugar_per_100g']),
       salt100g: _parseDouble(json['salt_100g'] ?? json['salt_per_100g']),
+      sodium100g: _parseDouble(json['sodium_100g'] ?? json['sodium_per_100g']),
     );
   }
 }
