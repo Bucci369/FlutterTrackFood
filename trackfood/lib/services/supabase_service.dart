@@ -289,10 +289,14 @@ class SupabaseService {
     if (query.trim().length < 3) return [];
     try {
       // Split the query into words and create a search pattern for each word
-      final searchTerms = query.split(' ').where((s) => s.isNotEmpty).map((s) => '%$s%').toList();
-      
+      final searchTerms = query
+          .split(' ')
+          .where((s) => s.isNotEmpty)
+          .map((s) => '%$s%')
+          .toList();
+
       var request = client.from('products').select();
-      
+
       // Chain `ilike` filters for each search term
       for (final term in searchTerms) {
         request = request.ilike('name', term);
@@ -414,28 +418,16 @@ class SupabaseService {
     }
   }
 
-  Future<List<String>> getRecipeCategories() async {
+  Future<List<Map<String, dynamic>>> getRecipeCategories() async {
     try {
-      // Fetch all categories from the recipes table, similar to the web app
+      // Fetch all categories from the recipes table, exactly like the web app
       final response = await client.from('recipes').select('category');
 
-      // Process the data on the client side
-      final allCategories = (response as List)
-          .map((row) => row['category'] as String?)
-          .where((cat) => cat != null && cat.isNotEmpty)
+      // The web app does the counting on the client, so we provide the raw data.
+      // The provider will handle counting and sorting.
+      return (response as List)
+          .map((row) => {'category': row['category'], 'count': 1})
           .toList();
-
-      // Get unique categories and sort them
-      final uniqueCategories = Set<String>.from(allCategories).toList();
-      uniqueCategories.sort();
-
-      // Move "Schnell & einfach" to the top if it exists
-      if (uniqueCategories.contains('Schnell & einfach')) {
-        uniqueCategories.remove('Schnell & einfach');
-        uniqueCategories.insert(0, 'Schnell & einfach');
-      }
-
-      return uniqueCategories;
     } catch (e) {
       print('Error fetching recipe categories: $e');
       return [];

@@ -47,12 +47,12 @@ final foodSearchProvider = FutureProvider<List<FoodItem>>((ref) async {
 
   // 4. Combine and rank results: Supabase results first, then OpenFoodFacts
   final combined = <String, FoodItem>{};
-  
+
   // Add Supabase results first to prioritize them
   for (var item in supabaseResults) {
     combined[item.code] = item;
   }
-  
+
   // Add OpenFoodFacts results, but don't overwrite existing ones from Supabase
   for (var item in offResults) {
     combined.putIfAbsent(item.code, () => item);

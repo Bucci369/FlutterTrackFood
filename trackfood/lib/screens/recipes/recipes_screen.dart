@@ -36,17 +36,20 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(recipesProvider);
+    final notifier = ref.read(recipesProvider.notifier);
 
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(middle: Text('Rezepte')),
       child: SafeArea(
         child: Column(
           children: [
-            _buildSearchBar(),
-            _buildCategoryFilter(),
+            _buildSearchBar(notifier),
+            _buildKeywordFilter(state, notifier), // The one and only filter bar
             Expanded(
               child: state.isLoading && state.recipes.isEmpty
                   ? const Center(child: CupertinoActivityIndicator())
+                  : state.recipes.isEmpty
+                  ? const Center(child: Text('Keine Rezepte gefunden.'))
                   : GridView.builder(
                       controller: _scrollController,
                       padding: const EdgeInsets.all(16),
@@ -55,10 +58,9 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
                             crossAxisCount: 2,
                             crossAxisSpacing: 16,
                             mainAxisSpacing: 16,
-                            childAspectRatio: 0.75,
                           ),
                       itemCount:
-                          state.recipes.length + (state.canLoadMore ? 1 : 0),
+                          state.recipes.length + (state.isLoading ? 1 : 0),
                       itemBuilder: (context, index) {
                         if (index == state.recipes.length) {
                           return const Center(
@@ -76,46 +78,36 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(RecipesNotifier notifier) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: CupertinoSearchTextField(
-        onChanged: (query) {
-          ref.read(recipesProvider.notifier).setSearchQuery(query);
-        },
+        onChanged: notifier.setSearchQuery,
         placeholder: 'Suche nach Rezepten...',
       ),
     );
   }
 
-  Widget _buildCategoryFilter() {
-    final state = ref.watch(recipesProvider);
+  Widget _buildKeywordFilter(RecipesState state, RecipesNotifier notifier) {
     return SizedBox(
       height: 50,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 8),
-        itemCount: state.categories.length + 1,
+        itemCount: kKeywordFilters.length,
         itemBuilder: (context, index) {
-          final isAllCategory = index == 0;
-          final category = isAllCategory ? 'Alle' : state.categories[index - 1];
-          final isSelected = isAllCategory
-              ? state.selectedCategory == null
-              : state.selectedCategory == category;
-
+          final filter = kKeywordFilters[index];
+          final isSelected = state.selectedKeyword == filter['key'];
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
             child: CupertinoButton(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               color: isSelected
                   ? AppColors.primary
                   : AppColors.tertiarySystemFill,
-              onPressed: () {
-                ref
-                    .read(recipesProvider.notifier)
-                    .setCategory(isAllCategory ? null : category);
-              },
+              onPressed: () => notifier.setKeyword(filter['key']),
               child: Text(
-                category,
+                filter['title']!,
                 style: TextStyle(
                   color: isSelected ? CupertinoColors.white : AppColors.label,
                 ),
@@ -135,40 +127,66 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
           await launchUrl(Uri.parse(recipe.link!));
         }
       },
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Stack(
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.secondaryBackground,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.separator, width: 1),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Positioned.fill(
+            // Image without a fixed aspect ratio
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
               child: recipe.imageUrl != null
-                  ? Image.network(recipe.imageUrl!, fit: BoxFit.cover)
-                  : Container(color: AppColors.tertiarySystemFill),
+                  ? Image.network(
+                      recipe.imageUrl!,
+                      fit: BoxFit
+                          .cover, // Cover the width, height will be dynamic
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return const Center(
+                          child: CupertinoActivityIndicator(),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          height: 150, // Fallback height
+                          color: AppColors.tertiarySystemFill,
+                          child: const Icon(
+                            CupertinoIcons.photo,
+                            size: 40,
+                            color: AppColors.secondaryLabel,
+                          ),
+                        );
+                      },
+                    )
+                  : Container(
+                      height: 150, // Fallback height
+                      color: AppColors.tertiarySystemFill,
+                      child: const Icon(
+                        CupertinoIcons.photo,
+                        size: 40,
+                        color: AppColors.secondaryLabel,
+                      ),
+                    ),
             ),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                    colors: [
-                      CupertinoColors.black.withOpacity(0.8),
-                      CupertinoColors.black.withOpacity(0.0),
-                    ],
-                  ),
+            // Text content below the image
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                recipe.title,
+                style: AppTypography.body.copyWith(
+                  color: AppColors.label,
+                  fontWeight: FontWeight.w500,
                 ),
-                child: Text(
-                  recipe.title,
-                  style: AppTypography.body.copyWith(
-                    color: CupertinoColors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],

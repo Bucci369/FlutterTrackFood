@@ -54,11 +54,20 @@ class Nutriments {
     this.salt100g,
   });
 
-  factory Nutriments.fromJson(Map<String, dynamic> json, double? Function(dynamic) _parseDouble) {
+  factory Nutriments.fromJson(
+    Map<String, dynamic> json,
+    double? Function(dynamic) _parseDouble,
+  ) {
     return Nutriments(
-      energyKcal100g: _parseDouble(json['energy-kcal_100g'] ?? json['calories_per_100g']),
-      proteins100g: _parseDouble(json['proteins_100g'] ?? json['protein_per_100g']),
-      carbohydrates100g: _parseDouble(json['carbohydrates_100g'] ?? json['carbs_per_100g']),
+      energyKcal100g: _parseDouble(
+        json['energy-kcal_100g'] ?? json['calories_per_100g'],
+      ),
+      proteins100g: _parseDouble(
+        json['proteins_100g'] ?? json['protein_per_100g'],
+      ),
+      carbohydrates100g: _parseDouble(
+        json['carbohydrates_100g'] ?? json['carbs_per_100g'],
+      ),
       fat100g: _parseDouble(json['fat_100g'] ?? json['fat_per_100g']),
       fiber100g: _parseDouble(json['fiber_100g'] ?? json['fiber_per_100g']),
       sugars100g: _parseDouble(json['sugars_100g'] ?? json['sugar_per_100g']),
